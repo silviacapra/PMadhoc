@@ -1,0 +1,131 @@
+.dashboard-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.new-project-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--accent);
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  padding: 11px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.project-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.project-card {
+  background: var(--black);
+  border-radius: 14px;
+  padding: 20px 26px;
+  color: var(--white);
+}
+
+.project-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.project-card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.project-card-title h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.project-card-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.phase-pill {
+  background: rgba(255, 255, 255, 0.12);
+  padding: 5px 13px;
+  border-radius: 20px;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.project-card-stats {
+  display: flex;
+  gap: 32px;
+}
+
+.stat-value {
+  display: block;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.stat-label {
+  font-size: 11.5px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.project-progress-track {
+  margin-top: 14px;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.15);
+  overflow: hidden;
+}
+
+.project-progress-fill {
+  height: 100%;
+  background: var(--white);
+}
+
+.quick-links-card {
+  background: var(--white);
+  border-radius: 12px;
+  padding: 20px 22px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.quick-links-card h3 {
+  margin: 0 0 14px 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--blue-primary);
+}
+
+.quick-links-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.quick-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--gray-light);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.quick-link span {
+  font-size: 12.5px;
+  font-weight: 600;
+}

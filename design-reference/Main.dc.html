@@ -1,0 +1,1057 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    :root {
+      --blue-primary: #002D62;
+      --accent: #4CAF88;
+      --gray-dark: #333333;
+      --gray-light: #F4F4F4;
+      --white: #FFFFFF;
+      --black: #0A2733;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      color: var(--gray-dark);
+      background: var(--white);
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--blue-primary); }
+    button { font-family: inherit; cursor: pointer; }
+    input { font-family: inherit; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-thumb { background: #d8d8d8; border-radius: 8px; }
+    .nav-item { transition: background 0.15s ease; }
+    .nav-item:hover { background: rgba(255,255,255,0.08); }
+    .tpl-card { transition: box-shadow 0.15s ease, transform 0.15s ease; }
+    .tpl-card:hover { box-shadow: 0 6px 18px rgba(0,45,98,0.12); transform: translateY(-2px); }
+    .send-btn:hover { filter: brightness(1.08); }
+    .phase-dot:hover { filter: brightness(1.05); }
+    .auth-submit:hover { filter: brightness(1.08); }
+    .auth-toggle:hover { text-decoration: underline; }
+    .avatar-row:hover { background: rgba(255,255,255,0.06); }
+    .logout-btn:hover { background: rgba(255,255,255,0.1); }
+  </style>
+</helmet>
+
+<div style="width:1440px; height:900px; overflow:hidden; position:relative; background:var(--white);">
+
+  <!-- ===================== LOGIN / SIGNUP ===================== -->
+  <sc-if value="{{isLoggedOut}}" hint-placeholder-val="{{true}}">
+    <div style="display:flex; align-items:center; justify-content:center; width:1440px; height:900px; background:var(--black);">
+      <div style="width:420px; background:var(--white); border-radius:16px; padding:40px 36px; box-shadow:0 20px 60px rgba(0,0,0,0.4);">
+
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:28px;">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="{{accent}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"></path><path d="M9 12l2 2 4-4"></path></svg>
+          <span style="font-size:19px; font-weight:700; color:var(--black); letter-spacing:-0.3px;">PM Ad Hoc</span>
+        </div>
+
+        <div style="display:flex; gap:4px; background:var(--gray-light); border-radius:10px; padding:4px; margin-bottom:24px;">
+          <div onClick="{{ showLogin }}" style="flex:1; text-align:center; padding:9px 0; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; background:{{loginTabBg}}; color:{{loginTabColor}};">Iniciar sesión</div>
+          <div onClick="{{ showSignup }}" style="flex:1; text-align:center; padding:9px 0; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; background:{{signupTabBg}}; color:{{signupTabColor}};">Registrarse</div>
+        </div>
+
+        <sc-if value="{{isSignup}}" hint-placeholder-val="{{false}}">
+          <div style="margin-bottom:14px;">
+            <label style="display:block; font-size:12px; font-weight:600; color:var(--gray-dark); margin-bottom:6px;">Nombre</label>
+            <input type="text" value="{{authName}}" onChange="{{ onAuthNameChange }}" placeholder="Tu nombre" style="width:100%; border:1px solid #E0E0E0; border-radius:8px; padding:10px 12px; font-size:13.5px; outline:none;" />
+          </div>
+          <div style="margin-bottom:14px;">
+            <label style="display:block; font-size:12px; font-weight:600; color:var(--gray-dark); margin-bottom:6px;">Rol</label>
+            <select value="{{authRole}}" onChange="{{ onAuthRoleChange }}" style="width:100%; border:1px solid #E0E0E0; border-radius:8px; padding:10px 12px; font-size:13.5px; outline:none; background:var(--white); font-family:inherit; color:var(--gray-dark);">
+              <option value="sponsor">Sponsor</option>
+              <option value="pm">Project manager</option>
+              <option value="team">Team</option>
+              <option value="expert">Experto</option>
+            </select>
+            <span style="display:block; margin-top:6px; font-size:11px; color:#8a8a8a;">Tu rol determina a qué secciones de la app tienes acceso.</span>
+          </div>
+        </sc-if>
+
+        <div style="margin-bottom:14px;">
+          <label style="display:block; font-size:12px; font-weight:600; color:var(--gray-dark); margin-bottom:6px;">Correo electrónico</label>
+          <input type="text" value="{{authEmail}}" onChange="{{ onAuthEmailChange }}" placeholder="tu@email.com" style="width:100%; border:1px solid #E0E0E0; border-radius:8px; padding:10px 12px; font-size:13.5px; outline:none;" />
+        </div>
+
+        <div style="margin-bottom:22px;">
+          <label style="display:block; font-size:12px; font-weight:600; color:var(--gray-dark); margin-bottom:6px;">Contraseña</label>
+          <input type="password" value="{{authPassword}}" onChange="{{ onAuthPasswordChange }}" placeholder="••••••••" style="width:100%; border:1px solid #E0E0E0; border-radius:8px; padding:10px 12px; font-size:13.5px; outline:none;" />
+        </div>
+
+        <div onClick="{{ doAuth }}" class="auth-submit" style="width:100%; background:{{accent}}; color:var(--white); border:none; border-radius:24px; padding:12px 0; text-align:center; font-size:14px; font-weight:700; cursor:pointer; margin-bottom:16px;">{{authSubmitLabel}}</div>
+
+        <p style="margin:0; font-size:11.5px; color:#8a8a8a; text-align:center; line-height:1.6;">Tus proyectos y tareas son privados: solo tú puedes verlos, siempre vinculados a tu cuenta.</p>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===================== APP AUTENTICADA ===================== -->
+  <sc-if value="{{isLoggedIn}}" hint-placeholder-val="{{false}}">
+    <div style="display:flex; width:1440px; height:900px; background:var(--gray-light); overflow:hidden;">
+
+      <!-- SIDEBAR -->
+      <div style="display:flex; flex-direction:column; width:240px; min-width:240px; height:900px; background:var(--black); padding:28px 0;">
+        <div style="display:flex; align-items:center; gap:10px; padding:0 24px 28px 24px; border-bottom:1px solid rgba(255,255,255,0.1); margin-bottom:20px;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="{{accent}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"></path><path d="M9 12l2 2 4-4"></path></svg>
+          <div style="display:flex; flex-direction:column;">
+            <span style="color:var(--white); font-size:17px; font-weight:700; letter-spacing:-0.3px;">PM Ad Hoc</span>
+            <span style="color:rgba(255,255,255,0.45); font-size:11px; letter-spacing:0.4px;">powered by PMI best practices</span>
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:2px; padding:0 12px;">
+          <sc-if value="{{canDashboard}}" hint-placeholder-val="{{true}}">
+            <div onClick="{{ nav.dashboard.pick }}" class="nav-item" style="display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:8px; cursor:pointer; background:{{nav.dashboard.bg}};">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{nav.dashboard.iconColor}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"></path><path d="M5 10v10h14V10"></path></svg>
+              <span style="flex:1; line-height:1.3; color:{{nav.dashboard.textColor}}; font-size:13.5px; font-weight:{{nav.dashboard.weight}};">Dashboard</span>
+            </div>
+          </sc-if>
+          <sc-if value="{{canRoadmap}}" hint-placeholder-val="{{true}}">
+            <div onClick="{{ nav.roadmap.pick }}" class="nav-item" style="display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:8px; cursor:pointer; background:{{nav.roadmap.bg}};">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{nav.roadmap.iconColor}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3L3 6v15l6-3 6 3 6-3V3l-6 3-6-3z"></path><path d="M9 3v15"></path><path d="M15 6v15"></path></svg>
+              <span style="flex:1; line-height:1.3; color:{{nav.roadmap.textColor}}; font-size:13.5px; font-weight:{{nav.roadmap.weight}};">Roadmap Proyecto</span>
+            </div>
+          </sc-if>
+          <sc-if value="{{canTemplates}}" hint-placeholder-val="{{true}}">
+            <div onClick="{{ nav.templates.pick }}" class="nav-item" style="display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:8px; cursor:pointer; background:{{nav.templates.bg}};">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{nav.templates.iconColor}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"></path></svg>
+              <span style="flex:1; line-height:1.3; color:{{nav.templates.textColor}}; font-size:13.5px; font-weight:{{nav.templates.weight}};">Plantillas</span>
+            </div>
+          </sc-if>
+          <sc-if value="{{canStatusReport}}" hint-placeholder-val="{{true}}">
+            <div onClick="{{ nav.statusreport.pick }}" class="nav-item" style="display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:8px; cursor:pointer; background:{{nav.statusreport.bg}};">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{nav.statusreport.iconColor}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17v-6M13 17V9M17 17v-3"></path><rect x="3" y="3" width="18" height="18" rx="2"></rect></svg>
+              <span style="flex:1; line-height:1.3; color:{{nav.statusreport.textColor}}; font-size:13.5px; font-weight:{{nav.statusreport.weight}};">Status Report</span>
+            </div>
+          </sc-if>
+        </div>
+
+        <div style="margin-top:auto; padding:16px 12px 0 12px; border-top:1px solid rgba(255,255,255,0.1);">
+          <div style="display:flex; flex-direction:column; gap:2px; padding-top:12px;">
+            <sc-if value="{{canKnowledge}}" hint-placeholder-val="{{true}}">
+              <div onClick="{{ nav.knowledge.pick }}" class="nav-item" style="display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:8px; cursor:pointer; background:{{nav.knowledge.bg}};">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{nav.knowledge.iconColor}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h11a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3V4z"></path><path d="M18 4v16"></path></svg>
+                <span style="flex:1; line-height:1.3; color:{{nav.knowledge.textColor}}; font-size:13.5px; font-weight:{{nav.knowledge.weight}};">Base de conocimiento</span>
+              </div>
+            </sc-if>
+            <sc-if value="{{canChatbot}}" hint-placeholder-val="{{true}}">
+              <div onClick="{{ nav.chatbot.pick }}" class="nav-item" style="display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:8px; cursor:pointer; background:{{nav.chatbot.bg}};">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{nav.chatbot.iconColor}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-4-.9L3 21l1.9-5.5a8.38 8.38 0 0 1-.9-4A8.5 8.5 0 0 1 12.5 3 8.38 8.38 0 0 1 21 11.5z"></path></svg>
+                <span style="flex:1; line-height:1.3; color:{{nav.chatbot.textColor}}; font-size:13.5px; font-weight:{{nav.chatbot.weight}};">Pregunta al PM virtual</span>
+              </div>
+            </sc-if>
+          </div>
+          <div onClick="{{ goProfile }}" class="avatar-row" style="display:flex; align-items:center; gap:10px; padding:12px; border-radius:8px; cursor:pointer; margin-top:10px; border-top:1px solid rgba(255,255,255,0.1); padding-top:16px;">
+            <div style="width:32px; height:32px; border-radius:16px; background:{{accent}}; display:flex; align-items:center; justify-content:center; color:var(--white); font-size:13px; font-weight:700; flex-shrink:0;">{{profileInitials}}</div>
+            <div style="display:flex; flex-direction:column; overflow:hidden;">
+              <span style="color:var(--white); font-size:13px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{profileName}}</span>
+              <span style="color:rgba(255,255,255,0.45); font-size:11px;">{{roleLabel}}</span>
+            </div>
+          </div>
+          <div onClick="{{ logout }}" class="logout-btn" style="display:flex; align-items:center; gap:8px; padding:9px 12px; border-radius:8px; cursor:pointer; margin-top:2px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>
+            <span style="color:rgba(255,255,255,0.55); font-size:12px; font-weight:600;">Cerrar sesión</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTENT AREA -->
+      <div style="flex:1; height:900px; overflow-y:auto; padding:36px 44px;">
+
+        <!-- DASHBOARD -->
+        <sc-if value="{{isDashboard}}" hint-placeholder-val="{{true}}">
+          <div>
+            <div style="display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:24px;">
+              <div>
+                <h1 style="margin:0 0 6px 0; font-size:26px; font-weight:700; color:var(--blue-primary); letter-spacing:-0.4px;">Overview de proyectos</h1>
+                <p style="margin:0; font-size:14px; color:#6b6b6b;">Buenos días, {{profileFirstName}}. Así está el estado general de tus proyectos.</p>
+              </div>
+              <button style="display:flex; align-items:center; gap:8px; background:{{accent}}; color:var(--white); border:none; border-radius:8px; padding:11px 18px; font-size:14px; font-weight:600; flex-shrink:0;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
+                Nuevo proyecto
+              </button>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:14px; margin-bottom:24px;">
+              <sc-for list="{{projects}}" as="proj" hint-placeholder-count="3">
+                <div style="background:var(--black); border-radius:14px; padding:20px 26px; color:var(--white);">
+                  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                      <span style="width:10px; height:10px; border-radius:5px; background:{{proj.statusDot}}; flex-shrink:0;"></span>
+                      <h2 style="margin:0; font-size:17px; font-weight:700;">{{proj.name}}</h2>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                      <span style="background:{{proj.statusBg}}; color:{{proj.statusColor}}; font-size:11px; font-weight:700; padding:4px 11px; border-radius:12px;">{{proj.statusLabel}}</span>
+                      <span style="background:rgba(255,255,255,0.12); padding:5px 13px; border-radius:20px; font-size:11.5px; font-weight:600;">Fase: {{proj.phase}}</span>
+                    </div>
+                  </div>
+                  <div style="display:flex; gap:32px;">
+                    <div>
+                      <span style="display:block; font-size:19px; font-weight:700;">{{proj.progress}}%</span>
+                      <span style="font-size:11.5px; color:rgba(255,255,255,0.65);">avance</span>
+                    </div>
+                    <div>
+                      <span style="display:block; font-size:19px; font-weight:700;">{{proj.daysLeft}}</span>
+                      <span style="font-size:11.5px; color:rgba(255,255,255,0.65);">días restantes</span>
+                    </div>
+                    <div>
+                      <span style="display:block; font-size:19px; font-weight:700;">{{proj.risks}}</span>
+                      <span style="font-size:11.5px; color:rgba(255,255,255,0.65);">riesgos abiertos</span>
+                    </div>
+                  </div>
+                  <div style="margin-top:14px; height:5px; border-radius:3px; background:rgba(255,255,255,0.15); overflow:hidden;">
+                    <div style="width:{{proj.progress}}%; height:100%; background:var(--white);"></div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="background:var(--white); border-radius:12px; padding:20px 22px; box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+              <h3 style="margin:0 0 14px 0; font-size:15px; font-weight:700; color:var(--blue-primary);">Accesos rápidos</h3>
+              <div style="display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:10px;">
+                <sc-if value="{{canRoadmap}}" hint-placeholder-val="{{true}}">
+                  <div onClick="{{ goRoadmap }}" style="display:flex; align-items:center; gap:10px; padding:10px 12px; background:var(--gray-light); border-radius:8px; cursor:pointer;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{accent}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3L3 6v15l6-3 6 3 6-3V3l-6 3-6-3z"></path><path d="M9 3v15"></path><path d="M15 6v15"></path></svg>
+                    <span style="font-size:12.5px; font-weight:600;">Roadmap</span>
+                  </div>
+                </sc-if>
+                <sc-if value="{{canStatusReport}}" hint-placeholder-val="{{true}}">
+                  <div onClick="{{ goStatusReport }}" style="display:flex; align-items:center; gap:10px; padding:10px 12px; background:var(--gray-light); border-radius:8px; cursor:pointer;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{accent}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17v-6M13 17V9M17 17v-3"></path><rect x="3" y="3" width="18" height="18" rx="2"></rect></svg>
+                    <span style="font-size:12.5px; font-weight:600;">Status Report</span>
+                  </div>
+                </sc-if>
+                <sc-if value="{{canKnowledge}}" hint-placeholder-val="{{true}}">
+                  <div onClick="{{ goKnowledge }}" style="display:flex; align-items:center; gap:10px; padding:10px 12px; background:var(--gray-light); border-radius:8px; cursor:pointer;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{accent}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h11a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3V4z"></path><path d="M18 4v16"></path></svg>
+                    <span style="font-size:12.5px; font-weight:600;">Base de conocimiento</span>
+                  </div>
+                </sc-if>
+                <sc-if value="{{canChatbot}}" hint-placeholder-val="{{true}}">
+                  <div onClick="{{ goChatbot }}" style="display:flex; align-items:center; gap:10px; padding:10px 12px; background:var(--gray-light); border-radius:8px; cursor:pointer;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{accent}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-4-.9L3 21l1.9-5.5a8.38 8.38 0 0 1-.9-4A8.5 8.5 0 0 1 12.5 3 8.38 8.38 0 0 1 21 11.5z"></path></svg>
+                    <span style="font-size:12.5px; font-weight:600;">PM virtual</span>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- STATUS REPORT -->
+        <sc-if value="{{isStatusReport}}" hint-placeholder-val="{{false}}">
+          <div>
+            <h1 style="margin:0 0 4px 0; font-size:26px; font-weight:700; color:var(--blue-primary); letter-spacing:-0.4px;">Status Report</h1>
+            <p style="margin:0 0 24px 0; font-size:14px; color:#6b6b6b;">Vista PMO del portafolio, y el informe de estado detallado del proyecto activo.</p>
+
+            <h3 style="margin:0 0 12px 0; font-size:14px; font-weight:700; color:var(--gray-dark);">Portafolio · vista general</h3>
+            <div style="background:var(--white); border-radius:12px; padding:6px; box-shadow:0 1px 3px rgba(0,0,0,0.06); margin-bottom:32px; overflow:hidden;">
+              <div style="display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr; padding:12px 16px; font-size:11px; font-weight:700; color:#8a8a8a; letter-spacing:0.4px;">
+                <span>PROYECTO</span><span>FASE</span><span>AVANCE</span><span>RIESGOS</span><span>ESTADO</span>
+              </div>
+              <sc-for list="{{projects}}" as="proj" hint-placeholder-count="3">
+                <div style="display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr; align-items:center; padding:13px 16px; border-top:1px solid #F0F0F0;">
+                  <span style="font-size:13px; font-weight:600; color:var(--gray-dark);">{{proj.name}}</span>
+                  <span style="font-size:12.5px; color:#6b6b6b;">{{proj.phase}}</span>
+                  <span style="font-size:12.5px; color:#6b6b6b;">{{proj.progress}}%</span>
+                  <span style="font-size:12.5px; color:#6b6b6b;">{{proj.risks}}</span>
+                  <span style="display:inline-flex; align-items:center; gap:6px; background:{{proj.statusBg}}; color:{{proj.statusColor}}; font-size:11px; font-weight:700; padding:3px 10px; border-radius:10px; width:fit-content;">{{proj.statusLabel}}</span>
+                </div>
+              </sc-for>
+            </div>
+
+            <h3 style="margin:0 0 12px 0; font-size:14px; font-weight:700; color:var(--gray-dark);">Informe de estado · {{report.projectName}}</h3>
+            <div style="background:var(--black); border-radius:12px 12px 0 0; padding:20px 26px; color:var(--white);">
+              <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+                <div>
+                  <h2 style="margin:0 0 4px 0; font-size:18px; font-weight:700;">{{report.projectName}}</h2>
+                  <span style="font-size:12px; color:rgba(255,255,255,0.6);">Periodo del informe: {{report.period}} · Preparado por {{report.preparedBy}}</span>
+                </div>
+                <span style="background:{{report.overallBg}}; color:{{report.overallColor}}; font-size:12px; font-weight:700; padding:6px 14px; border-radius:14px;">{{report.overallLabel}}</span>
+              </div>
+            </div>
+            <div style="background:var(--white); border-radius:0 0 12px 12px; padding:24px 26px; box-shadow:0 1px 3px rgba(0,0,0,0.06); margin-bottom:24px;">
+
+              <div style="display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:12px; margin-bottom:26px;">
+                <sc-for list="{{report.categories}}" as="cat" hint-placeholder-count="4">
+                  <div style="background:var(--gray-light); border-radius:10px; padding:14px;">
+                    <div style="display:flex; align-items:center; gap:7px; margin-bottom:6px;">
+                      <span style="width:9px; height:9px; border-radius:5px; background:{{cat.dot}}; flex-shrink:0;"></span>
+                      <span style="font-size:12.5px; font-weight:700; color:var(--gray-dark);">{{cat.label}}</span>
+                    </div>
+                    <span style="font-size:11.5px; color:#6b6b6b; line-height:1.5;">{{cat.note}}</span>
+                  </div>
+                </sc-for>
+              </div>
+
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:26px;">
+                <div>
+                  <h4 style="margin:0 0 10px 0; font-size:13px; font-weight:700; color:var(--blue-primary);">Logros de este periodo</h4>
+                  <div style="display:flex; flex-direction:column; gap:8px;">
+                    <sc-for list="{{report.achievements}}" as="a" hint-placeholder-count="3">
+                      <div style="display:flex; align-items:flex-start; gap:8px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1E7A45" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0; margin-top:2px;"><path d="M20 6L9 17l-5-5"></path></svg>
+                        <span style="font-size:12.5px; color:var(--gray-dark); line-height:1.5;">{{a}}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+                <div>
+                  <h4 style="margin:0 0 10px 0; font-size:13px; font-weight:700; color:var(--blue-primary);">Próximos pasos</h4>
+                  <div style="display:flex; flex-direction:column; gap:8px;">
+                    <sc-for list="{{report.nextSteps}}" as="n" hint-placeholder-count="3">
+                      <div style="display:flex; align-items:flex-start; gap:8px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="{{accent}}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0; margin-top:2px;"><path d="M9 18l6-6-6-6"></path></svg>
+                        <span style="font-size:12.5px; color:var(--gray-dark); line-height:1.5;">{{n}}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+              </div>
+
+              <h4 style="margin:0 0 10px 0; font-size:13px; font-weight:700; color:var(--blue-primary);">Riesgos y problemas</h4>
+              <div style="border-radius:10px; overflow:hidden; border:1px solid #EFEFEF; margin-bottom:26px;">
+                <div style="display:grid; grid-template-columns:2.2fr 0.8fr 1fr 0.8fr; padding:10px 14px; background:var(--gray-light); font-size:10.5px; font-weight:700; color:#8a8a8a; letter-spacing:0.3px;">
+                  <span>DESCRIPCIÓN</span><span>IMPACTO</span><span>PROPIETARIO</span><span>ESTADO</span>
+                </div>
+                <sc-for list="{{report.risks}}" as="r" hint-placeholder-count="3">
+                  <div style="display:grid; grid-template-columns:2.2fr 0.8fr 1fr 0.8fr; align-items:center; padding:11px 14px; border-top:1px solid #F0F0F0;">
+                    <span style="font-size:12px; color:var(--gray-dark);">{{r.desc}}</span>
+                    <span style="font-size:11px; font-weight:700; color:{{r.impactColor}};">{{r.impact}}</span>
+                    <span style="font-size:12px; color:#6b6b6b;">{{r.owner}}</span>
+                    <span style="font-size:11px; color:#6b6b6b;">{{r.status}}</span>
+                  </div>
+                </sc-for>
+              </div>
+
+              <h4 style="margin:0 0 10px 0; font-size:13px; font-weight:700; color:var(--blue-primary);">Presupuesto</h4>
+              <div style="display:flex; align-items:center; gap:16px;">
+                <div style="flex:1; height:8px; border-radius:4px; background:var(--gray-light); overflow:hidden;">
+                  <div style="width:{{report.budgetPct}}%; height:100%; background:{{accent}};"></div>
+                </div>
+                <span style="font-size:12.5px; color:#6b6b6b; white-space:nowrap;">{{report.budgetSpent}} de {{report.budgetTotal}} ({{report.budgetPct}}%)</span>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- BASE DE CONOCIMIENTO -->
+        <sc-if value="{{isKnowledge}}" hint-placeholder-val="{{false}}">
+          <div>
+            <h1 style="margin:0 0 4px 0; font-size:26px; font-weight:700; color:var(--blue-primary); letter-spacing:-0.4px;">Base de conocimiento</h1>
+            <p style="margin:0 0 24px 0; font-size:14px; color:#6b6b6b;">Conceptos, procesos y buenas prácticas de project management, explicados sin la densidad de un manual de certificación.</p>
+
+            <div style="display:flex; gap:10px; margin-bottom:22px;">
+              <sc-for list="{{kbCategories}}" as="cat" hint-placeholder-count="4">
+                <span style="background:{{cat.bg}}; color:{{cat.color}}; font-size:12px; font-weight:600; padding:7px 14px; border-radius:20px;">{{cat.label}}</span>
+              </sc-for>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:12px;">
+              <sc-for list="{{articles}}" as="art" hint-placeholder-count="6">
+                <div style="display:flex; align-items:center; justify-content:space-between; background:var(--white); border-radius:12px; padding:16px 20px; box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+                  <div style="display:flex; align-items:center; gap:14px;">
+                    <div style="width:38px; height:38px; border-radius:9px; background:var(--gray-light); display:flex; align-items:center; justify-content:center; color:var(--blue-primary);">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h11a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3V4z"></path><path d="M18 4v16"></path></svg>
+                    </div>
+                    <div>
+                      <span style="display:block; font-size:14px; font-weight:600; color:var(--gray-dark);">{{art.title}}</span>
+                      <span style="font-size:12px; color:#8a8a8a;">{{art.category}} · {{art.readTime}}</span>
+                    </div>
+                  </div>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B7B7B7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ROADMAP PROYECTO -->
+        <sc-if value="{{isRoadmap}}" hint-placeholder-val="{{false}}">
+          <div>
+            <h1 style="margin:0 0 4px 0; font-size:26px; font-weight:700; color:var(--blue-primary); letter-spacing:-0.4px;">Roadmap Proyecto</h1>
+            <p style="margin:0 0 28px 0; font-size:14px; color:#6b6b6b;">Las 5 fases del proyecto según las mejores prácticas del PMI. Haz clic en una fase para ver sus pasos.</p>
+
+            <div style="display:flex; align-items:center; margin-bottom:30px;">
+              <sc-for list="{{phases}}" as="ph" hint-placeholder-count="6">
+                <div style="display:flex; align-items:center; flex:1;">
+                  <div onClick="{{ ph.pick }}" class="phase-dot" style="display:flex; flex-direction:column; align-items:center; gap:8px; min-width:96px; cursor:pointer;">
+                    <div style="width:36px; height:36px; border-radius:18px; background:{{ph.dotBg}}; color:{{ph.dotColor}}; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; border:2px solid {{ph.dotBorder}};">{{ph.index}}</div>
+                    <span style="font-size:12px; font-weight:600; color:{{ph.labelColor}}; text-align:center;">{{ph.name}}</span>
+                  </div>
+                  <sc-if value="{{ph.showLine}}" hint-placeholder-val="{{true}}">
+                    <div style="flex:1; height:2px; background:{{ph.lineColor}}; margin:0 6px 22px 6px;"></div>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="background:var(--white); border-radius:12px; padding:22px 24px; box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+              <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+                <span style="background:{{selectedPhaseBadgeBg}}; color:{{selectedPhaseBadgeColor}}; font-size:11px; font-weight:700; padding:4px 12px; border-radius:12px;">{{selectedPhaseBadgeLabel}}</span>
+                <h3 style="margin:0; font-size:16px; font-weight:700; color:var(--gray-dark);">{{selectedPhaseName}}</h3>
+              </div>
+              <div style="display:flex; flex-direction:column;">
+                <sc-for list="{{roadmapSteps}}" as="step" hint-placeholder-count="4">
+                  <div style="border-bottom:1px solid #EFEFEF; padding:12px 0;">
+                    <div onClick="{{ step.toggle }}" style="display:flex; align-items:flex-start; gap:12px; cursor:pointer;">
+                      <div style="width:20px; height:20px; border-radius:10px; border:2px solid {{step.dotBorder}}; background:{{step.dotFill}}; flex-shrink:0; margin-top:1px; display:flex; align-items:center; justify-content:center;">
+                        <sc-if value="{{step.isDone}}" hint-placeholder-val="{{false}}">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg>
+                        </sc-if>
+                      </div>
+                      <div style="flex:1;">
+                        <span style="display:block; font-size:14px; font-weight:600; color:{{step.titleColor}}; text-decoration:{{step.titleDecoration}};">{{step.title}}</span>
+                        <span style="font-size:12px; color:#8a8a8a;">{{step.detail}}</span>
+                        <sc-if value="{{step.hasMeta}}" hint-placeholder-val="{{false}}">
+                          <span style="display:block; margin-top:5px; font-size:11.5px; color:{{accent}}; font-weight:600;">{{step.metaSummary}}</span>
+                        </sc-if>
+                      </div>
+                      <sc-if value="{{step.hasStatus}}" hint-placeholder-val="{{false}}">
+                        <span style="flex-shrink:0; background:{{step.statusBg}}; color:{{step.statusColor}}; font-size:10.5px; font-weight:700; padding:3px 9px; border-radius:10px; margin-top:1px;">{{step.statusLabel}}</span>
+                      </sc-if>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B7B7B7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0; margin-top:2px; transform:{{step.chevronRotation}}; transition:transform 0.15s ease;"><path d="M6 9l6 6 6-6"></path></svg>
+                    </div>
+
+                    <sc-if value="{{step.expanded}}" hint-placeholder-val="{{false}}">
+                      <div style="margin:12px 0 2px 32px; padding:16px; background:var(--gray-light); border-radius:10px; display:flex; flex-direction:column; gap:14px;">
+                        <div>
+                          <label style="display:block; font-size:11.5px; font-weight:600; color:#6b6b6b; margin-bottom:7px;">Estado</label>
+                          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                            <sc-for list="{{step.statusOptions}}" as="opt" hint-placeholder-count="4">
+                              <span onClick="{{ opt.pick }}" style="cursor:pointer; display:flex; align-items:center; gap:6px; background:{{opt.bg}}; color:{{opt.color}}; border:1.5px solid {{opt.border}}; font-size:11.5px; font-weight:600; padding:6px 11px; border-radius:14px;">
+                                <span style="width:8px; height:8px; border-radius:4px; background:{{opt.dot}};"></span>{{opt.label}}
+                              </span>
+                            </sc-for>
+                          </div>
+                        </div>
+                        <div>
+                          <label style="display:block; font-size:11.5px; font-weight:600; color:#6b6b6b; margin-bottom:5px;">Responsable</label>
+                          <select value="{{step.assignee}}" onChange="{{ step.onAssigneeChange }}" style="width:100%; border:1px solid #E0E0E0; border-radius:8px; padding:8px 10px; font-size:13px; font-family:inherit; color:var(--gray-dark); outline:none; background:var(--white);">
+                            <option value="">Sin asignar</option>
+                            <sc-for list="{{teamMembers}}" as="tm" hint-placeholder-count="5">
+                              <option value="{{tm.name}}">{{tm.optionLabel}}</option>
+                            </sc-for>
+                          </select>
+                        </div>
+                        <div style="display:flex; gap:12px;">
+                          <div style="flex:1;">
+                            <label style="display:block; font-size:11.5px; font-weight:600; color:#6b6b6b; margin-bottom:5px;">Fecha inicio</label>
+                            <input type="date" value="{{step.startDate}}" onChange="{{ step.onStartDateChange }}" style="width:100%; border:1px solid #E0E0E0; border-radius:8px; padding:8px 10px; font-size:13px; font-family:inherit; color:var(--gray-dark); outline:none; background:var(--white);" />
+                          </div>
+                          <div style="flex:1;">
+                            <label style="display:block; font-size:11.5px; font-weight:600; color:#6b6b6b; margin-bottom:5px;">Fecha fin (deadline)</label>
+                            <input type="date" value="{{step.endDate}}" onChange="{{ step.onEndDateChange }}" style="width:100%; border:1px solid #E0E0E0; border-radius:8px; padding:8px 10px; font-size:13px; font-family:inherit; color:var(--gray-dark); outline:none; background:var(--white);" />
+                          </div>
+                        </div>
+                        <div>
+                          <label style="display:block; font-size:11.5px; font-weight:600; color:#6b6b6b; margin-bottom:5px;">Enlace al artefacto</label>
+                          <input type="text" value="{{step.link}}" onChange="{{ step.onLinkChange }}" placeholder="https://..." style="width:100%; border:1px solid #E0E0E0; border-radius:8px; padding:8px 10px; font-size:13px; font-family:inherit; color:var(--gray-dark); outline:none; background:var(--white);" />
+                          <sc-if value="{{step.hasLink}}" hint-placeholder-val="{{false}}">
+                            <a href="{{step.link}}" target="_blank" style="display:inline-flex; align-items:center; gap:4px; margin-top:6px; font-size:11.5px; font-weight:600;">Abrir documento
+                              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"></path><path d="M7 7h10v10"></path></svg>
+                            </a>
+                          </sc-if>
+                        </div>
+                      </div>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- PLANTILLAS -->
+        <sc-if value="{{isTemplates}}" hint-placeholder-val="{{false}}">
+          <div>
+            <h1 style="margin:0 0 4px 0; font-size:26px; font-weight:700; color:var(--blue-primary); letter-spacing:-0.4px;">Repositorio de plantillas</h1>
+            <p style="margin:0 0 20px 0; font-size:14px; color:#6b6b6b;">Documentos y artefactos del PMI, listos para usar sin partir de cero.</p>
+
+            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
+              <sc-for list="{{phaseFilters}}" as="pf" hint-placeholder-count="8">
+                <span onClick="{{ pf.pick }}" style="cursor:pointer; background:{{pf.bg}}; color:{{pf.color}}; font-size:12px; font-weight:600; padding:7px 14px; border-radius:20px;">{{pf.label}}</span>
+              </sc-for>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:24px;">
+              <span style="font-size:12px; font-weight:600; color:#8a8a8a;">Tarea específica</span>
+              <select value="{{templateFilterTask}}" onChange="{{ onTemplateTaskChange }}" style="border:1px solid #E0E0E0; border-radius:8px; padding:8px 12px; font-size:12.5px; font-family:inherit; color:var(--gray-dark); outline:none; min-width:260px;">
+                <option value="todas">Todas las tareas</option>
+                <sc-for list="{{taskOptions}}" as="t" hint-placeholder-count="4">
+                  <option value="{{t}}">{{t}}</option>
+                </sc-for>
+              </select>
+            </div>
+
+            <sc-if value="{{hasFilteredTemplates}}" hint-placeholder-val="{{true}}">
+              <div style="display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:16px;">
+                <sc-for list="{{filteredTemplates}}" as="tpl" hint-placeholder-count="10">
+                  <div class="tpl-card" style="background:var(--white); border-radius:12px; padding:18px; box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+                      <span style="background:{{tpl.badgeBg}}; color:{{tpl.badgeColor}}; font-size:11px; font-weight:700; padding:4px 10px; border-radius:10px;">{{tpl.category}}</span>
+                      <span style="font-size:11px; color:#a0a0a0;">{{tpl.format}}</span>
+                    </div>
+                    <h4 style="margin:0 0 6px 0; font-size:14px; font-weight:700; color:var(--gray-dark);">{{tpl.title}}</h4>
+                    <p style="margin:0 0 16px 0; font-size:12px; color:#8a8a8a; line-height:1.5;">{{tpl.desc}}</p>
+                    <button style="display:flex; align-items:center; justify-content:center; gap:6px; width:100%; background:{{accent}}; color:var(--white); border:none; border-radius:8px; padding:9px 0; font-size:13px; font-weight:600;">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"></path></svg>
+                      Descargar
+                    </button>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{hasNoFilteredTemplates}}" hint-placeholder-val="{{false}}">
+              <div style="background:var(--white); border-radius:12px; padding:32px; text-align:center; box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+                <span style="font-size:13.5px; color:#8a8a8a;">No hay plantillas para este filtro todavía.</span>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <!-- PREGUNTA AL PM VIRTUAL -->
+        <sc-if value="{{isChatbot}}" hint-placeholder-val="{{false}}">
+          <div style="display:flex; flex-direction:column; height:100%;">
+            <h1 style="margin:0 0 4px 0; font-size:26px; font-weight:700; color:var(--blue-primary); letter-spacing:-0.4px;">Pregunta al PM virtual</h1>
+            <p style="margin:0 0 20px 0; font-size:14px; color:#6b6b6b;">Preguntas puntuales del día a día, respondidas al momento.</p>
+
+            <div style="flex:1; background:var(--white); border-radius:14px; padding:22px; display:flex; flex-direction:column; box-shadow:0 1px 3px rgba(0,0,0,0.06); overflow:hidden;">
+              <div style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:14px; padding-right:4px;">
+                <sc-for list="{{messages}}" as="msg" hint-placeholder-count="2">
+                  <div style="display:flex; justify-content:{{msg.align}};">
+                    <div style="max-width:70%; background:{{msg.bg}}; color:{{msg.color}}; padding:12px 16px; border-radius:14px; font-size:13.5px; line-height:1.55;">{{msg.text}}</div>
+                  </div>
+                </sc-for>
+              </div>
+
+              <div style="display:flex; align-items:center; gap:10px; margin-top:16px; padding-top:16px; border-top:1px solid #EFEFEF;">
+                <input
+                  type="text"
+                  value="{{chatInput}}"
+                  onChange="{{ onChatInput }}"
+                  placeholder="Escribe tu pregunta, por ejemplo: ¿qué tool uso para un análisis de riesgo?"
+                  style="flex:1; border:1px solid #E0E0E0; border-radius:22px; padding:11px 18px; font-size:13.5px; font-family:inherit; outline:none;"
+                />
+                <button onClick="{{ sendMessage }}" class="send-btn" style="width:40px; height:40px; border-radius:20px; background:{{accent}}; border:none; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--white)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"></path><path d="M22 2l-7 20-4-9-9-4 20-7z"></path></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- PERFIL -->
+        <sc-if value="{{isProfile}}" hint-placeholder-val="{{false}}">
+          <div style="max-width:480px;">
+            <h1 style="margin:0 0 4px 0; font-size:26px; font-weight:700; color:var(--blue-primary); letter-spacing:-0.4px;">Configuración de perfil</h1>
+            <p style="margin:0 0 24px 0; font-size:14px; color:#6b6b6b;">Actualiza tu nombre y tu correo electrónico.</p>
+
+            <div style="background:var(--white); border-radius:12px; padding:24px; box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+              <div style="display:flex; align-items:center; gap:14px; margin-bottom:24px;">
+                <div style="width:52px; height:52px; border-radius:26px; background:{{accent}}; display:flex; align-items:center; justify-content:center; color:var(--white); font-size:18px; font-weight:700;">{{profileInitials}}</div>
+                <div>
+                  <span style="display:block; font-size:15px; font-weight:700; color:var(--gray-dark);">{{profileName}}</span>
+                  <span style="font-size:12px; color:#8a8a8a;">{{profileEmail}}</span>
+                </div>
+              </div>
+
+              <div style="margin-bottom:16px;">
+                <label style="display:block; font-size:12px; font-weight:600; color:var(--gray-dark); margin-bottom:6px;">Nombre</label>
+                <input type="text" value="{{profileNameDraft}}" onChange="{{ onProfileNameChange }}" style="width:100%; border:1px solid #E0E0E0; border-radius:8px; padding:10px 12px; font-size:13.5px; outline:none;" />
+              </div>
+
+              <div style="margin-bottom:20px;">
+                <label style="display:block; font-size:12px; font-weight:600; color:var(--gray-dark); margin-bottom:6px;">Correo electrónico</label>
+                <input type="text" value="{{profileEmailDraft}}" onChange="{{ onProfileEmailChange }}" style="width:100%; border:1px solid #E0E0E0; border-radius:8px; padding:10px 12px; font-size:13.5px; outline:none;" />
+              </div>
+
+              <div style="display:flex; align-items:center; gap:14px;">
+                <button onClick="{{ saveProfile }}" style="background:{{accent}}; color:var(--white); border:none; border-radius:8px; padding:10px 22px; font-size:13.5px; font-weight:600;">Guardar cambios</button>
+                <sc-if value="{{profileSaved}}" hint-placeholder-val="{{false}}">
+                  <span style="font-size:12.5px; color:#1E7A45; font-weight:600;">Cambios guardados</span>
+                </sc-if>
+              </div>
+            </div>
+
+            <p style="margin:20px 0 0 0; font-size:12px; color:#8a8a8a; line-height:1.6;">Tus proyectos y tareas están vinculados únicamente a esta cuenta y no son visibles para otros usuarios.</p>
+          </div>
+        </sc-if>
+
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{
+  "accent": {"editor": "color", "default": "#4CAF88", "options": ["#4CAF88", "#002D62", "#333333"], "section": "Marca"}
+}'>
+const DEFAULT_TASK_STATUS = {
+  preproyecto__0: { status: "done" }, preproyecto__1: { status: "done" }, preproyecto__2: { status: "done" }, preproyecto__3: { status: "done" },
+  iniciar__0: { status: "done" }, iniciar__1: { status: "done" }, iniciar__2: { status: "done" }, iniciar__3: { status: "done" },
+  planificar__0: { status: "done" }, planificar__1: { status: "done" }, planificar__2: { status: "done" }, planificar__3: { status: "done" }, planificar__4: { status: "done" },
+  ejecutar__0: { status: "done" }, ejecutar__1: { status: "green" }, ejecutar__2: { status: "yellow" }
+};
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      loggedIn: false,
+      authMode: "login",
+      authName: "",
+      authEmail: "",
+      authPassword: "",
+      authRole: "pm",
+      userRole: "pm",
+      view: "dashboard",
+      roadmapPhase: "ejecutar",
+      profileName: "Silvia Capra",
+      profileEmail: "silvia@pmadhoc.com",
+      profileNameDraft: "Silvia Capra",
+      profileEmailDraft: "silvia@pmadhoc.com",
+      profileSaved: false,
+      templateFilterPhase: "todas",
+      templateFilterTask: "todas",
+      expandedStepKey: null,
+      taskAssignments: {},
+      chatInput: "",
+      messages: [
+        { from: "user", text: "¿Qué tool puedo usar para el análisis de riesgo de mi proyecto?" },
+        { from: "bot", text: "Para un análisis cualitativo, usa una matriz de probabilidad e impacto y regístralo en el registro de riesgos del PMI. Si necesitas algo cuantitativo, una simulación Montecarlo sobre el cronograma te da un rango de fechas más realista. ¿Quieres que te abra la plantilla del registro de riesgos?" }
+      ]
+    };
+  }
+
+  setView(view) {
+    this.setState({ view });
+  }
+
+  updateTaskMeta(key, patch) {
+    const current = this.state.taskAssignments[key] || {};
+    this.setState({
+      taskAssignments: { ...this.state.taskAssignments, [key]: { ...current, ...patch } }
+    });
+  }
+
+  renderVals() {
+    const accent = this.props.accent ?? "#4CAF88";
+    const view = this.state.view;
+    const loggedIn = this.state.loggedIn;
+    const isSignup = this.state.authMode === "signup";
+
+    const trimmedName = (this.state.profileName || "").trim();
+    const firstName = trimmedName.split(" ")[0] || "";
+    const initials = trimmedName
+      .split(" ")
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((w) => w[0].toUpperCase())
+      .join("") || "U";
+
+    const navIds = ["dashboard", "knowledge", "roadmap", "templates", "chatbot", "statusreport"];
+    const nav = {};
+    navIds.forEach((id) => {
+      const active = id === view;
+      nav[id] = {
+        bg: active ? accent : "transparent",
+        textColor: active ? "#FFFFFF" : "rgba(255,255,255,0.75)",
+        iconColor: active ? "#FFFFFF" : "rgba(255,255,255,0.55)",
+        weight: active ? "700" : "500",
+        pick: () => this.setView(id)
+      };
+    });
+
+    // --- Roles y permisos: cada rol ve un subconjunto de secciones ---
+    const rolePermissions = {
+      sponsor: ["dashboard", "roadmap", "statusreport"],
+      pm: ["dashboard", "knowledge", "roadmap", "templates", "chatbot", "statusreport"],
+      team: ["dashboard", "roadmap", "templates", "chatbot", "statusreport"],
+      expert: ["knowledge", "templates", "chatbot"]
+    };
+    const roleLabels = { sponsor: "Sponsor", pm: "Project manager", team: "Team", expert: "Experto" };
+    const role = rolePermissions[this.state.userRole] ? this.state.userRole : "pm";
+    const perms = rolePermissions[role];
+    const canDashboard = perms.includes("dashboard");
+    const canKnowledge = perms.includes("knowledge");
+    const canRoadmap = perms.includes("roadmap");
+    const canTemplates = perms.includes("templates");
+    const canChatbot = perms.includes("chatbot");
+    const canStatusReport = perms.includes("statusreport");
+    const defaultViewForRole = (r) => rolePermissions[r][0];
+
+    // --- Roadmap Proyecto: fase 0 (pre-proyecto) + 5 fases del PDF, cada una con sus pasos ---
+    const roadmapContent = {
+      preproyecto: {
+        label: "Pre-proyecto",
+        steps: [
+          { title: "Identificación del problema u oportunidad", detail: "Entender el estado actual de la organización y definir qué se quiere resolver o aprovechar." },
+          { title: "Análisis de factibilidad", detail: "Evaluar si las soluciones propuestas son viables técnica, económica y operativamente." },
+          { title: "Desarrollo del caso de negocio (Business Case)", detail: "Documentar la justificación financiera y estratégica para el proyecto." },
+          { title: "Definición de requisitos de alto nivel", detail: "Establecer a grandes rasgos qué capacidades debe tener la solución." }
+        ]
+      },
+      iniciar: {
+        label: "Iniciar",
+        steps: [
+          { title: "Investigar la organización y su cultura", detail: "Entender la estructura de la empresa antes de arrancar el proyecto." },
+          { title: "Definir el goal del proyecto", detail: "Objetivos SMART a largo plazo, u OKR a corto plazo." },
+          { title: "Mapear stakeholders y equipo", detail: "Sponsor, clientes, usuario final, PM y roles del equipo." },
+          { title: "Redactar el estatuto del proyecto (Charter)", detail: "Formaliza alcance, entregables y KPI; requiere firma de aprobación." }
+        ]
+      },
+      planificar: {
+        label: "Planificar",
+        steps: [
+          { title: "Kickoff meeting", detail: "Alinear a todo el equipo y stakeholders con una agenda clara." },
+          { title: "Desglosar tareas y milestones (WBS)", detail: "Work Breakdown Structure para definir la jerarquía del trabajo." },
+          { title: "Preparar el presupuesto", detail: "Prever recursos, calcular una reserva del 5-10% y revisar tras cada milestone." },
+          { title: "Planificar la gestión de riesgos", detail: "Registro de riesgos, matriz probabilidad-impacto y plan de mitigación." },
+          { title: "Cerrar el plan de proyecto definitivo", detail: "Charter, Risk Management Plan, RACI y plan de comunicación." }
+        ]
+      },
+      ejecutar: {
+        label: "Ejecutar",
+        steps: [
+          { title: "Hacer seguimiento del avance", detail: "Gantt, roadmap o burndown chart según el tipo de proyecto." },
+          { title: "Gestionar cambios y riesgos", detail: "Categorizar con ROAM y actualizar el project status report." },
+          { title: "Controlar la calidad", detail: "Asegurar calidad (QA) antes del lanzamiento y controlarla (QC) después." },
+          { title: "Mantener el contacto con el cliente", detail: "Encuestas de satisfacción y beta testing antes del lanzamiento." }
+        ]
+      },
+      controlar: {
+        label: "Controlar",
+        steps: [
+          { title: "Impulsar la mejora continua", detail: "Retrospectivas tras cada milestone para no repetir errores." },
+          { title: "Tomar decisiones basadas en datos", detail: "Métricas de productividad y de calidad del proyecto." },
+          { title: "Analizar y visualizar los datos", detail: "Detectar sesgos y comunicar hallazgos con dashboards e infografías." }
+        ]
+      },
+      cerrar: {
+        label: "Cerrar",
+        steps: [
+          { title: "Revisar la checklist de cierre", detail: "Confirmar que todas las tareas están completadas y aprobadas por los SH." },
+          { title: "Documentar el cierre", detail: "Impact report, retrospectiva formal y project closeout report." },
+          { title: "Entregar y agradecer", detail: "Poner a disposición herramientas, formación y documentación al cliente." }
+        ]
+      }
+    };
+
+    const phaseOrder = ["preproyecto", "iniciar", "planificar", "ejecutar", "controlar", "cerrar"];
+    const currentProjectPhase = "ejecutar";
+    const currentIndex = phaseOrder.indexOf(currentProjectPhase);
+    const selected = phaseOrder.includes(this.state.roadmapPhase) ? this.state.roadmapPhase : currentProjectPhase;
+    const selectedIndex = phaseOrder.indexOf(selected);
+
+    const phases = phaseOrder.map((id, i) => {
+      const isSelected = id === selected;
+      const isPastOrCurrent = i <= currentIndex;
+      return {
+        id,
+        name: roadmapContent[id].label,
+        index: i,
+        pick: () => this.setState({ roadmapPhase: id }),
+        dotBg: isSelected ? accent : "#FFFFFF",
+        dotColor: isSelected ? "#FFFFFF" : (isPastOrCurrent ? accent : "#B7B7B7"),
+        dotBorder: isSelected ? accent : (isPastOrCurrent ? accent : "#DADADA"),
+        labelColor: isSelected ? "#002D62" : (isPastOrCurrent ? "#333333" : "#A0A0A0"),
+        showLine: i < phaseOrder.length - 1,
+        lineColor: i < currentIndex ? accent : "#E0E0E0"
+      };
+    });
+
+    const teamMembers = [
+      { id: "silvia", name: "Silvia Capra", roleLabel: "Project manager", optionLabel: "Silvia Capra · Project manager" },
+      { id: "marco", name: "Marco Rossi", roleLabel: "Team", optionLabel: "Marco Rossi · Team" },
+      { id: "laura", name: "Laura Fernández", roleLabel: "Team", optionLabel: "Laura Fernández · Team" },
+      { id: "carlos", name: "Carlos Méndez", roleLabel: "Sponsor", optionLabel: "Carlos Méndez · Sponsor" },
+      { id: "ana", name: "Ana Torres", roleLabel: "Experto", optionLabel: "Ana Torres · Experto" }
+    ];
+
+    const statusDefs = {
+      green: { label: "En curso", dot: "#1E7A45", bg: "#E9F7EF", color: "#1E7A45" },
+      yellow: { label: "Atención", dot: "#C08A00", bg: "#FFF4E0", color: "#9A6300" },
+      red: { label: "Crítico", dot: "#B3261E", bg: "#FDECEC", color: "#B3261E" },
+      done: { label: "Completado", dot: "#333333", bg: "#F4F4F4", color: "#333333" }
+    };
+
+    const roadmapSteps = roadmapContent[selected].steps.map((s, idx) => {
+      const key = selected + "__" + idx;
+      const defaults = DEFAULT_TASK_STATUS[key] || {};
+      const meta = { ...defaults, ...(this.state.taskAssignments[key] || {}) };
+      const status = meta.status || null;
+      const isDone = status === "done";
+      const expanded = this.state.expandedStepKey === key;
+      const metaParts = [];
+      if (meta.assignee) metaParts.push(meta.assignee);
+      if (meta.startDate || meta.endDate) metaParts.push((meta.startDate || "¿?") + " → " + (meta.endDate || "¿?"));
+      if (meta.link) metaParts.push("enlace ↗");
+
+      const statusOptions = Object.keys(statusDefs).map((id) => {
+        const d = statusDefs[id];
+        const active = status === id;
+        return {
+          id,
+          label: d.label,
+          dot: d.dot,
+          bg: active ? d.bg : "#FFFFFF",
+          color: active ? d.color : "#8a8a8a",
+          border: active ? d.dot : "#E0E0E0",
+          pick: () => this.updateTaskMeta(key, { status: id })
+        };
+      });
+
+      return {
+        key,
+        title: s.title,
+        detail: s.detail,
+        titleColor: isDone ? "#A0A0A0" : "var(--gray-dark)",
+        titleDecoration: isDone ? "line-through" : "none",
+        dotBorder: isDone ? "#333333" : (status ? statusDefs[status].dot : "#DADADA"),
+        dotFill: isDone ? "#333333" : (status ? statusDefs[status].dot : "#FFFFFF"),
+        isDone,
+        hasStatus: !!status && !isDone,
+        statusLabel: status ? statusDefs[status].label.toUpperCase() : "",
+        statusBg: status ? statusDefs[status].bg : "#F4F4F4",
+        statusColor: status ? statusDefs[status].color : "#8a8a8a",
+        statusOptions,
+        expanded,
+        chevronRotation: expanded ? "rotate(180deg)" : "rotate(0deg)",
+        hasMeta: metaParts.length > 0,
+        metaSummary: metaParts.join(" · "),
+        toggle: () => this.setState({ expandedStepKey: expanded ? null : key }),
+        assignee: meta.assignee || "",
+        startDate: meta.startDate || "",
+        endDate: meta.endDate || "",
+        link: meta.link || "",
+        hasLink: !!meta.link,
+        onAssigneeChange: (e) => this.updateTaskMeta(key, { assignee: e.target.value }),
+        onStartDateChange: (e) => this.updateTaskMeta(key, { startDate: e.target.value }),
+        onEndDateChange: (e) => this.updateTaskMeta(key, { endDate: e.target.value }),
+        onLinkChange: (e) => this.updateTaskMeta(key, { link: e.target.value })
+      };
+    });
+
+    // --- Plantillas: catálogo + filtro por fase y tarea específica ---
+    const allTemplates = [
+      { category: "Fundamentos", format: "DOCX", title: "Marco de project management", desc: "Las 5 fases del proyecto con sus elementos clave y documentos, en un único documento de referencia.", badgeBg: "#E8F6EF", badgeColor: "#4CAF88", phase: "fundamentos", task: null },
+      { category: "Fundamentos", format: "DOCX", title: "OKR de ejemplo: proyecto Muévete", desc: "Un caso de referencia para ver cómo se redactan objetivos y resultados clave medibles.", badgeBg: "#E8F6EF", badgeColor: "#4CAF88", phase: "iniciar", task: "Definir el goal del proyecto" },
+      { category: "Inicio", format: "DOCX", title: "Acta de constitución", desc: "Formaliza el arranque del proyecto y su alcance inicial.", badgeBg: "#E4F0FB", badgeColor: "#002D62", phase: "iniciar", task: "Redactar el estatuto del proyecto (Charter)" },
+      { category: "Inicio", format: "DOCX", title: "Estatuto del proyecto (plantilla en blanco)", desc: "Objetivo, entregables, caso de negocio, presupuesto, alcance y equipo, listos para rellenar.", badgeBg: "#E4F0FB", badgeColor: "#002D62", phase: "iniciar", task: "Redactar el estatuto del proyecto (Charter)" },
+      { category: "Planificación", format: "XLSX", title: "Registro de riesgos", desc: "Identifica, valora y da seguimiento a los riesgos del proyecto.", badgeBg: "#FFF4E0", badgeColor: "#9A6300", phase: "planificar", task: "Planificar la gestión de riesgos" },
+      { category: "Planificación", format: "XLSX", title: "Matriz RACI", desc: "Define responsables, aprobadores, consultados e informados.", badgeBg: "#FFF4E0", badgeColor: "#9A6300", phase: "planificar", task: "Cerrar el plan de proyecto definitivo" },
+      { category: "Planificación", format: "DOCX", title: "Agenda de kickoff meeting", desc: "Bloques, tiempos y contenidos para la reunión de arranque del proyecto (1 hora).", badgeBg: "#FFF4E0", badgeColor: "#9A6300", phase: "planificar", task: "Kickoff meeting" },
+      { category: "Ejecución", format: "DOCX", title: "Plan de comunicación", desc: "Qué se comunica, a quién, con qué frecuencia y por qué canal.", badgeBg: "#E9F7EF", badgeColor: "#1E7A45", phase: "planificar", task: "Cerrar el plan de proyecto definitivo" },
+      { category: "Controlar", format: "XLSX", title: "Informe de estado semanal", desc: "Plantilla de seguimiento de avance, riesgos y bloqueos.", badgeBg: "#F1E9FB", badgeColor: "#5B3A9E", phase: "ejecutar", task: "Gestionar cambios y riesgos" },
+      { category: "Cierre", format: "DOCX", title: "Acta de cierre y lecciones", desc: "Cierra formalmente el proyecto y documenta el aprendizaje.", badgeBg: "#FDECEC", badgeColor: "#B3261E", phase: "cerrar", task: "Documentar el cierre" }
+    ];
+
+    const phaseFilterDefs = [
+      { id: "todas", label: "Todas" },
+      { id: "fundamentos", label: "Fundamentos" },
+      { id: "preproyecto", label: "Pre-proyecto" },
+      { id: "iniciar", label: "Iniciar" },
+      { id: "planificar", label: "Planificar" },
+      { id: "ejecutar", label: "Ejecutar" },
+      { id: "controlar", label: "Controlar" },
+      { id: "cerrar", label: "Cerrar" }
+    ];
+    const templateFilterPhase = this.state.templateFilterPhase || "todas";
+    const templateFilterTask = this.state.templateFilterTask || "todas";
+    const phaseFilters = phaseFilterDefs.map((pf) => {
+      const active = pf.id === templateFilterPhase;
+      return {
+        ...pf,
+        bg: active ? accent : "#F4F4F4",
+        color: active ? "#FFFFFF" : "#6B6B6B",
+        pick: () => this.setState({ templateFilterPhase: pf.id, templateFilterTask: "todas" })
+      };
+    });
+    const taskOptions = roadmapContent[templateFilterPhase] ? roadmapContent[templateFilterPhase].steps.map((s) => s.title) : [];
+    const filteredTemplates = allTemplates.filter((t) => {
+      const matchesPhase = templateFilterPhase === "todas" || t.phase === templateFilterPhase;
+      const matchesTask = templateFilterTask === "todas" || t.task === templateFilterTask;
+      return matchesPhase && matchesTask;
+    });
+
+    return {
+      isLoggedOut: !loggedIn,
+      isLoggedIn: loggedIn,
+      isSignup,
+      authName: this.state.authName,
+      authEmail: this.state.authEmail,
+      authPassword: this.state.authPassword,
+      authSubmitLabel: isSignup ? "Crear cuenta" : "Iniciar sesión",
+      loginTabBg: isSignup ? "transparent" : "#FFFFFF",
+      loginTabColor: isSignup ? "#8a8a8a" : "#000000",
+      signupTabBg: isSignup ? "#FFFFFF" : "transparent",
+      signupTabColor: isSignup ? "#000000" : "#8a8a8a",
+      showLogin: () => this.setState({ authMode: "login" }),
+      showSignup: () => this.setState({ authMode: "signup" }),
+      onAuthNameChange: (e) => this.setState({ authName: e.target.value }),
+      onAuthEmailChange: (e) => this.setState({ authEmail: e.target.value }),
+      onAuthPasswordChange: (e) => this.setState({ authPassword: e.target.value }),
+      onAuthRoleChange: (e) => this.setState({ authRole: e.target.value }),
+      doAuth: () => {
+        const name = (this.state.authName || "").trim();
+        const newRole = isSignup ? (this.state.authRole || "pm") : this.state.userRole;
+        this.setState({
+          loggedIn: true,
+          userRole: newRole,
+          view: defaultViewForRole(newRole),
+          profileName: isSignup && name ? name : this.state.profileName,
+          profileNameDraft: isSignup && name ? name : this.state.profileNameDraft,
+          profileEmail: this.state.authEmail || this.state.profileEmail,
+          profileEmailDraft: this.state.authEmail || this.state.profileEmailDraft,
+          authPassword: ""
+        });
+      },
+      logout: () => {
+        this.setState({ loggedIn: false, view: "dashboard", authMode: "login", authPassword: "" });
+      },
+
+      isDashboard: loggedIn && view === "dashboard" && canDashboard,
+      isKnowledge: loggedIn && view === "knowledge" && canKnowledge,
+      isRoadmap: loggedIn && view === "roadmap" && canRoadmap,
+      isTemplates: loggedIn && view === "templates" && canTemplates,
+      isChatbot: loggedIn && view === "chatbot" && canChatbot,
+      isStatusReport: loggedIn && view === "statusreport" && canStatusReport,
+      isProfile: loggedIn && view === "profile",
+      accent,
+      nav,
+      canDashboard,
+      canKnowledge,
+      canRoadmap,
+      canTemplates,
+      canChatbot,
+      canStatusReport,
+      roleLabel: roleLabels[role],
+      profileName: this.state.profileName,
+      profileEmail: this.state.profileEmail,
+      profileFirstName: firstName,
+      profileInitials: initials,
+      goProfile: () => this.setState({ view: "profile" }),
+      goKnowledge: () => this.setView("knowledge"),
+      goRoadmap: () => this.setView("roadmap"),
+      goChatbot: () => this.setView("chatbot"),
+      goStatusReport: () => this.setView("statusreport"),
+
+      projects: [
+        { name: "Migración de plataforma CRM", phase: "Ejecutar", progress: 64, daysLeft: 18, risks: 3, statusLabel: "EN RIESGO", statusDot: "#C08A00", statusBg: "#FFF4E0", statusColor: "#9A6300" },
+        { name: "Rediseño del portal de clientes", phase: "Cerrar", progress: 92, daysLeft: 4, risks: 0, statusLabel: "EN MARCHA", statusDot: "#1E7A45", statusBg: "#E9F7EF", statusColor: "#1E7A45" },
+        { name: "Implementación CRM para ventas", phase: "Planificar", progress: 15, daysLeft: 45, risks: 5, statusLabel: "CRÍTICO", statusDot: "#B3261E", statusBg: "#FDECEC", statusColor: "#B3261E" }
+      ],
+
+      report: {
+        projectName: "Migración de plataforma CRM",
+        period: "1-8 sept 2026",
+        preparedBy: "Silvia Capra",
+        overallLabel: "EN RIESGO",
+        overallBg: "#FFF4E0",
+        overallColor: "#9A6300",
+        categories: [
+          { label: "Alcance", dot: "#1E7A45", note: "Sin cambios de scope este periodo." },
+          { label: "Cronograma", dot: "#C08A00", note: "18 días para el cierre; margen ajustado." },
+          { label: "Presupuesto", dot: "#1E7A45", note: "Dentro de lo previsto, 58% ejecutado." },
+          { label: "Equipo", dot: "#B3261E", note: "QA con disponibilidad limitada en sprint 6." }
+        ],
+        achievements: [
+          "Migración de los módulos de contactos y oportunidades completada.",
+          "Pruebas de integración con el ERP superadas sin incidencias.",
+          "Kickoff del plan de comunicación de cambio con el equipo comercial."
+        ],
+        nextSteps: [
+          "Cerrar la migración de datos históricos antes del 15 de septiembre.",
+          "Confirmar disponibilidad del equipo de QA para el sprint 6.",
+          "Programar la sesión de formación para usuarios finales."
+        ],
+        risks: [
+          { desc: "Retraso en la migración de datos históricos", impact: "ALTO", impactColor: "#B3261E", owner: "Marco Rossi", status: "Mitigando" },
+          { desc: "Dependencia de proveedor externo de API", impact: "MEDIO", impactColor: "#9A6300", owner: "Laura Fernández", status: "En seguimiento" },
+          { desc: "Disponibilidad del equipo de QA en sprint 6", impact: "MEDIO", impactColor: "#9A6300", owner: "Silvia Capra", status: "Escalado" }
+        ],
+        budgetSpent: "46.400 €",
+        budgetTotal: "80.000 €",
+        budgetPct: 58
+      },
+
+      profileNameDraft: this.state.profileNameDraft,
+      profileEmailDraft: this.state.profileEmailDraft,
+      profileSaved: this.state.profileSaved,
+      onProfileNameChange: (e) => this.setState({ profileNameDraft: e.target.value, profileSaved: false }),
+      onProfileEmailChange: (e) => this.setState({ profileEmailDraft: e.target.value, profileSaved: false }),
+      saveProfile: () => {
+        this.setState({
+          profileName: this.state.profileNameDraft,
+          profileEmail: this.state.profileEmailDraft,
+          profileSaved: true
+        });
+      },
+
+      kbCategories: [
+        { label: "Fundamentos", bg: "#E8F6EF", color: "#4CAF88" },
+        { label: "Riesgos", bg: "#FFF4E0", color: "#9A6300" },
+        { label: "Comunicación", bg: "#E9F7EF", color: "#1E7A45" },
+        { label: "Agile", bg: "#E4F0FB", color: "#002D62" }
+      ],
+      articles: [
+        { title: "Qué es la triple restricción y por qué te la piden en cada reunión", category: "Fundamentos", readTime: "4 min" },
+        { title: "Cómo montar un registro de riesgos que de verdad se usa", category: "Riesgos", readTime: "6 min" },
+        { title: "Plan de comunicación: quién necesita saber qué, y cuándo", category: "Comunicación", readTime: "5 min" },
+        { title: "Scrum vs. Waterfall: cuándo conviene cada uno", category: "Agile", readTime: "7 min" },
+        { title: "La matriz RACI explicada sin jerga", category: "Fundamentos", readTime: "3 min" },
+        { title: "Cómo priorizar el backlog cuando todo es 'urgente'", category: "Agile", readTime: "5 min" }
+      ],
+
+      phases,
+      roadmapSteps,
+      teamMembers,
+      selectedPhaseName: roadmapContent[selected].label,
+      selectedPhaseBadgeLabel: selected === currentProjectPhase ? "FASE ACTUAL" : "EN REVISIÓN",
+      selectedPhaseBadgeBg: selected === currentProjectPhase ? "var(--blue-primary)" : "#E8F6EF",
+      selectedPhaseBadgeColor: selected === currentProjectPhase ? "#FFFFFF" : "#4CAF88",
+
+      phaseFilters,
+      templateFilterTask,
+      taskOptions,
+      filteredTemplates,
+      hasFilteredTemplates: filteredTemplates.length > 0,
+      hasNoFilteredTemplates: filteredTemplates.length === 0,
+      onTemplateTaskChange: (e) => this.setState({ templateFilterTask: e.target.value }),
+
+      messages: this.state.messages.map((m) => ({
+        text: m.text,
+        align: m.from === "user" ? "flex-end" : "flex-start",
+        bg: m.from === "user" ? accent : "#F4F4F4",
+        color: m.from === "user" ? "#FFFFFF" : "#333333"
+      })),
+      chatInput: this.state.chatInput,
+      onChatInput: (e) => this.setState({ chatInput: e.target.value }),
+      sendMessage: () => {
+        const text = (this.state.chatInput || "").trim();
+        if (!text) return;
+        const reply = "Buena pregunta. Revisa la base de conocimiento para el concepto y la sección de plantillas para el artefacto correspondiente del PMI; si quieres, te lo dejo abierto directamente.";
+        this.setState({
+          messages: [...this.state.messages, { from: "user", text }, { from: "bot", text: reply }],
+          chatInput: ""
+        });
+      }
+    };
+  }
+}
+</script>
+</x-dc>
+</body>
+</html>

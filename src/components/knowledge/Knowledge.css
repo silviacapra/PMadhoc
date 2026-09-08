@@ -1,0 +1,56 @@
+.kb-categories {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.kb-category-pill {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: 20px;
+}
+
+.kb-articles {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.kb-article {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--white);
+  border-radius: 12px;
+  padding: 16px 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.kb-article-main {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.kb-article-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  background: var(--gray-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kb-article-title {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-dark);
+}
+
+.kb-article-meta {
+  font-size: 12px;
+  color: var(--text-faint);
+}

@@ -1,0 +1,26 @@
+.status-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 11px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  flex-shrink: 0;
+}
+
+.status-dot--onTrack {
+  background: var(--status-ontrack-dot);
+}
+
+.status-dot--atRisk {
+  background: var(--status-atrisk-dot);
+}
+
+.status-dot--critical {
+  background: var(--status-critical-dot);
+}
