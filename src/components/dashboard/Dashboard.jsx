@@ -1,5 +1,9 @@
+import { useState } from "react";
 import { PlusIcon, RoadmapIcon, StatusReportIcon, KnowledgeIcon, ChatbotIcon } from "../icons/Icons";
 import StatusBadge from "../shared/StatusBadge";
+import NewProjectModal from "./NewProjectModal";
+import { METHODOLOGY_LABELS } from "../../data/projects";
+import { TEAM_MEMBERS, DEPARTMENTS } from "../../data/team";
 import "./Dashboard.css";
 
 const QUICK_LINKS = [
@@ -9,8 +13,19 @@ const QUICK_LINKS = [
   { id: "chatbot", label: "PM virtual", icon: ChatbotIcon, permission: "canChatbot", view: "chatbot" },
 ];
 
+const SPONSORS = TEAM_MEMBERS.filter((t) => t.roleLabel === "Sponsor");
+
 export default function Dashboard({ dashboard, permissions, session, nav }) {
+  const [modalOpen, setModalOpen] = useState(false);
   const visibleLinks = QUICK_LINKS.filter((link) => permissions[link.permission]);
+
+  function objectiveLabel(contributesTo) {
+    if (!contributesTo || contributesTo.length === 0) return "Sin objetivo estratégico asignado";
+    return contributesTo
+      .map((id) => dashboard.okrCatalog.find((o) => o.id === id)?.objective)
+      .filter(Boolean)
+      .join(" · ");
+  }
 
   return (
     <div>
@@ -19,7 +34,7 @@ export default function Dashboard({ dashboard, permissions, session, nav }) {
           <h1 className="page-title">Overview de proyectos</h1>
           <p className="page-subtitle">Buenos días, {session.profile.firstName}. Así está el estado general de tus proyectos.</p>
         </div>
-        <button className="new-project-btn">
+        <button className="new-project-btn" onClick={() => setModalOpen(true)}>
           <PlusIcon size={16} color="currentColor" />
           Nuevo proyecto
         </button>
@@ -36,8 +51,10 @@ export default function Dashboard({ dashboard, permissions, session, nav }) {
               <div className="project-card-badges">
                 <StatusBadge status={proj.status} />
                 <span className="phase-pill">Fase: {proj.phase}</span>
+                <span className="phase-pill">{METHODOLOGY_LABELS[proj.methodology]}</span>
               </div>
             </div>
+            <p className="project-card-objective">{objectiveLabel(proj.contributesTo)}</p>
             <div className="project-card-stats">
               <div>
                 <span className="stat-value">{proj.progress}%</span>
@@ -58,6 +75,18 @@ export default function Dashboard({ dashboard, permissions, session, nav }) {
           </div>
         ))}
       </div>
+
+      <NewProjectModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        sponsors={SPONSORS}
+        departments={DEPARTMENTS}
+        okrCatalog={dashboard.okrCatalog}
+        onCreate={(project) => {
+          dashboard.addProject(project);
+          setModalOpen(false);
+        }}
+      />
 
       {visibleLinks.length > 0 && (
         <div className="quick-links-card">

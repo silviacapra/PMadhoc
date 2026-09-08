@@ -6,6 +6,7 @@ export default function Sidebar({ nav, permissions, session }) {
   const { view, setView } = nav;
   const canFor = {
     dashboard: permissions.canDashboard,
+    empresa: permissions.canEmpresa,
     roadmap: permissions.canRoadmap,
     templates: permissions.canTemplates,
     statusreport: permissions.canStatusReport,

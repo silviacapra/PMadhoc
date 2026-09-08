@@ -1,7 +1,7 @@
-import { ROADMAP_CONTENT, PHASE_ORDER, CURRENT_PROJECT_PHASE, DEFAULT_TASK_STATUS } from "../data/roadmapContent";
+import { ROADMAP_CONTENT, PHASE_ORDER, DEFAULT_TASK_STATUS } from "../data/roadmapContent";
 
-export function buildPhases(selectedPhase) {
-  const currentIndex = PHASE_ORDER.indexOf(CURRENT_PROJECT_PHASE);
+export function buildPhases(selectedPhase, currentPhase) {
+  const currentIndex = PHASE_ORDER.indexOf(currentPhase);
   return PHASE_ORDER.map((id, i) => {
     const isSelected = id === selectedPhase;
     const isPastOrCurrent = i <= currentIndex;
@@ -49,6 +49,7 @@ export function buildRoadmapSteps(selectedPhase, taskAssignments, expandedStepKe
   });
 }
 
-export function isCurrentPhase(phaseId) {
-  return phaseId === CURRENT_PROJECT_PHASE;
+export function nextPhase(phaseId) {
+  const idx = PHASE_ORDER.indexOf(phaseId);
+  return idx >= 0 && idx < PHASE_ORDER.length - 1 ? PHASE_ORDER[idx + 1] : null;
 }

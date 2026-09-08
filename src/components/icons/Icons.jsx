@@ -70,6 +70,17 @@ export function KnowledgeIcon(props) {
   );
 }
 
+export function BuildingIcon(props) {
+  return (
+    <Svg {...props}>
+      <rect x="4" y="3" width="10" height="18" rx="1" />
+      <path d="M14 21v-4h6v4" />
+      <path d="M14 8h6v13" />
+      <path d="M7 7h1M10 7h1M7 11h1M10 11h1M7 15h1M10 15h1" />
+    </Svg>
+  );
+}
+
 export function ChatbotIcon(props) {
   return (
     <Svg {...props}>
@@ -156,6 +167,7 @@ export function SendIcon(props) {
 
 export const NAV_ICON_MAP = {
   dashboard: DashboardIcon,
+  empresa: BuildingIcon,
   roadmap: RoadmapIcon,
   templates: TemplatesIcon,
   statusreport: StatusReportIcon,
