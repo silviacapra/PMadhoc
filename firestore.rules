@@ -1,0 +1,21 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Perfil de cada usuario: solo el propio usuario puede leer/escribir el suyo.
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      match /chat/{document=**} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+
+    // Datos compartidos de la organización (empresa, OKR, proyectos, plantillas, roadmap):
+    // cualquier usuario con sesión iniciada puede leer y escribir.
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}

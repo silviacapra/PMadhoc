@@ -27,7 +27,7 @@ function TemplateCard({ tpl, onMigrate }) {
       {hasNewerVersion && (
         <div className="template-version-alert">
           <span>Hay una versión más nueva disponible: {tpl.latestVersion}</span>
-          <button className="template-migrate-btn" onClick={() => onMigrate(tpl.title)}>
+          <button className="template-migrate-btn" onClick={() => onMigrate(tpl.id)}>
             Migrar
           </button>
         </div>
@@ -123,7 +123,7 @@ export default function Templates({ templates }) {
       {filteredTemplates.length > 0 ? (
         <div className="template-grid">
           {filteredTemplates.map((tpl) => (
-            <TemplateCard key={tpl.title} tpl={tpl} onMigrate={migrateTemplate} />
+            <TemplateCard key={tpl.id} tpl={tpl} onMigrate={migrateTemplate} />
           ))}
         </div>
       ) : (

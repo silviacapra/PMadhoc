@@ -71,3 +71,19 @@
 .chatbot-send-btn:hover {
   filter: brightness(1.08);
 }
+
+.chatbot-send-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.chatbot-bubble--typing {
+  font-style: italic;
+  color: var(--text-faint) !important;
+}
+
+.chatbot-error {
+  margin: 10px 0 0 0;
+  font-size: 12px;
+  color: var(--status-critical-color);
+}

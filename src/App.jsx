@@ -15,6 +15,10 @@ export default function App() {
   const state = useAppState();
   const { auth, session, permissions, nav } = state;
 
+  if (!auth.authReady) {
+    return null;
+  }
+
   if (!auth.loggedIn) {
     return <AuthScreen auth={auth} />;
   }

@@ -2,7 +2,7 @@ import { LogoIcon } from "../icons/Icons";
 import "./AuthScreen.css";
 
 export default function AuthScreen({ auth }) {
-  const { mode, isSignup, form, setMode, updateField, submit } = auth;
+  const { mode, isSignup, form, error, busy, setMode, updateField, submit } = auth;
 
   return (
     <div className="auth-screen">
@@ -71,12 +71,15 @@ export default function AuthScreen({ auth }) {
           />
         </div>
 
-        <div className="auth-submit" onClick={submit}>
-          {isSignup ? "Crear cuenta" : "Iniciar sesión"}
+        {error && <p className="auth-error">{error}</p>}
+
+        <div className={`auth-submit ${busy ? "auth-submit--busy" : ""}`} onClick={busy ? undefined : submit}>
+          {busy ? "Un momento..." : isSignup ? "Crear cuenta" : "Iniciar sesión"}
         </div>
 
         <p className="auth-disclaimer">
-          Tus proyectos y tareas son privados: solo tú puedes verlos, siempre vinculados a tu cuenta.
+          Los proyectos, la empresa y las plantillas son compartidos entre todo el equipo. Tu perfil y tus
+          conversaciones con el PM virtual son solo tuyos.
         </p>
       </div>
     </div>
