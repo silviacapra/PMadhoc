@@ -1,7 +1,30 @@
+import { useState } from "react";
+import { PencilIcon } from "../icons/Icons";
 import "./Profile.css";
 
 export default function Profile({ profile }) {
-  const { current, draft, saved, initials, updateField, save } = profile;
+  const {
+    current,
+    draft,
+    saved,
+    initials,
+    updateField,
+    save,
+    passwordForm,
+    passwordError,
+    passwordSuccess,
+    passwordBusy,
+    updatePasswordField,
+    changePassword,
+  } = profile;
+
+  const [editingInfo, setEditingInfo] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
+
+  function handleSave() {
+    save();
+    setEditingInfo(false);
+  }
 
   return (
     <div className="profile-page">
@@ -17,20 +40,92 @@ export default function Profile({ profile }) {
           </div>
         </div>
 
-        <div className="profile-field">
-          <label>Nombre</label>
-          <input type="text" value={draft.name} onChange={(e) => updateField("name", e.target.value)} />
+        <div className="profile-section-head section-head-row">
+          <h3>Datos personales</h3>
+          {!editingInfo && (
+            <button className="edit-toggle-btn" onClick={() => setEditingInfo(true)}>
+              <PencilIcon size={14} color="currentColor" />
+              Editar
+            </button>
+          )}
         </div>
 
-        <div className="profile-field profile-field--email">
-          <label>Correo electrónico</label>
-          <input type="text" value={draft.email} onChange={(e) => updateField("email", e.target.value)} />
+        {editingInfo ? (
+          <>
+            <div className="profile-field">
+              <label>Nombre</label>
+              <input type="text" value={draft.name} onChange={(e) => updateField("name", e.target.value)} />
+            </div>
+
+            <div className="profile-field profile-field--email">
+              <label>Correo electrónico</label>
+              <input type="text" value={draft.email} onChange={(e) => updateField("email", e.target.value)} />
+            </div>
+
+            <div className="profile-actions">
+              <button onClick={handleSave}>Guardar cambios</button>
+              <span className="cancel-link" onClick={() => setEditingInfo(false)}>
+                Cancelar
+              </span>
+              {saved && <span className="profile-saved">Cambios guardados</span>}
+            </div>
+          </>
+        ) : (
+          <p className="profile-readonly-hint">Pulsa "Editar" para cambiar tu nombre o tu correo.</p>
+        )}
+      </div>
+
+      <div className="profile-card profile-password-card">
+        <div className="profile-section-head section-head-row">
+          <h3>Contraseña</h3>
+          {!changingPassword && (
+            <button className="edit-toggle-btn" onClick={() => setChangingPassword(true)}>
+              <PencilIcon size={14} color="currentColor" />
+              Cambiar contraseña
+            </button>
+          )}
         </div>
 
-        <div className="profile-actions">
-          <button onClick={save}>Guardar cambios</button>
-          {saved && <span className="profile-saved">Cambios guardados</span>}
-        </div>
+        {changingPassword && (
+          <>
+            <div className="profile-field">
+              <label>Contraseña actual</label>
+              <input
+                type="password"
+                value={passwordForm.current}
+                onChange={(e) => updatePasswordField("current", e.target.value)}
+              />
+            </div>
+            <div className="profile-field">
+              <label>Contraseña nueva</label>
+              <input
+                type="password"
+                value={passwordForm.next}
+                onChange={(e) => updatePasswordField("next", e.target.value)}
+              />
+            </div>
+            <div className="profile-field profile-field--email">
+              <label>Confirmar contraseña nueva</label>
+              <input
+                type="password"
+                value={passwordForm.confirm}
+                onChange={(e) => updatePasswordField("confirm", e.target.value)}
+              />
+            </div>
+
+            {passwordError && <p className="profile-password-error">{passwordError}</p>}
+
+            <div className="profile-actions">
+              <button disabled={passwordBusy} onClick={changePassword}>
+                {passwordBusy ? "Guardando..." : "Guardar contraseña"}
+              </button>
+              <span className="cancel-link" onClick={() => setChangingPassword(false)}>
+                Cancelar
+              </span>
+              {passwordSuccess && <span className="profile-saved">Contraseña actualizada</span>}
+            </div>
+          </>
+        )}
       </div>
 
       <p className="profile-disclaimer">

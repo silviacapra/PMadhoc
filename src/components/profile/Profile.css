@@ -66,6 +66,29 @@
   outline: none;
 }
 
+.profile-section-head h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--blue-primary);
+}
+
+.profile-readonly-hint {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--text-faint);
+}
+
+.profile-password-card {
+  margin-top: 16px;
+}
+
+.profile-password-error {
+  margin: -6px 0 14px 0;
+  font-size: 12.5px;
+  color: var(--status-critical-color);
+}
+
 .profile-actions {
   display: flex;
   align-items: center;
@@ -73,13 +96,18 @@
 }
 
 .profile-actions button {
-  background: var(--accent);
+  background: var(--black);
   color: var(--white);
   border: none;
-  border-radius: 8px;
+  border-radius: 25px;
   padding: 10px 22px;
   font-size: 13.5px;
   font-weight: 600;
+}
+
+.profile-actions button:disabled {
+  opacity: 0.6;
+  cursor: default;
 }
 
 .profile-saved {

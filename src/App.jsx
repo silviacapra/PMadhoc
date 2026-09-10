@@ -3,9 +3,10 @@ import AuthScreen from "./components/auth/AuthScreen";
 import Sidebar from "./components/layout/Sidebar";
 import Dashboard from "./components/dashboard/Dashboard";
 import EmpresaOkr from "./components/company/EmpresaOkr";
-import Roadmap from "./components/roadmap/Roadmap";
+import FichaProyecto from "./components/ficha/FichaProyecto";
 import Templates from "./components/templates/Templates";
 import StatusReport from "./components/statusReport/StatusReport";
+import Stakeholders from "./components/stakeholders/Stakeholders";
 import Knowledge from "./components/knowledge/Knowledge";
 import Chatbot from "./components/chatbot/Chatbot";
 import Profile from "./components/profile/Profile";
@@ -30,6 +31,7 @@ export default function App() {
     roadmap: permissions.canRoadmap,
     templates: permissions.canTemplates,
     statusreport: permissions.canStatusReport,
+    stakeholders: permissions.canStakeholders,
     knowledge: permissions.canKnowledge,
     chatbot: permissions.canChatbot,
     profile: true,
@@ -40,12 +42,13 @@ export default function App() {
       <Sidebar nav={nav} permissions={permissions} session={session} />
       <main className="content-area">
         {view === "dashboard" && canShow.dashboard && (
-          <Dashboard dashboard={state.dashboard} permissions={permissions} session={session} nav={nav} />
+          <Dashboard dashboard={state.dashboard} permissions={permissions} session={session} nav={nav} statusReport={state.statusReport} />
         )}
         {view === "empresa" && canShow.empresa && <EmpresaOkr company={state.company} okr={state.okr} />}
-        {view === "roadmap" && canShow.roadmap && <Roadmap roadmap={state.roadmap} />}
+        {view === "roadmap" && canShow.roadmap && <FichaProyecto ficha={state.ficha} />}
         {view === "templates" && canShow.templates && <Templates templates={state.templates} />}
         {view === "statusreport" && canShow.statusreport && <StatusReport statusReport={state.statusReport} />}
+        {view === "stakeholders" && canShow.stakeholders && <Stakeholders stakeholders={state.stakeholders} />}
         {view === "knowledge" && canShow.knowledge && <Knowledge knowledge={state.knowledge} />}
         {view === "chatbot" && canShow.chatbot && <Chatbot chatbot={state.chatbot} />}
         {view === "profile" && <Profile profile={state.profile} />}

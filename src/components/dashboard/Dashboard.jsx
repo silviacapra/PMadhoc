@@ -1,23 +1,16 @@
 import { useState } from "react";
-import { PlusIcon, RoadmapIcon, StatusReportIcon, KnowledgeIcon, ChatbotIcon } from "../icons/Icons";
+import { PlusIcon, RoadmapIcon, StatusReportIcon, TrashIcon } from "../icons/Icons";
 import StatusBadge from "../shared/StatusBadge";
 import NewProjectModal from "./NewProjectModal";
+import DeleteProjectModal from "./DeleteProjectModal";
 import { METHODOLOGY_LABELS } from "../../data/projects";
 import { TEAM_MEMBERS, DEPARTMENTS } from "../../data/team";
 import "./Dashboard.css";
 
-const QUICK_LINKS = [
-  { id: "roadmap", label: "Roadmap", icon: RoadmapIcon, permission: "canRoadmap", view: "roadmap" },
-  { id: "statusreport", label: "Status Report", icon: StatusReportIcon, permission: "canStatusReport", view: "statusreport" },
-  { id: "knowledge", label: "Base de conocimiento", icon: KnowledgeIcon, permission: "canKnowledge", view: "knowledge" },
-  { id: "chatbot", label: "PM virtual", icon: ChatbotIcon, permission: "canChatbot", view: "chatbot" },
-];
-
 const SPONSORS = TEAM_MEMBERS.filter((t) => t.roleLabel === "Sponsor");
 
-export default function Dashboard({ dashboard, permissions, session, nav }) {
+export default function Dashboard({ dashboard, permissions, session, nav, statusReport }) {
   const [modalOpen, setModalOpen] = useState(false);
-  const visibleLinks = QUICK_LINKS.filter((link) => permissions[link.permission]);
 
   function objectiveLabel(contributesTo) {
     if (!contributesTo || contributesTo.length === 0) return "Sin objetivo estratégico asignado";
@@ -26,6 +19,18 @@ export default function Dashboard({ dashboard, permissions, session, nav }) {
       .filter(Boolean)
       .join(" · ");
   }
+
+  function goToRoadmap(proj) {
+    dashboard.openFicha(proj.id, "roadmap");
+    nav.setView("roadmap");
+  }
+
+  function goToStatusReport(proj) {
+    statusReport.setSelectedProjectId(proj.id);
+    nav.setView("statusreport");
+  }
+
+  const deletingProject = dashboard.projects.find((p) => p.id === dashboard.deleteProjectId) || null;
 
   return (
     <div>
@@ -52,6 +57,19 @@ export default function Dashboard({ dashboard, permissions, session, nav }) {
                 <StatusBadge status={proj.status} />
                 <span className="phase-pill">Fase: {proj.phase}</span>
                 <span className="phase-pill">{METHODOLOGY_LABELS[proj.methodology]}</span>
+                <button className="project-card-icon-btn" title="Ir al roadmap" onClick={() => goToRoadmap(proj)}>
+                  <RoadmapIcon size={15} color="currentColor" />
+                </button>
+                <button className="project-card-icon-btn" title="Ir al status report" onClick={() => goToStatusReport(proj)}>
+                  <StatusReportIcon size={15} color="currentColor" />
+                </button>
+                <button
+                  className="project-card-icon-btn project-card-icon-btn--danger"
+                  title="Eliminar proyecto"
+                  onClick={() => dashboard.setDeleteProjectId(proj.id)}
+                >
+                  <TrashIcon size={15} color="currentColor" />
+                </button>
               </div>
             </div>
             <p className="project-card-objective">{objectiveLabel(proj.contributesTo)}</p>
@@ -88,19 +106,11 @@ export default function Dashboard({ dashboard, permissions, session, nav }) {
         }}
       />
 
-      {visibleLinks.length > 0 && (
-        <div className="quick-links-card">
-          <h3>Accesos rápidos</h3>
-          <div className="quick-links-grid">
-            {visibleLinks.map((link) => (
-              <div key={link.id} className="quick-link" onClick={() => nav.setView(link.view)}>
-                <link.icon size={18} color="var(--accent)" />
-                <span>{link.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      <DeleteProjectModal
+        project={deletingProject}
+        onClose={() => dashboard.setDeleteProjectId(null)}
+        onConfirm={dashboard.deleteProject}
+      />
     </div>
   );
 }

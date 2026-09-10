@@ -53,3 +53,16 @@ export function nextPhase(phaseId) {
   const idx = PHASE_ORDER.indexOf(phaseId);
   return idx >= 0 && idx < PHASE_ORDER.length - 1 ? PHASE_ORDER[idx + 1] : null;
 }
+
+const PHASE_LABEL_TO_KEY = {
+  "Pre-proyecto": "preproyecto",
+  Iniciar: "iniciar",
+  Planificar: "planificar",
+  Ejecutar: "ejecutar",
+  Controlar: "controlar",
+  Cerrar: "cerrar",
+};
+
+export function phaseLabelToKey(label) {
+  return PHASE_LABEL_TO_KEY[label] || "preproyecto";
+}

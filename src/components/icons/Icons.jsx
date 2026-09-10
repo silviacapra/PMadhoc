@@ -25,6 +25,16 @@ export function LogoIcon(props) {
   );
 }
 
+export function TriDotIcon({ size = 20, color = "#4CAF88", style }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+      <circle cx="12" cy="5" r="3.4" fill={color} />
+      <circle cx="5.5" cy="18" r="3.4" fill={color} />
+      <circle cx="18.5" cy="18" r="3.4" fill={color} />
+    </svg>
+  );
+}
+
 export function DashboardIcon(props) {
   return (
     <Svg {...props}>
@@ -77,6 +87,17 @@ export function BuildingIcon(props) {
       <path d="M14 21v-4h6v4" />
       <path d="M14 8h6v13" />
       <path d="M7 7h1M10 7h1M7 11h1M10 11h1M7 15h1M10 15h1" />
+    </Svg>
+  );
+}
+
+export function StakeholdersIcon(props) {
+  return (
+    <Svg {...props}>
+      <circle cx="9" cy="8" r="3.2" />
+      <path d="M2.5 20c0-3.6 2.9-6.2 6.5-6.2s6.5 2.6 6.5 6.2" />
+      <circle cx="17" cy="8.5" r="2.5" />
+      <path d="M15.8 13.9c2.9.3 5.2 2.7 5.2 6.1" />
     </Svg>
   );
 }
@@ -148,6 +169,26 @@ export function ExternalLinkIcon(props) {
   );
 }
 
+export function PencilIcon(props) {
+  return (
+    <Svg {...props}>
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+    </Svg>
+  );
+}
+
+export function TrashIcon(props) {
+  return (
+    <Svg {...props}>
+      <path d="M3 6h18" />
+      <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+      <path d="M10 11v6M14 11v6" />
+    </Svg>
+  );
+}
+
 export function DownloadIcon(props) {
   return (
     <Svg {...props}>
@@ -171,6 +212,7 @@ export const NAV_ICON_MAP = {
   roadmap: RoadmapIcon,
   templates: TemplatesIcon,
   statusreport: StatusReportIcon,
+  stakeholders: StakeholdersIcon,
   knowledge: KnowledgeIcon,
   chatbot: ChatbotIcon,
 };

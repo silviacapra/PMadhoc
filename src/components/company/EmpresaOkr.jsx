@@ -1,10 +1,98 @@
 import { useState } from "react";
+import { PencilIcon, TrashIcon } from "../icons/Icons";
 import "./EmpresaOkr.css";
+
+function OkrCard({ okr, onUpdate, onDelete }) {
+  const [editing, setEditing] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [objective, setObjective] = useState(okr.objective);
+  const [keyResultsText, setKeyResultsText] = useState(okr.keyResults.join("\n"));
+
+  function handleSave() {
+    const keyResults = keyResultsText
+      .split("\n")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (!objective.trim() || keyResults.length === 0) return;
+    onUpdate(okr.id, { objective: objective.trim(), keyResults });
+    setEditing(false);
+  }
+
+  function handleCancel() {
+    setObjective(okr.objective);
+    setKeyResultsText(okr.keyResults.join("\n"));
+    setEditing(false);
+  }
+
+  return (
+    <div className="section-card okr-card">
+      <div className="okr-card-head">
+        {editing ? (
+          <input className="okr-card-edit-title" type="text" value={objective} onChange={(e) => setObjective(e.target.value)} />
+        ) : (
+          <h4>{okr.objective}</h4>
+        )}
+        <div className="okr-card-actions">
+          <button className="okr-icon-btn" onClick={() => setEditing((v) => !v)}>
+            <PencilIcon size={14} color="currentColor" />
+          </button>
+          <button className="okr-icon-btn" onClick={() => setConfirmingDelete((v) => !v)}>
+            <TrashIcon size={14} color="currentColor" />
+          </button>
+        </div>
+      </div>
+
+      {editing ? (
+        <>
+          <textarea
+            className="okr-card-edit-kr"
+            rows={3}
+            value={keyResultsText}
+            onChange={(e) => setKeyResultsText(e.target.value)}
+          />
+          <div className="okr-card-edit-actions">
+            <button className="okr-add-btn" onClick={handleSave}>
+              Guardar
+            </button>
+            <span className="cancel-link" onClick={handleCancel}>
+              Cancelar
+            </span>
+          </div>
+        </>
+      ) : (
+        <ul className="okr-key-results">
+          {okr.keyResults.map((kr) => (
+            <li key={kr}>{kr}</li>
+          ))}
+        </ul>
+      )}
+
+      {confirmingDelete && (
+        <div className="okr-confirm-delete">
+          <span>¿Eliminar este objetivo?</span>
+          <button
+            className="okr-confirm-yes"
+            onClick={() => {
+              onDelete(okr.id);
+              setConfirmingDelete(false);
+            }}
+          >
+            Sí, eliminar
+          </button>
+          <span className="cancel-link" onClick={() => setConfirmingDelete(false)}>
+            Cancelar
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function EmpresaOkr({ company, okr }) {
   const { info, updateField } = company;
-  const { catalog, addOkr } = okr;
+  const { catalog, addOkr, updateOkr, deleteOkr } = okr;
 
+  const [editingCompany, setEditingCompany] = useState(false);
   const [year, setYear] = useState(String(new Date().getFullYear()));
   const [objective, setObjective] = useState("");
   const [keyResultsText, setKeyResultsText] = useState("");
@@ -28,21 +116,54 @@ export default function EmpresaOkr({ company, okr }) {
       <p className="page-subtitle">Datos generales de la empresa y catálogo de objetivos estratégicos. Cada proyecto se vincula a uno o varios de estos objetivos.</p>
 
       <div className="section-card okr-company-card">
-        <h3 className="section-heading">Datos de la empresa</h3>
-        <div className="okr-company-fields">
-          <div className="okr-field">
-            <label>Nombre</label>
-            <input type="text" value={info.name} onChange={(e) => updateField("name", e.target.value)} />
-          </div>
-          <div className="okr-field">
-            <label>Sector</label>
-            <input type="text" value={info.sector} onChange={(e) => updateField("sector", e.target.value)} />
-          </div>
-          <div className="okr-field">
-            <label>Tamaño</label>
-            <input type="text" value={info.size} onChange={(e) => updateField("size", e.target.value)} />
-          </div>
+        <div className="section-head-row">
+          <h3 className="section-heading" style={{ margin: 0 }}>
+            Datos de la empresa
+          </h3>
+          {!editingCompany && (
+            <button className="edit-toggle-btn" onClick={() => setEditingCompany(true)}>
+              <PencilIcon size={14} color="currentColor" />
+              Editar
+            </button>
+          )}
         </div>
+
+        {editingCompany ? (
+          <>
+            <div className="okr-company-fields">
+              <div className="okr-field">
+                <label>Nombre</label>
+                <input type="text" value={info.name} onChange={(e) => updateField("name", e.target.value)} />
+              </div>
+              <div className="okr-field">
+                <label>Sector</label>
+                <input type="text" value={info.sector} onChange={(e) => updateField("sector", e.target.value)} />
+              </div>
+              <div className="okr-field">
+                <label>Tamaño</label>
+                <input type="text" value={info.size} onChange={(e) => updateField("size", e.target.value)} />
+              </div>
+            </div>
+            <span className="cancel-link" onClick={() => setEditingCompany(false)}>
+              Listo
+            </span>
+          </>
+        ) : (
+          <div className="okr-company-readonly">
+            <div>
+              <span className="okr-company-readonly-label">Nombre</span>
+              <span>{info.name}</span>
+            </div>
+            <div>
+              <span className="okr-company-readonly-label">Sector</span>
+              <span>{info.sector}</span>
+            </div>
+            <div>
+              <span className="okr-company-readonly-label">Tamaño</span>
+              <span>{info.size}</span>
+            </div>
+          </div>
+        )}
       </div>
 
       <h3 className="section-heading okr-catalog-heading">Catálogo de objetivos estratégicos (OKR)</h3>
@@ -53,14 +174,7 @@ export default function EmpresaOkr({ company, okr }) {
             {catalog
               .filter((o) => o.year === y)
               .map((o) => (
-                <div key={o.id} className="section-card okr-card">
-                  <h4>{o.objective}</h4>
-                  <ul className="okr-key-results">
-                    {o.keyResults.map((kr) => (
-                      <li key={kr}>{kr}</li>
-                    ))}
-                  </ul>
-                </div>
+                <OkrCard key={o.id} okr={o} onUpdate={updateOkr} onDelete={deleteOkr} />
               ))}
           </div>
         </div>

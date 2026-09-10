@@ -9,10 +9,10 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: var(--accent);
+  background: var(--black);
   color: var(--white);
   border: none;
-  border-radius: 8px;
+  border-radius: 25px;
   padding: 11px 18px;
   font-size: 14px;
   font-weight: 600;
@@ -66,6 +66,28 @@
   font-weight: 600;
 }
 
+.project-card-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 14px;
+  border: none;
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.8);
+  flex-shrink: 0;
+}
+
+.project-card-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.project-card-icon-btn--danger:hover {
+  background: var(--status-critical-color);
+  color: var(--white);
+}
+
 .project-card-objective {
   margin: 0 0 14px 0;
   font-size: 12.5px;
@@ -99,39 +121,4 @@
 .project-progress-fill {
   height: 100%;
   background: var(--white);
-}
-
-.quick-links-card {
-  background: var(--white);
-  border-radius: 12px;
-  padding: 20px 22px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-}
-
-.quick-links-card h3 {
-  margin: 0 0 14px 0;
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--blue-primary);
-}
-
-.quick-links-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.quick-link {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  background: var(--gray-light);
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.quick-link span {
-  font-size: 12.5px;
-  font-weight: 600;
 }

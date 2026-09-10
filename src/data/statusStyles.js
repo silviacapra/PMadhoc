@@ -11,17 +11,17 @@ export const IMPACT_STYLES = {
 };
 
 export const ROADMAP_STEP_STATUS_DEFS = {
-  green: { label: "En curso", dot: "var(--status-ontrack-dot)", bg: "var(--status-ontrack-bg)", color: "var(--status-ontrack-color)" },
+  green: { label: "En curso", dot: "var(--accent)", bg: "var(--status-ontrack-bg)", color: "var(--status-ontrack-color)" },
   yellow: { label: "Atención", dot: "var(--status-atrisk-dot)", bg: "var(--status-atrisk-bg)", color: "var(--status-atrisk-color)" },
   red: { label: "Crítico", dot: "var(--status-critical-dot)", bg: "var(--status-critical-bg)", color: "var(--status-critical-color)" },
   done: { label: "Completado", dot: "var(--status-done-dot)", bg: "var(--status-done-bg)", color: "var(--status-done-color)" },
 };
 
 export const TEMPLATE_CATEGORY_STYLES = {
-  Fundamentos: { bg: "#E8F6EF", color: "#4CAF88" },
-  Inicio: { bg: "#E4F0FB", color: "#002D62" },
-  Planificación: { bg: "#FFF4E0", color: "#9A6300" },
-  Ejecución: { bg: "#E9F7EF", color: "#1E7A45" },
-  Controlar: { bg: "#F1E9FB", color: "#5B3A9E" },
-  Cierre: { bg: "#FDECEC", color: "#B3261E" },
+  Fundamentos: { bg: "#F4F4F4", color: "#6B6B6B", emoji: "📘" },
+  Inicio: { bg: "#F4F4F4", color: "#6B6B6B", emoji: "🚀" },
+  Planificación: { bg: "#F4F4F4", color: "#6B6B6B", emoji: "📋" },
+  Ejecución: { bg: "#F4F4F4", color: "#6B6B6B", emoji: "⚙️" },
+  Controlar: { bg: "#F4F4F4", color: "#6B6B6B", emoji: "🔍" },
+  Cierre: { bg: "#F4F4F4", color: "#6B6B6B", emoji: "✅" },
 };

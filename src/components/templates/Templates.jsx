@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { DownloadIcon, ChevronDownIcon } from "../icons/Icons";
 import { TEMPLATE_CATEGORY_STYLES } from "../../data/statusStyles";
-import { METHODOLOGY_LABELS } from "../../data/projects";
 import "./Templates.css";
 
 function TemplateCard({ tpl, onMigrate }) {
@@ -13,6 +12,7 @@ function TemplateCard({ tpl, onMigrate }) {
     <div className="template-card">
       <div className="template-card-header">
         <span className="template-badge" style={{ background: badge.bg, color: badge.color }}>
+          {badge.emoji && <span className="template-badge-emoji">{badge.emoji}</span>}
           {tpl.category}
         </span>
         <span className="template-format">{tpl.format}</span>
@@ -51,10 +51,17 @@ function TemplateCard({ tpl, onMigrate }) {
         </div>
       )}
 
-      <button className="template-download-btn">
-        <DownloadIcon size={14} color="currentColor" />
-        Descargar
-      </button>
+      {tpl.disponible && tpl.file ? (
+        <a className="template-download-btn" href={tpl.file} download>
+          <DownloadIcon size={14} color="currentColor" />
+          Descargar
+        </a>
+      ) : (
+        <button className="template-download-btn template-download-btn--disabled" disabled>
+          <DownloadIcon size={14} color="currentColor" />
+          No disponible todavía
+        </button>
+      )}
     </div>
   );
 }
@@ -62,36 +69,23 @@ function TemplateCard({ tpl, onMigrate }) {
 export default function Templates({ templates }) {
   const {
     phaseFilters,
+    methodologyFilters,
     activePhaseFilter,
-    activeTaskFilter,
-    taskOptions,
+    activeMethodologyFilter,
+    sostenibleOnly,
     filteredTemplates,
     pickPhaseFilter,
-    setTaskFilter,
-    projects,
-    activeProjectId,
-    setActiveProjectId,
+    setMethodologyFilter,
+    setSostenibleOnly,
     migrateTemplate,
   } = templates;
-
-  const activeProject = projects.find((p) => p.id === activeProjectId) || projects[0];
 
   return (
     <div>
       <h1 className="page-title">Repositorio de plantillas</h1>
       <p className="page-subtitle">Documentos y artefactos del PMI, listos para usar sin partir de cero.</p>
 
-      <div className="template-project-select">
-        <span>Proyecto activo</span>
-        <select value={activeProjectId} onChange={(e) => setActiveProjectId(e.target.value)}>
-          {projects.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.name} · {METHODOLOGY_LABELS[p.methodology]}
-            </option>
-          ))}
-        </select>
-      </div>
-
+      <div className="template-filter-label">Fase</div>
       <div className="phase-filter-row">
         {phaseFilters.map((pf) => {
           const active = pf.id === activePhaseFilter;
@@ -108,16 +102,28 @@ export default function Templates({ templates }) {
         })}
       </div>
 
-      <div className="task-filter-row">
-        <span>Tarea específica</span>
-        <select value={activeTaskFilter} onChange={(e) => setTaskFilter(e.target.value)}>
-          <option value="todas">Todas las tareas</option>
-          {taskOptions.map((t) => (
-            <option key={t} value={t}>
-              {t}
-            </option>
-          ))}
-        </select>
+      <div className="template-filter-label">Tipo de proyecto</div>
+      <div className="phase-filter-row">
+        {methodologyFilters.map((mf) => {
+          const active = mf.id === activeMethodologyFilter;
+          return (
+            <span
+              key={mf.id}
+              className="phase-filter-pill"
+              style={{ background: active ? "var(--accent)" : "var(--gray-light)", color: active ? "#FFFFFF" : "#6B6B6B" }}
+              onClick={() => setMethodologyFilter(mf.id)}
+            >
+              {mf.label}
+            </span>
+          );
+        })}
+        <span
+          className="phase-filter-pill"
+          style={{ background: sostenibleOnly ? "var(--accent)" : "var(--gray-light)", color: sostenibleOnly ? "#FFFFFF" : "#6B6B6B" }}
+          onClick={() => setSostenibleOnly(!sostenibleOnly)}
+        >
+          🌱 Proyectos sostenibles
+        </span>
       </div>
 
       {filteredTemplates.length > 0 ? (
@@ -128,7 +134,7 @@ export default function Templates({ templates }) {
         </div>
       ) : (
         <div className="template-empty">
-          <span>No hay plantillas para este filtro todavía, con la metodología de {activeProject?.name}.</span>
+          <span>No hay plantillas para este filtro todavía.</span>
         </div>
       )}
     </div>

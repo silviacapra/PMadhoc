@@ -1,0 +1,144 @@
+.ficha-back {
+  display: inline-block;
+  margin-bottom: 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.ficha-back:hover {
+  text-decoration: underline;
+}
+
+.ficha-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.ficha-picker-card {
+  background: var(--white);
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.ficha-picker-card:hover {
+  box-shadow: 0 6px 18px rgba(0, 45, 98, 0.12);
+  transform: translateY(-2px);
+}
+
+.ficha-picker-card h4 {
+  margin: 0 0 6px 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--blue-primary);
+}
+
+.ficha-picker-card span {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.ficha-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  background: var(--gray-light);
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 20px;
+  width: fit-content;
+}
+
+.ficha-tab {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.ficha-tab--active {
+  background: var(--white);
+  color: var(--blue-primary);
+}
+
+.registry-empty {
+  font-size: 13px;
+  color: var(--text-faint);
+  margin: 0 0 16px 0;
+}
+
+.registry-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.registry-row {
+  display: flex;
+  gap: 14px;
+  padding: 12px;
+  background: var(--gray-light);
+  border-radius: 10px;
+}
+
+.registry-impact {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.registry-desc {
+  margin: 0 0 4px 0;
+  font-size: 13px;
+  color: var(--gray-dark);
+}
+
+.registry-meta {
+  font-size: 11.5px;
+  color: var(--text-faint);
+}
+
+.registry-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-lighter);
+}
+
+.registry-form input,
+.registry-form select,
+.registry-form textarea {
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--gray-dark);
+}
+
+.registry-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.4fr;
+  gap: 10px;
+}
+
+.doc-group {
+  margin-bottom: 20px;
+}
+
+.doc-row {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-lighter);
+}

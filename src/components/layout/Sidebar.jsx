@@ -1,5 +1,6 @@
-import { LogoIcon, LogoutIcon, NAV_ICON_MAP } from "../icons/Icons";
+import { LogoutIcon, NAV_ICON_MAP } from "../icons/Icons";
 import { NAV_ITEMS } from "../../data/roles";
+import Logo from "../shared/Logo";
 import "./Sidebar.css";
 
 export default function Sidebar({ nav, permissions, session }) {
@@ -10,6 +11,7 @@ export default function Sidebar({ nav, permissions, session }) {
     roadmap: permissions.canRoadmap,
     templates: permissions.canTemplates,
     statusreport: permissions.canStatusReport,
+    stakeholders: permissions.canStakeholders,
     knowledge: permissions.canKnowledge,
     chatbot: permissions.canChatbot,
   };
@@ -35,11 +37,8 @@ export default function Sidebar({ nav, permissions, session }) {
   return (
     <div className="sidebar">
       <div className="sidebar-brand">
-        <LogoIcon size={28} color="var(--accent)" />
-        <div className="sidebar-brand-text">
-          <span className="sidebar-brand-name">PM Ad Hoc</span>
-          <span className="sidebar-brand-tagline">powered by PMI best practices</span>
-        </div>
+        <Logo variant="light" size={46} />
+        <span className="sidebar-brand-tagline">powered by PMI best practices</span>
       </div>
 
       <div className="sidebar-nav">{mainItems.map(renderNavItem)}</div>

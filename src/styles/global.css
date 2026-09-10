@@ -13,7 +13,7 @@ body,
 
 body {
   margin: 0;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: var(--gray-dark);
   background: var(--white);
 }

@@ -1,6 +1,6 @@
-# PM Ad Hoc
+# PMO Ad Hoc
 
-**PM Ad Hoc** es una aplicación web de gestión de proyectos con enfoque de PMO (oficina de gestión de proyectos), pensada para la consultora ficticia "Adhoc Consulting". Incluye inicio de sesión con roles, un dashboard de proyectos, un catálogo de objetivos estratégicos (OKR), un roadmap de proyecto con checklist de avance de fase, un repositorio de plantillas, informes de estado (Status Report), una base de conocimiento y un chatbot de ejemplo.
+**PMO Ad Hoc** es una aplicación web de gestión de proyectos con enfoque de PMO (oficina de gestión de proyectos), pensada para la consultora ficticia "Adhoc Consulting". Incluye inicio de sesión con roles, un dashboard de proyectos, un catálogo de objetivos estratégicos (OKR), un roadmap de proyecto con checklist de avance de fase, un repositorio de plantillas, informes de estado (Status Report), una base de conocimiento y un chatbot de ejemplo.
 
 Esta es la versión de **frontend**: todo lo que se ve y con lo que se interactúa en el navegador. Los datos (proyectos, OKR, plantillas...) están guardados solo en la memoria del navegador mientras la app está abierta — no hay servidor, base de datos ni inicio de sesión real todavía. Eso llegará en una fase posterior.
 
@@ -36,7 +36,7 @@ Una vez instalado Node.js, sigue estos pasos:
    npm run dev
    ```
 
-5. En la terminal aparecerá una dirección como `http://localhost:5173/`. Ábrela en tu navegador (Chrome, Safari...) y verás la pantalla de inicio de sesión de PM Ad Hoc.
+5. En la terminal aparecerá una dirección como `http://localhost:5173/`. Ábrela en tu navegador (Chrome, Safari...) y verás la pantalla de inicio de sesión de PMO Ad Hoc.
 
 6. Para parar el servidor, vuelve a la terminal y pulsa `Ctrl + C`.
 

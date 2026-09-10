@@ -4,29 +4,21 @@
   width: 240px;
   min-width: 240px;
   height: 100vh;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
   background: var(--black);
   padding: 28px 0;
+  overflow-y: auto;
 }
 
 .sidebar-brand {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 10px;
   padding: 0 24px 28px 24px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   margin-bottom: 20px;
-}
-
-.sidebar-brand-text {
-  display: flex;
-  flex-direction: column;
-}
-
-.sidebar-brand-name {
-  color: var(--white);
-  font-size: 17px;
-  font-weight: 700;
-  letter-spacing: -0.3px;
 }
 
 .sidebar-brand-tagline {

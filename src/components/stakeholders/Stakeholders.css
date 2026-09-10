@@ -1,0 +1,58 @@
+.stakeholder-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.stakeholder-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.stakeholder-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 22px;
+  background: var(--accent);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.stakeholder-card h4 {
+  margin: 0 0 2px 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--gray-dark);
+}
+
+.stakeholder-role {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 14px;
+}
+
+.stakeholder-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 10px;
+}
+
+.stakeholder-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-faint);
+}
+
+.stakeholder-field > span:last-child {
+  font-size: 12.5px;
+  color: var(--gray-dark);
+  line-height: 1.4;
+}

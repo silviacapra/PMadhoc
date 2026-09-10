@@ -1,0 +1,24 @@
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+}
+
+.logo-text span {
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+.logo--dark .logo-text span {
+  color: var(--black);
+}
+
+.logo--light .logo-text span {
+  color: var(--white);
+}

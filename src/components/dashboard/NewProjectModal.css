@@ -120,7 +120,7 @@
 
 .modal-btn {
   border: none;
-  border-radius: 8px;
+  border-radius: 25px;
   padding: 10px 18px;
   font-size: 14px;
   font-weight: 600;
@@ -132,6 +132,24 @@
 }
 
 .modal-btn--primary {
-  background: var(--accent);
+  background: var(--black);
   color: var(--white);
+}
+
+.delete-modal-text {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin: 0 0 16px 0;
+}
+
+.delete-modal-confirm {
+  background: var(--status-critical-color);
+  color: var(--white);
+}
+
+.delete-modal-confirm:disabled {
+  background: var(--gray-light);
+  color: var(--text-faint);
+  cursor: not-allowed;
 }
