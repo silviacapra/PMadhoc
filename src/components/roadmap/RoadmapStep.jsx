@@ -1,7 +1,65 @@
-import { CheckIcon, ChevronDownIcon, ExternalLinkIcon } from "../icons/Icons";
+import { useState } from "react";
+import { CheckIcon, ChevronDownIcon, PencilIcon } from "../icons/Icons";
 import { ROADMAP_STEP_STATUS_DEFS } from "../../data/statusStyles";
 
-export default function RoadmapStep({ step, teamMembers, onToggle, onUpdate }) {
+function OutputRow({ output, stepKey, onUpdate }) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(output.link);
+
+  function startEdit() {
+    setDraft(output.link);
+    setEditing(true);
+  }
+
+  function saveLink() {
+    onUpdate(stepKey, output.index, { link: draft.trim() });
+    setEditing(false);
+  }
+
+  return (
+    <div className="output-row">
+      <input
+        type="checkbox"
+        checked={output.done}
+        onChange={(e) => onUpdate(stepKey, output.index, { done: e.target.checked })}
+      />
+      <span className="output-label">{output.label}</span>
+
+      {editing ? (
+        <div className="output-edit" onClick={(e) => e.stopPropagation()}>
+          <input
+            type="text"
+            autoFocus
+            value={draft}
+            placeholder="https://..."
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && saveLink()}
+          />
+          <button className="output-save-btn" onClick={saveLink}>
+            Guardar
+          </button>
+        </div>
+      ) : (
+        <div className="output-actions" onClick={(e) => e.stopPropagation()}>
+          {output.link ? (
+            <a href={output.link} target="_blank" rel="noreferrer" className="output-upload-btn output-upload-btn--set">
+              Ver documento
+            </a>
+          ) : (
+            <button className="output-upload-btn output-upload-btn--empty" onClick={startEdit}>
+              No disponible
+            </button>
+          )}
+          <button className="output-edit-btn" onClick={startEdit} title="Editar enlace">
+            <PencilIcon size={12} color="currentColor" />
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function RoadmapStep({ step, teamMembers, onToggle, onUpdate, onUpdateOutput }) {
   const activeDef = step.status ? ROADMAP_STEP_STATUS_DEFS[step.status] : null;
   const dotBorder = step.isDone ? "var(--status-done-dot)" : activeDef ? activeDef.dot : "#DADADA";
   const dotFill = step.isDone ? "var(--status-done-dot)" : activeDef ? activeDef.dot : "var(--white)";
@@ -47,10 +105,9 @@ export default function RoadmapStep({ step, teamMembers, onToggle, onUpdate }) {
                 return (
                   <span
                     key={id}
-                    className="status-option"
+                    className={`status-option ${active ? "status-option--active" : ""}`}
                     style={{
                       background: active ? def.bg : "#FFFFFF",
-                      color: active ? def.color : "#8a8a8a",
                       borderColor: active ? def.dot : "var(--border-light)",
                     }}
                     onClick={() => onUpdate(step.key, { status: id })}
@@ -86,21 +143,16 @@ export default function RoadmapStep({ step, teamMembers, onToggle, onUpdate }) {
             </div>
           </div>
 
-          <div>
-            <label>Enlace al artefacto</label>
-            <input
-              type="text"
-              value={step.link}
-              onChange={(e) => onUpdate(step.key, { link: e.target.value })}
-              placeholder="https://..."
-            />
-            {step.hasLink && (
-              <a href={step.link} target="_blank" rel="noreferrer" className="roadmap-step-link">
-                Abrir documento
-                <ExternalLinkIcon size={11} color="currentColor" />
-              </a>
-            )}
-          </div>
+          {step.outputs.length > 0 && (
+            <div>
+              <label>Artefactos a entregar (outputs)</label>
+              <div className="output-list">
+                {step.outputs.map((output) => (
+                  <OutputRow key={output.index} output={output} stepKey={step.key} onUpdate={onUpdateOutput} />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

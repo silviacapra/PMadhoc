@@ -1,14 +1,40 @@
 .kb-categories {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   margin-bottom: 22px;
 }
 
 .kb-category-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 12px;
   font-weight: 600;
   padding: 7px 14px;
   border-radius: 20px;
+  background: var(--gray-light);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.kb-category-pill:hover {
+  background: var(--gray-dark);
+  color: #ffffff;
+}
+
+.kb-category-pill--active {
+  background: var(--blue-primary);
+  color: #ffffff;
+}
+
+.kb-category-emoji {
+  font-size: 13px;
+}
+
+.kb-empty {
+  font-size: 13px;
+  color: var(--text-faint);
 }
 
 .kb-articles {
@@ -25,6 +51,13 @@
   border-radius: 12px;
   padding: 16px 20px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.kb-article:hover {
+  box-shadow: 0 6px 18px rgba(0, 45, 98, 0.12);
+  transform: translateY(-2px);
 }
 
 .kb-article-main {
@@ -41,6 +74,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .kb-article-title {
@@ -53,4 +87,89 @@
 .kb-article-meta {
   font-size: 12px;
   color: var(--text-faint);
+}
+
+.kb-back {
+  display: inline-block;
+  margin-bottom: 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.kb-back:hover {
+  text-decoration: underline;
+}
+
+.kb-post {
+  max-width: 720px;
+}
+
+.kb-post p {
+  margin: 0 0 16px 0;
+  font-size: 14.5px;
+  line-height: 1.75;
+  color: var(--gray-dark);
+}
+
+.kb-post p:last-child {
+  margin-bottom: 0;
+}
+
+.kb-reference {
+  display: inline-block;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--blue-primary);
+  background: var(--gray-light);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 16px;
+}
+
+.kb-diagram-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0 18px 0;
+}
+
+.kb-diagram {
+  width: 100%;
+  max-width: 360px;
+  height: auto;
+}
+
+.kb-points {
+  margin: 0 0 16px 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.kb-points > li {
+  font-size: 14.5px;
+  line-height: 1.75;
+  color: var(--gray-dark);
+}
+
+.kb-point-term {
+  font-weight: 700;
+  color: var(--blue-primary);
+}
+
+.kb-subpoints {
+  margin: 8px 0 0 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  list-style: circle;
+}
+
+.kb-subpoints li {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--text-muted);
 }

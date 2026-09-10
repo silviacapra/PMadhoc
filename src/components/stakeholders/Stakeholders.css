@@ -9,6 +9,12 @@
   flex-direction: column;
 }
 
+.stakeholder-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
 .stakeholder-avatar {
   width: 44px;
   height: 44px;
@@ -21,6 +27,63 @@
   font-size: 15px;
   font-weight: 700;
   margin-bottom: 12px;
+}
+
+.stakeholder-icon-btn {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 14px;
+  background: var(--gray-light);
+  color: var(--text-faint);
+  cursor: pointer;
+}
+
+.stakeholder-icon-btn:hover {
+  background: var(--gray-dark);
+  color: #ffffff;
+}
+
+.stakeholder-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.stakeholder-edit input,
+.stakeholder-edit textarea {
+  width: 100%;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: 12.5px;
+  font-family: inherit;
+  color: var(--gray-dark);
+  margin-top: 3px;
+  resize: vertical;
+}
+
+.stakeholder-edit-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 2px;
+}
+
+.stakeholder-save-btn {
+  background: var(--black);
+  color: var(--white);
+  border: none;
+  border-radius: 25px;
+  padding: 7px 16px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 .stakeholder-card h4 {

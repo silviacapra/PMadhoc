@@ -18,7 +18,7 @@ export const GATE_REQUIREMENTS = {
   ejecutar: [
     "Entregables principales completados",
     "Pruebas de calidad (QA) superadas sin incidencias críticas",
-    "Encuesta de satisfacción enviada al cliente",
+    "Revisado con Sponsor",
   ],
   controlar: [
     "Retrospectiva final realizada con el equipo",

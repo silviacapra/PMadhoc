@@ -9,7 +9,7 @@ import {
   reauthenticateWithCredential,
   updatePassword,
 } from "firebase/auth";
-import { doc, setDoc, updateDoc, addDoc, deleteDoc, getDoc, collection, onSnapshot } from "firebase/firestore";
+import { doc, setDoc, updateDoc, deleteDoc, getDoc, collection, onSnapshot } from "firebase/firestore";
 import { auth, db } from "../firebase";
 import { askGemini } from "../gemini";
 import { ROLE_PERMISSIONS, ROLE_LABELS, defaultViewForRole } from "../data/roles";
@@ -23,15 +23,12 @@ import { KB_CATEGORIES, ARTICLES } from "../data/knowledge";
 import { INITIAL_MESSAGES } from "../data/chatbot";
 import { INITIAL_COMPANY, INITIAL_OKR_CATALOG } from "../data/company";
 import { getInitials, getFirstName } from "../utils/text";
-import { buildPhases, buildRoadmapSteps, nextPhase, phaseLabelToKey } from "../utils/roadmap";
+import { buildPhases, buildRoadmapSteps, buildDocumentacionGroups, nextPhase, phaseLabelToKey } from "../utils/roadmap";
 import { filterTemplates } from "../utils/templates";
 import { riskLevel, slugify } from "../utils/projects";
 
 const INITIAL_AUTH_FORM = { name: "", email: "", password: "", role: "pm" };
 const INITIAL_PASSWORD_FORM = { current: "", next: "", confirm: "" };
-const INITIAL_REGISTRY_FORM = { desc: "", impact: "medio", owner: "", status: "" };
-const INITIAL_LECCION_FORM = { texto: "" };
-const INITIAL_DOC_FORM = { titulo: "", fase: "", url: "" };
 
 const AUTH_ERROR_MESSAGES = {
   "auth/email-already-in-use": "Ese correo ya está registrado. Prueba a iniciar sesión.",
@@ -73,6 +70,7 @@ export function useAppState() {
   const [templateFilterPhase, setTemplateFilterPhase] = useState("todas");
   const [templateFilterMethodology, setTemplateFilterMethodology] = useState("todas");
   const [templateFilterSostenible, setTemplateFilterSostenible] = useState(false);
+  const [templateFilterDisponible, setTemplateFilterDisponible] = useState(false);
   const [chatInput, setChatInput] = useState("");
   const [messages, setMessages] = useState(INITIAL_MESSAGES);
   const [chatLoading, setChatLoading] = useState(false);
@@ -93,16 +91,6 @@ export function useAppState() {
   const [fichaGateChecks, setFichaGateChecks] = useState({});
   const [fichaTaskAssignments, setFichaTaskAssignments] = useState({});
   const [fichaExpandedStepKey, setFichaExpandedStepKey] = useState(null);
-
-  // Riesgos, problemas, lecciones y documentación del proyecto abierto en la ficha.
-  const [riesgosItems, setRiesgosItems] = useState([]);
-  const [riesgosForm, setRiesgosForm] = useState(INITIAL_REGISTRY_FORM);
-  const [problemasItems, setProblemasItems] = useState([]);
-  const [problemasForm, setProblemasForm] = useState(INITIAL_REGISTRY_FORM);
-  const [leccionesItems, setLeccionesItems] = useState([]);
-  const [leccionesForm, setLeccionesForm] = useState(INITIAL_LECCION_FORM);
-  const [documentosItems, setDocumentosItems] = useState([]);
-  const [documentosForm, setDocumentosForm] = useState(INITIAL_DOC_FORM);
 
   const [stakeholders, setStakeholders] = useState([]);
 
@@ -211,8 +199,7 @@ export function useAppState() {
   }, [projects, statusSelectedProjectId]);
 
   // Al abrir la ficha de un proyecto: si es la primera vez, crea su roadmap con la fase
-  // que ya tenía el proyecto; luego escucha en tiempo real su roadmap, riesgos, problemas,
-  // lecciones y documentación.
+  // que ya tenía el proyecto; luego escucha en tiempo real su roadmap.
   useEffect(() => {
     if (!user || !fichaProjectId) return;
 
@@ -225,30 +212,16 @@ export function useAppState() {
       }
     })();
 
-    const unsubs = [
-      onSnapshot(doc(db, "projects", fichaProjectId, "roadmap", "main"), (snap) => {
-        if (!snap.exists()) return;
-        const data = snap.data();
-        setFichaCurrentPhase(data.currentPhase || "preproyecto");
-        setFichaGateChecks(data.gateChecks || {});
-        setFichaTaskAssignments(data.taskAssignments || {});
-        setFichaRoadmapPhase((prev) => prev || data.currentPhase || "preproyecto");
-      }),
-      onSnapshot(collection(db, "projects", fichaProjectId, "riesgos"), (snap) =>
-        setRiesgosItems(snap.docs.map((d) => ({ id: d.id, ...d.data() })))
-      ),
-      onSnapshot(collection(db, "projects", fichaProjectId, "problemas"), (snap) =>
-        setProblemasItems(snap.docs.map((d) => ({ id: d.id, ...d.data() })))
-      ),
-      onSnapshot(collection(db, "projects", fichaProjectId, "lecciones"), (snap) =>
-        setLeccionesItems(snap.docs.map((d) => ({ id: d.id, ...d.data() })))
-      ),
-      onSnapshot(collection(db, "projects", fichaProjectId, "documentos"), (snap) =>
-        setDocumentosItems(snap.docs.map((d) => ({ id: d.id, ...d.data() })))
-      ),
-    ];
+    const unsub = onSnapshot(doc(db, "projects", fichaProjectId, "roadmap", "main"), (snap) => {
+      if (!snap.exists()) return;
+      const data = snap.data();
+      setFichaCurrentPhase(data.currentPhase || "preproyecto");
+      setFichaGateChecks(data.gateChecks || {});
+      setFichaTaskAssignments(data.taskAssignments || {});
+      setFichaRoadmapPhase((prev) => prev || data.currentPhase || "preproyecto");
+    });
 
-    return () => unsubs.forEach((unsub) => unsub());
+    return unsub;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, fichaProjectId]);
 
@@ -329,8 +302,19 @@ export function useAppState() {
   }
 
   function updateFichaTaskMeta(key, patch) {
-    const merged = { ...(fichaTaskAssignments[key] || {}), ...patch };
-    updateDoc(doc(db, "projects", fichaProjectId, "roadmap", "main"), { [`taskAssignments.${key}`]: merged });
+    const updates = {};
+    Object.entries(patch).forEach(([field, value]) => {
+      updates[`taskAssignments.${key}.${field}`] = value;
+    });
+    updateDoc(doc(db, "projects", fichaProjectId, "roadmap", "main"), updates);
+  }
+
+  function updateStepOutput(key, outputIndex, patch) {
+    const updates = {};
+    Object.entries(patch).forEach(([field, value]) => {
+      updates[`taskAssignments.${key}.outputs.${outputIndex}.${field}`] = value;
+    });
+    updateDoc(doc(db, "projects", fichaProjectId, "roadmap", "main"), updates);
   }
 
   async function saveProfile() {
@@ -452,57 +436,8 @@ export function useAppState() {
     setFichaRoadmapPhase(next);
   }
 
-  function todayStr() {
-    return new Date().toISOString().slice(0, 10);
-  }
-
-  function updateRiesgoField(field, value) {
-    setRiesgosForm((prev) => ({ ...prev, [field]: value }));
-  }
-
-  async function addRiesgo() {
-    if (!riesgosForm.desc.trim()) return;
-    await addDoc(collection(db, "projects", fichaProjectId, "riesgos"), { ...riesgosForm, desc: riesgosForm.desc.trim(), fecha: todayStr() });
-    setRiesgosForm(INITIAL_REGISTRY_FORM);
-  }
-
-  function updateProblemaField(field, value) {
-    setProblemasForm((prev) => ({ ...prev, [field]: value }));
-  }
-
-  async function addProblema() {
-    if (!problemasForm.desc.trim()) return;
-    await addDoc(collection(db, "projects", fichaProjectId, "problemas"), { ...problemasForm, desc: problemasForm.desc.trim(), fecha: todayStr() });
-    setProblemasForm(INITIAL_REGISTRY_FORM);
-  }
-
-  function updateLeccionField(field, value) {
-    setLeccionesForm((prev) => ({ ...prev, [field]: value }));
-  }
-
-  async function addLeccion() {
-    if (!leccionesForm.texto.trim()) return;
-    await addDoc(collection(db, "projects", fichaProjectId, "lecciones"), {
-      texto: leccionesForm.texto.trim(),
-      autor: profile?.name || "Usuario",
-      fecha: todayStr(),
-    });
-    setLeccionesForm(INITIAL_LECCION_FORM);
-  }
-
-  function updateDocumentoField(field, value) {
-    setDocumentosForm((prev) => ({ ...prev, [field]: value }));
-  }
-
-  async function addDocumento() {
-    if (!documentosForm.titulo.trim() || !documentosForm.url.trim()) return;
-    await addDoc(collection(db, "projects", fichaProjectId, "documentos"), {
-      titulo: documentosForm.titulo.trim(),
-      fase: documentosForm.fase || null,
-      url: documentosForm.url.trim(),
-      fecha: todayStr(),
-    });
-    setDocumentosForm(INITIAL_DOC_FORM);
+  async function updateStakeholder(id, patch) {
+    await updateDoc(doc(db, "stakeholders", id), patch);
   }
 
   async function deleteProject(id) {
@@ -517,7 +452,13 @@ export function useAppState() {
     updateDoc(doc(db, "templates", templateId), { adoptedVersion: tpl.latestVersion });
   }
 
-  const filteredTemplates = filterTemplates(templatesList, templateFilterPhase, templateFilterMethodology, templateFilterSostenible);
+  const filteredTemplates = filterTemplates(
+    templatesList,
+    templateFilterPhase,
+    templateFilterMethodology,
+    templateFilterSostenible,
+    templateFilterDisponible
+  );
 
   const filteredPortfolio = projects.filter((p) => {
     const matchesSponsor = sponsorFilter === "todos" || p.sponsor === sponsorFilter;
@@ -604,6 +545,7 @@ export function useAppState() {
         selectPhase: setFichaRoadmapPhase,
         toggleStep: toggleFichaStep,
         updateTaskMeta: updateFichaTaskMeta,
+        updateStepOutput,
         teamMembers: TEAM_MEMBERS,
         gateItems: GATE_REQUIREMENTS[fichaRoadmapPhase || fichaCurrentPhase] || [],
         gateChecked: fichaGateChecks[fichaRoadmapPhase || fichaCurrentPhase] || {},
@@ -611,22 +553,22 @@ export function useAppState() {
         canAdvance: fichaCanAdvance,
         advancePhase: advanceFichaPhase,
       },
-      riesgos: { items: riesgosItems, form: riesgosForm, updateField: updateRiesgoField, add: addRiesgo },
-      problemas: { items: problemasItems, form: problemasForm, updateField: updateProblemaField, add: addProblema },
-      lecciones: { items: leccionesItems, form: leccionesForm, updateField: updateLeccionField, add: addLeccion },
-      documentacion: { items: documentosItems, form: documentosForm, updateField: updateDocumentoField, add: addDocumento },
+      documentacion: { groups: buildDocumentacionGroups(fichaTaskAssignments) },
     },
     stakeholders,
+    updateStakeholder,
     templates: {
       phaseFilters: PHASE_FILTER_DEFS,
       methodologyFilters: METHODOLOGY_FILTER_DEFS,
       activePhaseFilter: templateFilterPhase,
       activeMethodologyFilter: templateFilterMethodology,
       sostenibleOnly: templateFilterSostenible,
+      disponibleOnly: templateFilterDisponible,
       filteredTemplates,
       pickPhaseFilter,
       setMethodologyFilter: setTemplateFilterMethodology,
       setSostenibleOnly: setTemplateFilterSostenible,
+      setDisponibleOnly: setTemplateFilterDisponible,
       migrateTemplate,
     },
     statusReport: {

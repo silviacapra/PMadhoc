@@ -11,6 +11,7 @@ export default function Roadmap({ roadmap }) {
     selectPhase,
     toggleStep,
     updateTaskMeta,
+    updateStepOutput,
     teamMembers,
     gateItems,
     gateChecked,
@@ -63,7 +64,14 @@ export default function Roadmap({ roadmap }) {
         </div>
         <div className="roadmap-steps">
           {steps.map((step) => (
-            <RoadmapStep key={step.key} step={step} teamMembers={teamMembers} onToggle={toggleStep} onUpdate={updateTaskMeta} />
+            <RoadmapStep
+              key={step.key}
+              step={step}
+              teamMembers={teamMembers}
+              onToggle={toggleStep}
+              onUpdate={updateTaskMeta}
+              onUpdateOutput={updateStepOutput}
+            />
           ))}
         </div>
       </div>

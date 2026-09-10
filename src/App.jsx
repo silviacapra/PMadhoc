@@ -48,7 +48,9 @@ export default function App() {
         {view === "roadmap" && canShow.roadmap && <FichaProyecto ficha={state.ficha} />}
         {view === "templates" && canShow.templates && <Templates templates={state.templates} />}
         {view === "statusreport" && canShow.statusreport && <StatusReport statusReport={state.statusReport} />}
-        {view === "stakeholders" && canShow.stakeholders && <Stakeholders stakeholders={state.stakeholders} />}
+        {view === "stakeholders" && canShow.stakeholders && (
+          <Stakeholders stakeholders={state.stakeholders} updateStakeholder={state.updateStakeholder} />
+        )}
         {view === "knowledge" && canShow.knowledge && <Knowledge knowledge={state.knowledge} />}
         {view === "chatbot" && canShow.chatbot && <Chatbot chatbot={state.chatbot} />}
         {view === "profile" && <Profile profile={state.profile} />}

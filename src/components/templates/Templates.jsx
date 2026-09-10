@@ -1,12 +1,11 @@
-import { useState } from "react";
-import { DownloadIcon, ChevronDownIcon } from "../icons/Icons";
+import { DownloadIcon } from "../icons/Icons";
 import { TEMPLATE_CATEGORY_STYLES } from "../../data/statusStyles";
 import "./Templates.css";
 
 function TemplateCard({ tpl, onMigrate }) {
-  const [historyOpen, setHistoryOpen] = useState(false);
   const badge = TEMPLATE_CATEGORY_STYLES[tpl.category] || { bg: "#F4F4F4", color: "#6B6B6B" };
   const hasNewerVersion = tpl.adoptedVersion !== tpl.latestVersion;
+  const isAvailable = tpl.disponible && tpl.file;
 
   return (
     <div className="template-card">
@@ -33,25 +32,7 @@ function TemplateCard({ tpl, onMigrate }) {
         </div>
       )}
 
-      <button className="template-history-toggle" onClick={() => setHistoryOpen((v) => !v)}>
-        Historial de versiones
-        <ChevronDownIcon size={13} color="currentColor" style={{ transform: historyOpen ? "rotate(180deg)" : "rotate(0deg)" }} />
-      </button>
-      {historyOpen && (
-        <div className="template-history-list">
-          {[...tpl.versionHistory].reverse().map((v) => (
-            <div key={v.version} className="template-history-item">
-              <span className="template-history-version">{v.version}</span>
-              <div>
-                <span className="template-history-date">{v.date}</span>
-                <p>{v.notes}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {tpl.disponible && tpl.file ? (
+      {isAvailable ? (
         <a className="template-download-btn" href={tpl.file} download>
           <DownloadIcon size={14} color="currentColor" />
           Descargar
@@ -73,10 +54,12 @@ export default function Templates({ templates }) {
     activePhaseFilter,
     activeMethodologyFilter,
     sostenibleOnly,
+    disponibleOnly,
     filteredTemplates,
     pickPhaseFilter,
     setMethodologyFilter,
     setSostenibleOnly,
+    setDisponibleOnly,
     migrateTemplate,
   } = templates;
 
@@ -92,8 +75,7 @@ export default function Templates({ templates }) {
           return (
             <span
               key={pf.id}
-              className="phase-filter-pill"
-              style={{ background: active ? "var(--accent)" : "var(--gray-light)", color: active ? "#FFFFFF" : "#6B6B6B" }}
+              className={`phase-filter-pill ${active ? "phase-filter-pill--active" : ""}`}
               onClick={() => pickPhaseFilter(pf.id)}
             >
               {pf.label}
@@ -109,20 +91,28 @@ export default function Templates({ templates }) {
           return (
             <span
               key={mf.id}
-              className="phase-filter-pill"
-              style={{ background: active ? "var(--accent)" : "var(--gray-light)", color: active ? "#FFFFFF" : "#6B6B6B" }}
+              className={`phase-filter-pill ${active ? "phase-filter-pill--active" : ""}`}
               onClick={() => setMethodologyFilter(mf.id)}
             >
               {mf.label}
             </span>
           );
         })}
+      </div>
+
+      <div className="template-filter-label">Otros</div>
+      <div className="phase-filter-row">
         <span
-          className="phase-filter-pill"
-          style={{ background: sostenibleOnly ? "var(--accent)" : "var(--gray-light)", color: sostenibleOnly ? "#FFFFFF" : "#6B6B6B" }}
+          className={`phase-filter-pill ${sostenibleOnly ? "phase-filter-pill--active" : ""}`}
           onClick={() => setSostenibleOnly(!sostenibleOnly)}
         >
           🌱 Proyectos sostenibles
+        </span>
+        <span
+          className={`phase-filter-pill ${disponibleOnly ? "phase-filter-pill--active" : ""}`}
+          onClick={() => setDisponibleOnly(!disponibleOnly)}
+        >
+          ✅ Solo disponibles
         </span>
       </div>
 

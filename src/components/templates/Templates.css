@@ -18,6 +18,18 @@
   font-weight: 600;
   padding: 7px 14px;
   border-radius: 20px;
+  background: var(--gray-light);
+  color: #6b6b6b;
+}
+
+.phase-filter-pill--active {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.phase-filter-pill:hover {
+  background: var(--gray-dark);
+  color: #ffffff;
 }
 
 .template-grid {
@@ -116,51 +128,6 @@
 .template-migrate-btn:disabled {
   opacity: 0.6;
   cursor: default;
-}
-
-.template-history-toggle {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  background: none;
-  border: none;
-  padding: 0;
-  margin-bottom: 12px;
-  font-size: 11.5px;
-  font-weight: 600;
-  color: var(--accent);
-}
-
-.template-history-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 14px;
-  padding: 10px;
-  background: var(--gray-light);
-  border-radius: 8px;
-}
-
-.template-history-item {
-  display: flex;
-  gap: 8px;
-  font-size: 11px;
-}
-
-.template-history-version {
-  flex-shrink: 0;
-  font-weight: 700;
-  color: var(--blue-primary);
-}
-
-.template-history-date {
-  color: var(--text-faint);
-  display: block;
-}
-
-.template-history-item p {
-  margin: 2px 0 0 0;
-  color: var(--text-muted);
 }
 
 .template-download-btn {
