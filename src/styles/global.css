@@ -23,7 +23,10 @@ a {
   text-decoration: none;
 }
 
-a:hover {
+/* Plain text links turn blue-primary on hover. Buttons rendered as <a> (class
+   contains "btn") are excluded — they set their own color deliberately for
+   contrast against a dark/colored background, and should keep it on hover. */
+a:not([class*="btn"]):hover {
   color: var(--blue-primary);
 }
 

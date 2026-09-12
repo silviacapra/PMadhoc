@@ -5,6 +5,8 @@ import Dashboard from "./components/dashboard/Dashboard";
 import EmpresaOkr from "./components/company/EmpresaOkr";
 import FichaProyecto from "./components/ficha/FichaProyecto";
 import Templates from "./components/templates/Templates";
+import Riesgos from "./components/registro/Riesgos";
+import Lecciones from "./components/registro/Lecciones";
 import StatusReport from "./components/statusReport/StatusReport";
 import Stakeholders from "./components/stakeholders/Stakeholders";
 import Knowledge from "./components/knowledge/Knowledge";
@@ -30,6 +32,8 @@ export default function App() {
     empresa: permissions.canEmpresa,
     roadmap: permissions.canRoadmap,
     templates: permissions.canTemplates,
+    riesgos: permissions.canRiesgos,
+    lecciones: permissions.canLecciones,
     statusreport: permissions.canStatusReport,
     stakeholders: permissions.canStakeholders,
     knowledge: permissions.canKnowledge,
@@ -47,6 +51,8 @@ export default function App() {
         {view === "empresa" && canShow.empresa && <EmpresaOkr company={state.company} okr={state.okr} />}
         {view === "roadmap" && canShow.roadmap && <FichaProyecto ficha={state.ficha} />}
         {view === "templates" && canShow.templates && <Templates templates={state.templates} />}
+        {view === "riesgos" && canShow.riesgos && <Riesgos riesgos={state.riesgos} />}
+        {view === "lecciones" && canShow.lecciones && <Lecciones lecciones={state.lecciones} />}
         {view === "statusreport" && canShow.statusreport && <StatusReport statusReport={state.statusReport} />}
         {view === "stakeholders" && canShow.stakeholders && (
           <Stakeholders stakeholders={state.stakeholders} updateStakeholder={state.updateStakeholder} />

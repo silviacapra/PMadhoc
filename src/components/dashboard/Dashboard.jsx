@@ -13,6 +13,12 @@ const PMS = TEAM_MEMBERS.filter((t) => t.roleLabel === "Project manager");
 export default function Dashboard({ dashboard, permissions, session, nav, statusReport }) {
   const [modalOpen, setModalOpen] = useState(false);
 
+  function formatDate(dateStr) {
+    if (!dateStr) return "";
+    const d = new Date(`${dateStr}T00:00:00`);
+    return d.toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" });
+  }
+
   function objectiveLabel(contributesTo) {
     if (!contributesTo || contributesTo.length === 0) return "Sin objetivo estratégico asignado";
     return contributesTo
@@ -74,6 +80,13 @@ export default function Dashboard({ dashboard, permissions, session, nav, status
               </div>
             </div>
             <p className="project-card-objective">{objectiveLabel(proj.contributesTo)}</p>
+            {(proj.budgetTotal > 0 || proj.deadline || proj.hitos) && (
+              <div className="project-card-meta">
+                {proj.budgetTotal > 0 && <span>💰 {proj.budgetTotal.toLocaleString("es-ES")} €</span>}
+                {proj.deadline && <span>📅 {formatDate(proj.deadline)}</span>}
+                {proj.hitos && <span>🏁 {proj.hitos}</span>}
+              </div>
+            )}
             <div className="project-card-stats">
               <div>
                 <span className="stat-value">{proj.progress}%</span>

@@ -24,6 +24,14 @@
   filter: brightness(1.05);
 }
 
+.phase-dot-wrap--locked {
+  cursor: not-allowed;
+}
+
+.phase-dot-wrap--locked:hover {
+  filter: none;
+}
+
 .phase-dot {
   width: 36px;
   height: 36px;
@@ -259,10 +267,6 @@
 
 .output-upload-btn--set {
   background: var(--black);
-  color: var(--white);
-}
-
-.output-upload-btn--set:hover {
   color: var(--white);
 }
 

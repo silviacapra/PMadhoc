@@ -6,9 +6,20 @@ export const ROLE_LABELS = {
 };
 
 export const ROLE_PERMISSIONS = {
-  sponsor: ["dashboard", "empresa", "roadmap", "statusreport", "stakeholders"],
-  pm: ["dashboard", "empresa", "knowledge", "roadmap", "templates", "chatbot", "statusreport", "stakeholders"],
-  team: ["dashboard", "roadmap", "templates", "chatbot", "statusreport", "stakeholders"],
+  sponsor: ["dashboard", "empresa", "roadmap", "riesgos", "lecciones", "statusreport", "stakeholders"],
+  pm: [
+    "dashboard",
+    "empresa",
+    "knowledge",
+    "roadmap",
+    "templates",
+    "riesgos",
+    "lecciones",
+    "chatbot",
+    "statusreport",
+    "stakeholders",
+  ],
+  team: ["dashboard", "roadmap", "templates", "riesgos", "lecciones", "chatbot", "statusreport", "stakeholders"],
   expert: ["knowledge", "templates", "chatbot"],
 };
 
@@ -20,6 +31,8 @@ export const NAV_ITEMS = [
   { id: "dashboard", label: "Dashboard", icon: "dashboard", group: "main" },
   { id: "roadmap", label: "Roadmap Proyecto", icon: "roadmap", group: "main" },
   { id: "templates", label: "Plantillas", icon: "templates", group: "main" },
+  { id: "riesgos", label: "Registro de riesgos", icon: "riesgos", group: "main" },
+  { id: "lecciones", label: "Lecciones aprendidas", icon: "lecciones", group: "main" },
   { id: "statusreport", label: "Status Report", icon: "statusreport", group: "main" },
   { id: "empresa", label: "Empresa y OKR", icon: "empresa", group: "secondary" },
   { id: "stakeholders", label: "Stakeholders", icon: "stakeholders", group: "secondary" },

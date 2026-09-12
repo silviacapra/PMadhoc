@@ -13,6 +13,7 @@ export default function NewProjectModal({ open, onClose, sponsors, pms, departme
   const [selectedOkrIds, setSelectedOkrIds] = useState([]);
   const [deadline, setDeadline] = useState("");
   const [hitos, setHitos] = useState("");
+  const [budget, setBudget] = useState("");
 
   if (!open) return null;
 
@@ -29,6 +30,7 @@ export default function NewProjectModal({ open, onClose, sponsors, pms, departme
     setSelectedOkrIds([]);
     setDeadline("");
     setHitos("");
+    setBudget("");
   }
 
   function handleCreate() {
@@ -42,6 +44,7 @@ export default function NewProjectModal({ open, onClose, sponsors, pms, departme
       contributesTo: selectedOkrIds,
       deadline,
       hitos: hitos.trim(),
+      budget,
     });
     reset();
   }
@@ -114,6 +117,11 @@ export default function NewProjectModal({ open, onClose, sponsors, pms, departme
             <label>Fecha límite prevista</label>
             <input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} />
           </div>
+        </div>
+
+        <div className="modal-field">
+          <label>Presupuesto (€)</label>
+          <input type="number" min="0" placeholder="Ej: 50000" value={budget} onChange={(e) => setBudget(e.target.value)} />
         </div>
 
         <div className="modal-field">

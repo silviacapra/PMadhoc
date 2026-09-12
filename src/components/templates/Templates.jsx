@@ -1,10 +1,11 @@
-import { DownloadIcon } from "../icons/Icons";
+import { DownloadIcon, SearchIcon, PlusIcon } from "../icons/Icons";
 import { TEMPLATE_CATEGORY_STYLES } from "../../data/statusStyles";
+import { TYPE_LABELS } from "../../data/templates";
+import AddTemplateModal from "./AddTemplateModal";
 import "./Templates.css";
 
-function TemplateCard({ tpl, onMigrate }) {
+function TemplateCard({ tpl }) {
   const badge = TEMPLATE_CATEGORY_STYLES[tpl.category] || { bg: "#F4F4F4", color: "#6B6B6B" };
-  const hasNewerVersion = tpl.adoptedVersion !== tpl.latestVersion;
   const isAvailable = tpl.disponible && tpl.file;
 
   return (
@@ -16,21 +17,9 @@ function TemplateCard({ tpl, onMigrate }) {
         </span>
         <span className="template-format">{tpl.format}</span>
       </div>
+      {tpl.tipo && <span className="template-type-tag">{TYPE_LABELS[tpl.tipo] || tpl.tipo}</span>}
       <h4>{tpl.title}</h4>
       <p>{tpl.desc}</p>
-
-      <div className="template-version-row">
-        <span className="template-version-current">Versión adoptada: {tpl.adoptedVersion}</span>
-      </div>
-
-      {hasNewerVersion && (
-        <div className="template-version-alert">
-          <span>Hay una versión más nueva disponible: {tpl.latestVersion}</span>
-          <button className="template-migrate-btn" onClick={() => onMigrate(tpl.id)}>
-            Migrar
-          </button>
-        </div>
-      )}
 
       {isAvailable ? (
         <a className="template-download-btn" href={tpl.file} download>
@@ -51,22 +40,47 @@ export default function Templates({ templates }) {
   const {
     phaseFilters,
     methodologyFilters,
+    typeFilters,
     activePhaseFilter,
     activeMethodologyFilter,
+    activeTypeFilter,
     sostenibleOnly,
     disponibleOnly,
+    searchQuery,
     filteredTemplates,
     pickPhaseFilter,
     setMethodologyFilter,
+    setTypeFilter,
     setSostenibleOnly,
     setDisponibleOnly,
-    migrateTemplate,
+    setSearchQuery,
+    addTemplateOpen,
+    setAddTemplateOpen,
+    addTemplate,
   } = templates;
 
   return (
     <div>
-      <h1 className="page-title">Repositorio de plantillas</h1>
-      <p className="page-subtitle">Documentos y artefactos del PMI, listos para usar sin partir de cero.</p>
+      <div className="template-page-header">
+        <div>
+          <h1 className="page-title">Repositorio de plantillas</h1>
+          <p className="page-subtitle">Documentos y artefactos del PMI, listos para usar sin partir de cero.</p>
+        </div>
+        <button className="new-project-btn" onClick={() => setAddTemplateOpen(true)}>
+          <PlusIcon size={16} color="currentColor" />
+          Añadir plantilla
+        </button>
+      </div>
+
+      <div className="template-search-row">
+        <SearchIcon size={16} color="#8A8A8A" />
+        <input
+          type="text"
+          placeholder="Buscar plantillas por nombre o descripción..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
 
       <div className="template-filter-label">Fase</div>
       <div className="phase-filter-row">
@@ -100,6 +114,22 @@ export default function Templates({ templates }) {
         })}
       </div>
 
+      <div className="template-filter-label">Tipo de plantilla</div>
+      <div className="phase-filter-row">
+        {typeFilters.map((tf) => {
+          const active = tf.id === activeTypeFilter;
+          return (
+            <span
+              key={tf.id}
+              className={`phase-filter-pill ${active ? "phase-filter-pill--active" : ""}`}
+              onClick={() => setTypeFilter(tf.id)}
+            >
+              {tf.label}
+            </span>
+          );
+        })}
+      </div>
+
       <div className="template-filter-label">Otros</div>
       <div className="phase-filter-row">
         <span
@@ -119,7 +149,7 @@ export default function Templates({ templates }) {
       {filteredTemplates.length > 0 ? (
         <div className="template-grid">
           {filteredTemplates.map((tpl) => (
-            <TemplateCard key={tpl.id} tpl={tpl} onMigrate={migrateTemplate} />
+            <TemplateCard key={tpl.id} tpl={tpl} />
           ))}
         </div>
       ) : (
@@ -127,6 +157,8 @@ export default function Templates({ templates }) {
           <span>No hay plantillas para este filtro todavía.</span>
         </div>
       )}
+
+      <AddTemplateModal open={addTemplateOpen} onClose={() => setAddTemplateOpen(false)} onCreate={addTemplate} />
     </div>
   );
 }

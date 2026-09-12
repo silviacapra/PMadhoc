@@ -80,6 +80,26 @@ export function KnowledgeIcon(props) {
   );
 }
 
+export function WarningIcon(props) {
+  return (
+    <Svg {...props}>
+      <path d="M12 3l10 18H2L12 3z" />
+      <path d="M12 10v4" />
+      <path d="M12 17.5v.01" />
+    </Svg>
+  );
+}
+
+export function LightbulbIcon(props) {
+  return (
+    <Svg {...props}>
+      <path d="M9 18h6" />
+      <path d="M10 21h4" />
+      <path d="M12 3a6 6 0 0 0-3.7 10.7c.6.5 1 1.3 1.1 2.1v.2h5.2v-.2c.1-.8.5-1.6 1.1-2.1A6 6 0 0 0 12 3z" />
+    </Svg>
+  );
+}
+
 export function BuildingIcon(props) {
   return (
     <Svg {...props}>
@@ -189,6 +209,24 @@ export function TrashIcon(props) {
   );
 }
 
+export function SearchIcon(props) {
+  return (
+    <Svg {...props}>
+      <circle cx="11" cy="11" r="7" />
+      <path d="M21 21l-4.35-4.35" />
+    </Svg>
+  );
+}
+
+export function LockIcon(props) {
+  return (
+    <Svg {...props}>
+      <rect x="5" y="11" width="14" height="10" rx="2" />
+      <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+    </Svg>
+  );
+}
+
 export function DownloadIcon(props) {
   return (
     <Svg {...props}>
@@ -211,6 +249,8 @@ export const NAV_ICON_MAP = {
   empresa: BuildingIcon,
   roadmap: RoadmapIcon,
   templates: TemplatesIcon,
+  riesgos: WarningIcon,
+  lecciones: LightbulbIcon,
   statusreport: StatusReportIcon,
   stakeholders: StakeholdersIcon,
   knowledge: KnowledgeIcon,

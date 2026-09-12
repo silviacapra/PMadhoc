@@ -1,6 +1,7 @@
-import { CheckIcon, ArrowRightIcon } from "../icons/Icons";
+import { useState } from "react";
+import { CheckIcon, ArrowRightIcon, WarningIcon } from "../icons/Icons";
 import StatusBadge from "../shared/StatusBadge";
-import { PROJECT_STATUS_STYLES, IMPACT_STYLES } from "../../data/statusStyles";
+import { PROJECT_STATUS_STYLES, ROADMAP_STEP_STATUS_DEFS } from "../../data/statusStyles";
 import "./StatusReport.css";
 
 function riskLevel(risks) {
@@ -9,9 +10,58 @@ function riskLevel(risks) {
   return "bajo";
 }
 
+const CATEGORY_CYCLE = ["onTrack", "atRisk", "critical"];
+
+function nextInCycle(cycle, current) {
+  const idx = cycle.indexOf(current);
+  return cycle[(idx + 1) % cycle.length];
+}
+
+function EditableList({ title, items, onSave }) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(items.join("\n"));
+
+  function handleSave() {
+    onSave(
+      draft
+        .split("\n")
+        .map((l) => l.trim())
+        .filter(Boolean)
+    );
+    setEditing(false);
+  }
+
+  return (
+    <div>
+      <div className="report-list-head">
+        <h4>{title}</h4>
+        <span className="cancel-link" onClick={() => (editing ? handleSave() : (setDraft(items.join("\n")), setEditing(true)))}>
+          {editing ? "Guardar" : "Editar"}
+        </span>
+      </div>
+      {editing ? (
+        <textarea className="report-list-edit" rows={4} value={draft} onChange={(e) => setDraft(e.target.value)} />
+      ) : (
+        <div className="report-list">
+          {items.length === 0 && <span className="registry-empty">Sin elementos todavía.</span>}
+          {items.map((item, i) => (
+            <div key={i} className="report-list-item">
+              {title.includes("Logros") ? (
+                <CheckIcon size={14} color="var(--status-ontrack-dot)" style={{ flexShrink: 0, marginTop: 2 }} />
+              ) : (
+                <ArrowRightIcon size={14} color="var(--accent)" style={{ flexShrink: 0, marginTop: 2 }} />
+              )}
+              <span>{item}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function StatusReport({ statusReport }) {
   const {
-    portfolio,
     filteredPortfolio,
     sponsorFilter,
     setSponsorFilter,
@@ -24,9 +74,16 @@ export default function StatusReport({ statusReport }) {
     selectedProjectId,
     setSelectedProjectId,
     report,
+    updateOverallStatus,
+    updateCategory,
+    updateAchievements,
+    updateNextSteps,
+    updateBudgetSpent,
+    goToRiesgos,
   } = statusReport;
 
   const overallDef = PROJECT_STATUS_STYLES[report.overallStatus];
+  const currentTaskDef = report.currentTask ? ROADMAP_STEP_STATUS_DEFS[report.currentTask.status] : null;
 
   return (
     <div>
@@ -81,7 +138,9 @@ export default function StatusReport({ statusReport }) {
             <span className="portfolio-cell">
               {proj.risks} · {riskLevel(proj.risks)}
             </span>
-            <span className="portfolio-cell">{proj.budgetSpent.toLocaleString("es-ES")} € / {proj.budgetTotal.toLocaleString("es-ES")} €</span>
+            <span className="portfolio-cell">
+              {(proj.budgetSpent || 0).toLocaleString("es-ES")} € / {(proj.budgetTotal || 0).toLocaleString("es-ES")} €
+            </span>
             <StatusBadge status={proj.status} style={{ width: "fit-content" }} />
           </div>
         ))}
@@ -101,91 +160,88 @@ export default function StatusReport({ statusReport }) {
               Periodo del informe: {report.period} · Preparado por {report.preparedBy}
             </span>
           </div>
-          <span className="report-overall-badge" style={{ background: overallDef.bg, color: overallDef.color }}>
+          <span
+            className="report-overall-badge"
+            style={{ background: overallDef.bg, color: overallDef.color, cursor: "pointer" }}
+            onClick={() => updateOverallStatus(nextInCycle(CATEGORY_CYCLE, report.overallStatus))}
+            title="Haz clic para cambiar el estado general"
+          >
             {overallDef.label}
           </span>
         </div>
       </div>
 
       <div className="report-body">
-        <h4>Evolución en los últimos periodos</h4>
-        <div className="report-evolution">
-          {report.evolution.map((e, i) => {
-            const def = PROJECT_STATUS_STYLES[e.status];
+        <h4>Datos automáticos</h4>
+        <div className="report-auto-row">
+          <div className="report-auto-item">
+            <span className="report-auto-label">Fase actual</span>
+            <span className="report-auto-value">{report.currentPhaseLabel || "—"}</span>
+          </div>
+          <div className="report-auto-item">
+            <span className="report-auto-label">Tarea en curso de esta fase</span>
+            {report.currentTask ? (
+              <span className="report-auto-value">
+                <span className="status-dot" style={{ background: currentTaskDef?.dot, marginRight: 6 }} />
+                {report.currentTask.title} · {currentTaskDef?.label}
+              </span>
+            ) : (
+              <span className="report-auto-value">—</span>
+            )}
+          </div>
+        </div>
+
+        <h4>Categorías del informe</h4>
+        <div className="report-categories">
+          {report.categories.map((cat, i) => {
+            const def = PROJECT_STATUS_STYLES[cat.status];
             return (
-              <div key={e.period} className="report-evolution-item">
-                <span className="report-evolution-dot" style={{ background: def.dot }} />
-                <span className="report-evolution-label">{e.period}</span>
-                {i < report.evolution.length - 1 && <span className="report-evolution-line" />}
+              <div key={cat.label} className="report-category">
+                <div className="report-category-head">
+                  <span
+                    className="status-dot"
+                    style={{ background: def?.dot, cursor: "pointer" }}
+                    onClick={() => updateCategory(i, { status: nextInCycle(CATEGORY_CYCLE, cat.status) })}
+                    title="Haz clic para cambiar el estado"
+                  />
+                  <span>{cat.label}</span>
+                </div>
+                <input
+                  className="report-category-note-input"
+                  type="text"
+                  placeholder="Nota..."
+                  value={cat.note}
+                  onChange={(e) => updateCategory(i, { note: e.target.value })}
+                />
               </div>
             );
           })}
         </div>
 
-        <div className="report-categories">
-          {report.categories.map((cat) => (
-            <div key={cat.label} className="report-category">
-              <div className="report-category-head">
-                <span className={`status-dot status-dot--${cat.status}`} />
-                <span>{cat.label}</span>
-              </div>
-              <span className="report-category-note">{cat.note}</span>
-            </div>
-          ))}
-        </div>
-
         <div className="report-columns">
-          <div>
-            <h4>Logros de este periodo</h4>
-            <div className="report-list">
-              {report.achievements.map((a) => (
-                <div key={a} className="report-list-item">
-                  <CheckIcon size={14} color="var(--status-ontrack-dot)" style={{ flexShrink: 0, marginTop: 2 }} />
-                  <span>{a}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div>
-            <h4>Próximos pasos</h4>
-            <div className="report-list">
-              {report.nextSteps.map((n) => (
-                <div key={n} className="report-list-item">
-                  <ArrowRightIcon size={14} color="var(--accent)" style={{ flexShrink: 0, marginTop: 2 }} />
-                  <span>{n}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+          <EditableList title="Logros de este periodo" items={report.achievements} onSave={updateAchievements} />
+          <EditableList title="Próximos pasos" items={report.nextSteps} onSave={updateNextSteps} />
         </div>
 
-        <h4>Riesgos y problemas</h4>
-        <div className="risk-table">
-          <div className="risk-row risk-row--head">
-            <span>DESCRIPCIÓN</span>
-            <span>IMPACTO</span>
-            <span>PROPIETARIO</span>
-            <span>ESTADO</span>
-          </div>
-          {report.risks.map((r) => (
-            <div key={r.desc} className="risk-row">
-              <span className="risk-desc">{r.desc}</span>
-              <span className="risk-impact" style={{ color: IMPACT_STYLES[r.impact].color }}>
-                {IMPACT_STYLES[r.impact].label}
-              </span>
-              <span className="risk-owner">{r.owner}</span>
-              <span className="risk-status">{r.status}</span>
-            </div>
-          ))}
+        <div className="report-risks-link" onClick={goToRiesgos}>
+          <WarningIcon size={15} color="currentColor" />
+          Ver el registro de riesgos de este proyecto
         </div>
 
         <h4>Presupuesto</h4>
         <div className="budget-row">
           <div className="budget-track">
-            <div className="budget-fill" style={{ width: `${report.budgetPct}%` }} />
+            <div className="budget-fill" style={{ width: `${Math.min(report.budgetPct, 100)}%` }} />
           </div>
           <span className="budget-label">
-            {report.budgetSpent} de {report.budgetTotal} ({report.budgetPct}%)
+            <input
+              className="budget-input"
+              type="number"
+              min="0"
+              value={report.budgetSpent}
+              onChange={(e) => updateBudgetSpent(e.target.value)}
+            />
+            € de {report.budgetTotal.toLocaleString("es-ES")} € ({report.budgetPct}%)
           </span>
         </div>
       </div>

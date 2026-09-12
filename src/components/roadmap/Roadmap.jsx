@@ -1,4 +1,5 @@
 import RoadmapStep from "./RoadmapStep";
+import { LockIcon } from "../icons/Icons";
 import "./Roadmap.css";
 
 export default function Roadmap({ roadmap }) {
@@ -26,7 +27,11 @@ export default function Roadmap({ roadmap }) {
       <div className="phase-timeline">
         {phases.map((phase, i) => (
           <div key={phase.id} className="phase-timeline-item">
-            <div className="phase-dot-wrap" onClick={() => selectPhase(phase.id)}>
+            <div
+              className={`phase-dot-wrap ${phase.locked ? "phase-dot-wrap--locked" : ""}`}
+              onClick={() => !phase.locked && selectPhase(phase.id)}
+              title={phase.locked ? "Completa las fases anteriores para desbloquear esta" : undefined}
+            >
               <div
                 className="phase-dot"
                 style={{
@@ -35,7 +40,7 @@ export default function Roadmap({ roadmap }) {
                   borderColor: phase.isSelected ? "var(--accent)" : phase.isPastOrCurrent ? "var(--accent)" : "#DADADA",
                 }}
               >
-                {phase.index}
+                {phase.locked ? <LockIcon size={13} color="#B7B7B7" /> : phase.index}
               </div>
               <span
                 className="phase-label"

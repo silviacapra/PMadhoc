@@ -10,6 +10,8 @@ export default function Sidebar({ nav, permissions, session }) {
     empresa: permissions.canEmpresa,
     roadmap: permissions.canRoadmap,
     templates: permissions.canTemplates,
+    riesgos: permissions.canRiesgos,
+    lecciones: permissions.canLecciones,
     statusreport: permissions.canStatusReport,
     stakeholders: permissions.canStakeholders,
     knowledge: permissions.canKnowledge,

@@ -9,14 +9,14 @@ import {
   reauthenticateWithCredential,
   updatePassword,
 } from "firebase/auth";
-import { doc, setDoc, updateDoc, deleteDoc, getDoc, collection, onSnapshot } from "firebase/firestore";
+import { doc, setDoc, updateDoc, addDoc, deleteDoc, getDoc, collection, onSnapshot } from "firebase/firestore";
 import { auth, db } from "../firebase";
 import { askGemini } from "../gemini";
 import { ROLE_PERMISSIONS, ROLE_LABELS, defaultViewForRole } from "../data/roles";
-import { PHASE_ORDER } from "../data/roadmapContent";
+import { PHASE_ORDER, ROADMAP_CONTENT } from "../data/roadmapContent";
 import { GATE_REQUIREMENTS } from "../data/roadmapGates";
 import { TEAM_MEMBERS, INITIAL_STAKEHOLDERS } from "../data/team";
-import { PHASE_FILTER_DEFS, METHODOLOGY_FILTER_DEFS, ALL_TEMPLATES } from "../data/templates";
+import { PHASE_FILTER_DEFS, METHODOLOGY_FILTER_DEFS, TYPE_FILTER_DEFS, ALL_TEMPLATES } from "../data/templates";
 import { INITIAL_PROJECTS } from "../data/projects";
 import { STATUS_REPORTS } from "../data/statusReport";
 import { KB_CATEGORIES, ARTICLES } from "../data/knowledge";
@@ -28,6 +28,7 @@ import {
   buildRoadmapSteps,
   buildDocumentacionGroups,
   buildInitialTaskAssignments,
+  getCurrentTaskStatus,
   nextPhase,
   phaseLabelToKey,
 } from "../utils/roadmap";
@@ -36,6 +37,14 @@ import { riskLevel, slugify } from "../utils/projects";
 
 const INITIAL_AUTH_FORM = { name: "", email: "", password: "", role: "pm" };
 const INITIAL_PASSWORD_FORM = { current: "", next: "", confirm: "" };
+const INITIAL_REGISTRY_FORM = { desc: "", impact: "medio", owner: "", status: "" };
+const INITIAL_LECCION_FORM = { texto: "" };
+const DEFAULT_REPORT_CATEGORIES = [
+  { label: "Alcance", status: "onTrack", note: "" },
+  { label: "Cronograma", status: "onTrack", note: "" },
+  { label: "Presupuesto", status: "onTrack", note: "" },
+  { label: "Equipo", status: "onTrack", note: "" },
+];
 
 const AUTH_ERROR_MESSAGES = {
   "auth/email-already-in-use": "Ese correo ya está registrado. Prueba a iniciar sesión.",
@@ -78,6 +87,9 @@ export function useAppState() {
   const [templateFilterMethodology, setTemplateFilterMethodology] = useState("todas");
   const [templateFilterSostenible, setTemplateFilterSostenible] = useState(false);
   const [templateFilterDisponible, setTemplateFilterDisponible] = useState(false);
+  const [templateFilterTipo, setTemplateFilterTipo] = useState("todos");
+  const [templateSearchQuery, setTemplateSearchQuery] = useState("");
+  const [addTemplateOpen, setAddTemplateOpen] = useState(false);
   const [chatInput, setChatInput] = useState("");
   const [messages, setMessages] = useState(INITIAL_MESSAGES);
   const [chatLoading, setChatLoading] = useState(false);
@@ -107,6 +119,16 @@ export function useAppState() {
   const [departmentFilter, setDepartmentFilter] = useState("todos");
   const [riskFilter, setRiskFilter] = useState("todos");
   const [statusSelectedProjectId, setStatusSelectedProjectId] = useState("");
+  const [statusReportDoc, setStatusReportDoc] = useState(null);
+  const [statusRoadmapData, setStatusRoadmapData] = useState(null);
+
+  const [riesgosSelectedProjectId, setRiesgosSelectedProjectId] = useState("");
+  const [riesgosItems, setRiesgosItems] = useState([]);
+  const [riesgosForm, setRiesgosForm] = useState(INITIAL_REGISTRY_FORM);
+
+  const [leccionesSelectedProjectId, setLeccionesSelectedProjectId] = useState("");
+  const [leccionesItems, setLeccionesItems] = useState([]);
+  const [leccionesForm, setLeccionesForm] = useState(INITIAL_LECCION_FORM);
 
   // Sesión: se queda escuchando si hay alguien conectado (y sigue conectado tras recargar la página).
   useEffect(() => {
@@ -146,8 +168,13 @@ export function useAppState() {
           await setDoc(doc(db, "templates", id), t);
         } else {
           const data = snap.data();
-          if (data.disponible !== t.disponible || data.sostenible !== t.sostenible || data.file !== t.file) {
-            await updateDoc(doc(db, "templates", id), { disponible: t.disponible, sostenible: t.sostenible, file: t.file });
+          if (data.disponible !== t.disponible || data.sostenible !== t.sostenible || data.file !== t.file || data.tipo !== t.tipo) {
+            await updateDoc(doc(db, "templates", id), {
+              disponible: t.disponible,
+              sostenible: t.sostenible,
+              file: t.file,
+              tipo: t.tipo,
+            });
           }
         }
       }
@@ -199,11 +226,45 @@ export function useAppState() {
     }
   }, [profile]);
 
-  // Elige un proyecto por defecto en Status Report en cuanto llegan los proyectos.
+  // Elige un proyecto por defecto en Status Report, Riesgos y Lecciones en cuanto llegan los proyectos.
   useEffect(() => {
     if (projects.length === 0) return;
     if (!statusSelectedProjectId) setStatusSelectedProjectId(projects[0].id);
-  }, [projects, statusSelectedProjectId]);
+    if (!riesgosSelectedProjectId) setRiesgosSelectedProjectId(projects[0].id);
+    if (!leccionesSelectedProjectId) setLeccionesSelectedProjectId(projects[0].id);
+  }, [projects, statusSelectedProjectId, riesgosSelectedProjectId, leccionesSelectedProjectId]);
+
+  // Informe de estado y roadmap (para los datos automáticos) del proyecto elegido en Status Report.
+  useEffect(() => {
+    if (!user || !statusSelectedProjectId) return;
+    const unsubs = [
+      onSnapshot(doc(db, "projects", statusSelectedProjectId, "statusReport", "main"), (snap) => {
+        setStatusReportDoc(snap.exists() ? snap.data() : null);
+      }),
+      onSnapshot(doc(db, "projects", statusSelectedProjectId, "roadmap", "main"), (snap) => {
+        setStatusRoadmapData(snap.exists() ? snap.data() : null);
+      }),
+    ];
+    return () => unsubs.forEach((unsub) => unsub());
+  }, [user, statusSelectedProjectId]);
+
+  // Registro de riesgos del proyecto elegido.
+  useEffect(() => {
+    if (!user || !riesgosSelectedProjectId) return;
+    const unsub = onSnapshot(collection(db, "projects", riesgosSelectedProjectId, "riesgos"), (snap) =>
+      setRiesgosItems(snap.docs.map((d) => ({ id: d.id, ...d.data() })))
+    );
+    return unsub;
+  }, [user, riesgosSelectedProjectId]);
+
+  // Lecciones aprendidas del proyecto elegido.
+  useEffect(() => {
+    if (!user || !leccionesSelectedProjectId) return;
+    const unsub = onSnapshot(collection(db, "projects", leccionesSelectedProjectId, "lecciones"), (snap) =>
+      setLeccionesItems(snap.docs.map((d) => ({ id: d.id, ...d.data() })))
+    );
+    return unsub;
+  }, [user, leccionesSelectedProjectId]);
 
   // Al abrir la ficha de un proyecto: si es la primera vez, crea su roadmap con la fase
   // que ya tenía el proyecto; luego escucha en tiempo real su roadmap.
@@ -412,7 +473,7 @@ export function useAppState() {
     await deleteDoc(doc(db, "okrs", id));
   }
 
-  async function addProject({ name, methodology, sponsor, pm, department, contributesTo, deadline, hitos }) {
+  async function addProject({ name, methodology, sponsor, pm, department, contributesTo, deadline, hitos, budget }) {
     const id = `${slugify(name)}-${Date.now()}`;
     let daysLeft = 90;
     if (deadline) {
@@ -433,9 +494,61 @@ export function useAppState() {
       contributesTo,
       deadline: deadline || "",
       hitos: hitos || "",
-      budgetTotal: 0,
+      budgetTotal: Number(budget) || 0,
       budgetSpent: 0,
     });
+  }
+
+  function todayStr() {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  function updateRiesgoField(field, value) {
+    setRiesgosForm((prev) => ({ ...prev, [field]: value }));
+  }
+
+  async function addRiesgo() {
+    if (!riesgosForm.desc.trim() || !riesgosSelectedProjectId) return;
+    await addDoc(collection(db, "projects", riesgosSelectedProjectId, "riesgos"), {
+      ...riesgosForm,
+      desc: riesgosForm.desc.trim(),
+      fecha: todayStr(),
+    });
+    setRiesgosForm(INITIAL_REGISTRY_FORM);
+  }
+
+  function updateLeccionField(field, value) {
+    setLeccionesForm((prev) => ({ ...prev, [field]: value }));
+  }
+
+  async function addLeccion() {
+    if (!leccionesForm.texto.trim() || !leccionesSelectedProjectId) return;
+    await addDoc(collection(db, "projects", leccionesSelectedProjectId, "lecciones"), {
+      texto: leccionesForm.texto.trim(),
+      autor: profile?.name || "Usuario",
+      fecha: todayStr(),
+    });
+    setLeccionesForm(INITIAL_LECCION_FORM);
+  }
+
+  function openRiesgos(projectId) {
+    setRiesgosSelectedProjectId(projectId);
+    setView("riesgos");
+  }
+
+  function openLecciones(projectId) {
+    setLeccionesSelectedProjectId(projectId);
+    setView("lecciones");
+  }
+
+  function updateStatusReportField(field, value) {
+    setDoc(doc(db, "projects", statusSelectedProjectId, "statusReport", "main"), { [field]: value }, { merge: true });
+  }
+
+  function updateStatusReportCategory(index, patch) {
+    const current = statusReportDoc?.categories || STATUS_REPORTS[statusSelectedProjectId]?.categories || DEFAULT_REPORT_CATEGORIES;
+    const updated = current.map((c, i) => (i === index ? { ...c, ...patch } : c));
+    updateStatusReportField("categories", updated);
   }
 
   function toggleFichaGateItem(index) {
@@ -452,6 +565,7 @@ export function useAppState() {
     const next = nextPhase(fichaCurrentPhase);
     if (!fichaCanAdvance || !next) return;
     updateDoc(doc(db, "projects", fichaProjectId, "roadmap", "main"), { currentPhase: next });
+    updateDoc(doc(db, "projects", fichaProjectId), { phase: ROADMAP_CONTENT[next].label });
     setFichaRoadmapPhase(next);
   }
 
@@ -465,10 +579,20 @@ export function useAppState() {
     if (fichaProjectId === id) closeFicha();
   }
 
-  function migrateTemplate(templateId) {
-    const tpl = templatesList.find((t) => t.id === templateId);
-    if (!tpl) return;
-    updateDoc(doc(db, "templates", templateId), { adoptedVersion: tpl.latestVersion });
+  async function addTemplate({ title, desc, tipo, category, format, phase, methodologies, file }) {
+    await addDoc(collection(db, "templates"), {
+      title,
+      desc,
+      tipo,
+      category,
+      format,
+      phase,
+      methodologies,
+      sostenible: false,
+      disponible: !!file,
+      file: file || null,
+    });
+    setAddTemplateOpen(false);
   }
 
   const filteredTemplates = filterTemplates(
@@ -476,7 +600,9 @@ export function useAppState() {
     templateFilterPhase,
     templateFilterMethodology,
     templateFilterSostenible,
-    templateFilterDisponible
+    templateFilterDisponible,
+    templateFilterTipo,
+    templateSearchQuery
   );
 
   const filteredPortfolio = projects.filter((p) => {
@@ -487,7 +613,27 @@ export function useAppState() {
   });
 
   const statusSelectedProject = projects.find((p) => p.id === statusSelectedProjectId) || projects[0];
-  const report = STATUS_REPORTS[statusSelectedProject?.id] || STATUS_REPORTS[projects[0]?.id];
+  const seedReport = STATUS_REPORTS[statusSelectedProject?.id];
+  const currentTask = getCurrentTaskStatus(
+    statusRoadmapData?.currentPhase || phaseLabelToKey(statusSelectedProject?.phase),
+    statusRoadmapData?.taskAssignments || {}
+  );
+  const budgetTotal = statusSelectedProject?.budgetTotal || 0;
+  const budgetSpent = statusReportDoc?.budgetSpent ?? statusSelectedProject?.budgetSpent ?? 0;
+  const report = {
+    projectName: statusSelectedProject?.name || "",
+    period: statusReportDoc?.period ?? seedReport?.period ?? "Este mes",
+    preparedBy: statusReportDoc?.preparedBy ?? seedReport?.preparedBy ?? profile?.name ?? "",
+    overallStatus: statusReportDoc?.overallStatus ?? seedReport?.overallStatus ?? statusSelectedProject?.status ?? "onTrack",
+    categories: statusReportDoc?.categories ?? seedReport?.categories ?? DEFAULT_REPORT_CATEGORIES,
+    achievements: statusReportDoc?.achievements ?? seedReport?.achievements ?? [],
+    nextSteps: statusReportDoc?.nextSteps ?? seedReport?.nextSteps ?? [],
+    budgetTotal,
+    budgetSpent,
+    budgetPct: budgetTotal > 0 ? Math.round((budgetSpent / budgetTotal) * 100) : 0,
+    currentPhaseLabel: statusSelectedProject?.phase || "",
+    currentTask,
+  };
 
   return {
     auth: {
@@ -524,6 +670,8 @@ export function useAppState() {
       canKnowledge: can("knowledge"),
       canRoadmap: can("roadmap"),
       canTemplates: can("templates"),
+      canRiesgos: can("riesgos"),
+      canLecciones: can("lecciones"),
       canChatbot: can("chatbot"),
       canStatusReport: can("statusreport"),
       canStakeholders: can("stakeholders"),
@@ -555,6 +703,8 @@ export function useAppState() {
       closeFicha,
       tab: fichaTab,
       setTab: setFichaTab,
+      openRiesgos,
+      openLecciones,
       roadmap: {
         phases: buildPhases(fichaRoadmapPhase || fichaCurrentPhase || "preproyecto", fichaCurrentPhase || "preproyecto"),
         steps: buildRoadmapSteps(fichaRoadmapPhase || fichaCurrentPhase || "preproyecto", fichaTaskAssignments, fichaExpandedStepKey),
@@ -579,16 +729,23 @@ export function useAppState() {
     templates: {
       phaseFilters: PHASE_FILTER_DEFS,
       methodologyFilters: METHODOLOGY_FILTER_DEFS,
+      typeFilters: TYPE_FILTER_DEFS,
       activePhaseFilter: templateFilterPhase,
       activeMethodologyFilter: templateFilterMethodology,
+      activeTypeFilter: templateFilterTipo,
       sostenibleOnly: templateFilterSostenible,
       disponibleOnly: templateFilterDisponible,
+      searchQuery: templateSearchQuery,
       filteredTemplates,
       pickPhaseFilter,
       setMethodologyFilter: setTemplateFilterMethodology,
+      setTypeFilter: setTemplateFilterTipo,
       setSostenibleOnly: setTemplateFilterSostenible,
       setDisponibleOnly: setTemplateFilterDisponible,
-      migrateTemplate,
+      setSearchQuery: setTemplateSearchQuery,
+      addTemplateOpen,
+      setAddTemplateOpen,
+      addTemplate,
     },
     statusReport: {
       portfolio: projects,
@@ -604,6 +761,31 @@ export function useAppState() {
       selectedProjectId: statusSelectedProject?.id,
       setSelectedProjectId: setStatusSelectedProjectId,
       report,
+      updateOverallStatus: (status) => updateStatusReportField("overallStatus", status),
+      updateCategory: updateStatusReportCategory,
+      updateAchievements: (lines) => updateStatusReportField("achievements", lines),
+      updateNextSteps: (lines) => updateStatusReportField("nextSteps", lines),
+      updateBudgetSpent: (value) => updateStatusReportField("budgetSpent", Number(value) || 0),
+      goToRiesgos: () => openRiesgos(statusSelectedProject?.id),
+      goToLecciones: () => openLecciones(statusSelectedProject?.id),
+    },
+    riesgos: {
+      projects,
+      selectedProjectId: riesgosSelectedProjectId,
+      setSelectedProjectId: setRiesgosSelectedProjectId,
+      items: riesgosItems,
+      form: riesgosForm,
+      updateField: updateRiesgoField,
+      add: addRiesgo,
+    },
+    lecciones: {
+      projects,
+      selectedProjectId: leccionesSelectedProjectId,
+      setSelectedProjectId: setLeccionesSelectedProjectId,
+      items: leccionesItems,
+      form: leccionesForm,
+      updateField: updateLeccionField,
+      add: addLeccion,
     },
     knowledge: { categories: KB_CATEGORIES, articles: ARTICLES },
     chatbot: { messages, chatInput, setChatInput, sendMessage, loading: chatLoading, error: chatError },

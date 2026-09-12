@@ -11,6 +11,7 @@ export function buildPhases(selectedPhase, currentPhase) {
       index: i,
       isSelected,
       isPastOrCurrent,
+      locked: i > currentIndex,
       showLine: i < PHASE_ORDER.length - 1,
       isLineFilled: i < currentIndex,
     };
@@ -36,7 +37,7 @@ export function buildRoadmapSteps(selectedPhase, taskAssignments, expandedStepKe
     if (meta.assignee) metaParts.push(meta.assignee);
     if (meta.startDate || meta.endDate) metaParts.push(`${meta.startDate || "¿?"} → ${meta.endDate || "¿?"}`);
     const doneOutputs = outputs.filter((o) => o.done).length;
-    if (outputs.length > 0) metaParts.push(`${doneOutputs}/${outputs.length} outputs`);
+    if (outputs.length > 0) metaParts.push(`${doneOutputs}/${outputs.length} entregables`);
 
     return {
       key,
@@ -81,6 +82,27 @@ export function buildInitialTaskAssignments() {
     });
   });
   return assignments;
+}
+
+export function getCurrentTaskStatus(currentPhase, taskAssignments) {
+  if (!currentPhase || !ROADMAP_CONTENT[currentPhase]) return null;
+  const steps = ROADMAP_CONTENT[currentPhase].steps;
+  if (steps.length === 0) return null;
+
+  const statusOf = (idx) => {
+    const key = `${currentPhase}__${idx}`;
+    const defaults = DEFAULT_TASK_STATUS[key] || {};
+    const meta = { ...defaults, ...(taskAssignments[key] || {}) };
+    return meta.status || "notStarted";
+  };
+
+  // Prefer the first not-done step (the one actually in progress); fall back
+  // to the last step if the whole phase is already done.
+  for (let idx = 0; idx < steps.length; idx++) {
+    const status = statusOf(idx);
+    if (status !== "done") return { title: steps[idx].title, status };
+  }
+  return { title: steps[steps.length - 1].title, status: statusOf(steps.length - 1) };
 }
 
 export function nextPhase(phaseId) {

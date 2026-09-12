@@ -145,7 +145,7 @@ export default function RoadmapStep({ step, teamMembers, onToggle, onUpdate, onU
 
           {step.outputs.length > 0 && (
             <div>
-              <label>Artefactos a entregar (outputs)</label>
+              <label>Entregables</label>
               <div className="output-list">
                 {step.outputs.map((output) => (
                   <OutputRow key={output.index} output={output} stepKey={step.key} onUpdate={onUpdateOutput} />

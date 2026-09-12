@@ -1,5 +1,6 @@
 import Roadmap from "../roadmap/Roadmap";
 import Documentacion from "./Documentacion";
+import { WarningIcon, LightbulbIcon } from "../icons/Icons";
 import { METHODOLOGY_LABELS } from "../../data/projects";
 import "./FichaProyecto.css";
 
@@ -9,7 +10,7 @@ const TABS = [
 ];
 
 export default function FichaProyecto({ ficha }) {
-  const { projects, projectId, setProjectId, closeFicha, tab, setTab, roadmap, documentacion } = ficha;
+  const { projects, projectId, setProjectId, closeFicha, tab, setTab, roadmap, documentacion, openRiesgos, openLecciones } = ficha;
 
   if (!projectId) {
     return (
@@ -37,10 +38,24 @@ export default function FichaProyecto({ ficha }) {
       <span className="ficha-back" onClick={closeFicha}>
         ← Todos los proyectos
       </span>
-      <h1 className="page-title">{project?.name}</h1>
-      <p className="page-subtitle">
-        {project ? `${project.phase} · ${METHODOLOGY_LABELS[project.methodology]}` : ""}
-      </p>
+      <div className="ficha-header-row">
+        <div>
+          <h1 className="page-title">{project?.name}</h1>
+          <p className="page-subtitle">
+            {project ? `${project.phase} · ${METHODOLOGY_LABELS[project.methodology]}` : ""}
+          </p>
+        </div>
+        <div className="ficha-header-links">
+          <span className="ficha-header-link" onClick={() => openRiesgos(projectId)}>
+            <WarningIcon size={14} color="currentColor" />
+            Registro de riesgos
+          </span>
+          <span className="ficha-header-link" onClick={() => openLecciones(projectId)}>
+            <LightbulbIcon size={14} color="currentColor" />
+            Lecciones aprendidas
+          </span>
+        </div>
+      </div>
 
       <div className="ficha-tabs">
         {TABS.map((t) => (
