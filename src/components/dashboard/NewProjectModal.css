@@ -46,16 +46,20 @@
 }
 
 .modal-field input,
-.modal-field select {
+.modal-field select,
+.modal-field textarea {
   border: 1px solid var(--border-light);
   border-radius: 8px;
   padding: 9px 12px;
   font-size: 14px;
+  font-family: inherit;
   color: var(--gray-dark);
+  resize: vertical;
 }
 
 .modal-field input:focus,
-.modal-field select:focus {
+.modal-field select:focus,
+.modal-field textarea:focus {
   outline: none;
   border-color: var(--accent);
 }

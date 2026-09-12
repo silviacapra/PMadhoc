@@ -11,6 +11,7 @@ export const IMPACT_STYLES = {
 };
 
 export const ROADMAP_STEP_STATUS_DEFS = {
+  notStarted: { label: "Sin empezar", dot: "#B7B7B7", bg: "var(--gray-light)", color: "var(--text-faint)" },
   green: { label: "En curso", dot: "var(--accent)", bg: "var(--status-ontrack-bg)", color: "var(--status-ontrack-color)" },
   yellow: { label: "Atención", dot: "var(--status-atrisk-dot)", bg: "var(--status-atrisk-bg)", color: "var(--status-atrisk-color)" },
   red: { label: "Crítico", dot: "var(--status-critical-dot)", bg: "var(--status-critical-bg)", color: "var(--status-critical-color)" },

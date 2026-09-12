@@ -73,6 +73,16 @@ export function buildDocumentacionGroups(taskAssignments) {
   }).filter((g) => g.docs.length > 0);
 }
 
+export function buildInitialTaskAssignments() {
+  const assignments = {};
+  PHASE_ORDER.forEach((phaseId) => {
+    ROADMAP_CONTENT[phaseId].steps.forEach((step, idx) => {
+      assignments[`${phaseId}__${idx}`] = { status: "notStarted" };
+    });
+  });
+  return assignments;
+}
+
 export function nextPhase(phaseId) {
   const idx = PHASE_ORDER.indexOf(phaseId);
   return idx >= 0 && idx < PHASE_ORDER.length - 1 ? PHASE_ORDER[idx + 1] : null;

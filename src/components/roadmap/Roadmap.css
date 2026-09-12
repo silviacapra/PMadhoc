@@ -262,6 +262,10 @@
   color: var(--white);
 }
 
+.output-upload-btn--set:hover {
+  color: var(--white);
+}
+
 .output-edit-btn {
   width: 26px;
   height: 26px;

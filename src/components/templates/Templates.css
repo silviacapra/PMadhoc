@@ -145,6 +145,10 @@
   font-weight: 600;
 }
 
+.template-download-btn:hover {
+  color: var(--white);
+}
+
 .template-download-btn--disabled {
   background: var(--gray-light);
   color: var(--text-faint);

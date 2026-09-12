@@ -8,6 +8,7 @@ import { TEAM_MEMBERS, DEPARTMENTS } from "../../data/team";
 import "./Dashboard.css";
 
 const SPONSORS = TEAM_MEMBERS.filter((t) => t.roleLabel === "Sponsor");
+const PMS = TEAM_MEMBERS.filter((t) => t.roleLabel === "Project manager");
 
 export default function Dashboard({ dashboard, permissions, session, nav, statusReport }) {
   const [modalOpen, setModalOpen] = useState(false);
@@ -98,6 +99,7 @@ export default function Dashboard({ dashboard, permissions, session, nav, status
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         sponsors={SPONSORS}
+        pms={PMS}
         departments={DEPARTMENTS}
         okrCatalog={dashboard.okrCatalog}
         onCreate={(project) => {

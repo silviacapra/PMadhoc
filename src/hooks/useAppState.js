@@ -23,7 +23,14 @@ import { KB_CATEGORIES, ARTICLES } from "../data/knowledge";
 import { INITIAL_MESSAGES } from "../data/chatbot";
 import { INITIAL_COMPANY, INITIAL_OKR_CATALOG } from "../data/company";
 import { getInitials, getFirstName } from "../utils/text";
-import { buildPhases, buildRoadmapSteps, buildDocumentacionGroups, nextPhase, phaseLabelToKey } from "../utils/roadmap";
+import {
+  buildPhases,
+  buildRoadmapSteps,
+  buildDocumentacionGroups,
+  buildInitialTaskAssignments,
+  nextPhase,
+  phaseLabelToKey,
+} from "../utils/roadmap";
 import { filterTemplates } from "../utils/templates";
 import { riskLevel, slugify } from "../utils/projects";
 
@@ -208,7 +215,11 @@ export function useAppState() {
       const snap = await getDoc(roadmapRef);
       if (!snap.exists()) {
         const project = projects.find((p) => p.id === fichaProjectId);
-        await setDoc(roadmapRef, { currentPhase: phaseLabelToKey(project?.phase), gateChecks: {}, taskAssignments: {} });
+        await setDoc(roadmapRef, {
+          currentPhase: phaseLabelToKey(project?.phase),
+          gateChecks: {},
+          taskAssignments: buildInitialTaskAssignments(),
+        });
       }
     })();
 
@@ -401,19 +412,27 @@ export function useAppState() {
     await deleteDoc(doc(db, "okrs", id));
   }
 
-  async function addProject({ name, methodology, sponsor, department, contributesTo }) {
+  async function addProject({ name, methodology, sponsor, pm, department, contributesTo, deadline, hitos }) {
     const id = `${slugify(name)}-${Date.now()}`;
+    let daysLeft = 90;
+    if (deadline) {
+      const diffMs = new Date(deadline).getTime() - Date.now();
+      daysLeft = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+    }
     await setDoc(doc(db, "projects", id), {
       name,
       phase: "Pre-proyecto",
       progress: 0,
-      daysLeft: 90,
+      daysLeft,
       risks: 0,
       status: "onTrack",
       methodology,
       sponsor,
+      pm,
       department,
       contributesTo,
+      deadline: deadline || "",
+      hitos: hitos || "",
       budgetTotal: 0,
       budgetSpent: 0,
     });
