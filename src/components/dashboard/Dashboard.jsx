@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { PlusIcon, RoadmapIcon, StatusReportIcon, TrashIcon } from "../icons/Icons";
+import { PlusIcon, RoadmapIcon, StatusReportIcon, TrashIcon, PencilIcon } from "../icons/Icons";
 import StatusBadge from "../shared/StatusBadge";
-import NewProjectModal from "./NewProjectModal";
-import DeleteProjectModal from "./DeleteProjectModal";
+import ProjectModal from "./ProjectModal";
+import ConfirmDeleteModal from "../shared/ConfirmDeleteModal";
 import { METHODOLOGY_LABELS } from "../../data/projects";
 import { TEAM_MEMBERS, DEPARTMENTS } from "../../data/team";
 import "./Dashboard.css";
@@ -12,11 +12,18 @@ const PMS = TEAM_MEMBERS.filter((t) => t.roleLabel === "Project manager");
 
 export default function Dashboard({ dashboard, permissions, session, nav, statusReport }) {
   const [modalOpen, setModalOpen] = useState(false);
+  const [editingProject, setEditingProject] = useState(null);
 
   function formatDate(dateStr) {
     if (!dateStr) return "";
     const d = new Date(`${dateStr}T00:00:00`);
     return d.toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" });
+  }
+
+  function formatDateTime(isoStr) {
+    if (!isoStr) return "";
+    const d = new Date(isoStr);
+    return d.toLocaleString("es-ES", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
   }
 
   function objectiveLabel(contributesTo) {
@@ -64,6 +71,9 @@ export default function Dashboard({ dashboard, permissions, session, nav, status
                 <StatusBadge status={proj.status} />
                 <span className="phase-pill">Fase: {proj.phase}</span>
                 <span className="phase-pill">{METHODOLOGY_LABELS[proj.methodology]}</span>
+                <button className="project-card-icon-btn" title="Editar proyecto" onClick={() => setEditingProject(proj)}>
+                  <PencilIcon size={14} color="currentColor" />
+                </button>
                 <button className="project-card-icon-btn" title="Ir al roadmap" onClick={() => goToRoadmap(proj)}>
                   <RoadmapIcon size={15} color="currentColor" />
                 </button>
@@ -104,11 +114,21 @@ export default function Dashboard({ dashboard, permissions, session, nav, status
             <div className="project-progress-track">
               <div className="project-progress-fill" style={{ width: `${proj.progress}%` }} />
             </div>
+            {proj.createdAt && (
+              <p className="project-card-audit">
+                Creado{proj.createdBy ? ` por ${proj.createdBy}` : ""} · {formatDateTime(proj.createdAt)}
+              </p>
+            )}
+            {proj.lastModifiedBy && (
+              <p className="project-card-audit">
+                Editado por {proj.lastModifiedBy} · {formatDateTime(proj.lastModifiedAt)}
+              </p>
+            )}
           </div>
         ))}
       </div>
 
-      <NewProjectModal
+      <ProjectModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         sponsors={SPONSORS}
@@ -121,8 +141,24 @@ export default function Dashboard({ dashboard, permissions, session, nav, status
         }}
       />
 
-      <DeleteProjectModal
-        project={deletingProject}
+      <ProjectModal
+        open={!!editingProject}
+        project={editingProject}
+        onClose={() => setEditingProject(null)}
+        sponsors={SPONSORS}
+        pms={PMS}
+        departments={DEPARTMENTS}
+        okrCatalog={dashboard.okrCatalog}
+        onSave={(id, patch) => {
+          dashboard.updateProject(id, patch);
+          setEditingProject(null);
+        }}
+      />
+
+      <ConfirmDeleteModal
+        item={deletingProject}
+        itemLabel="proyecto"
+        itemName={deletingProject?.name}
         onClose={() => dashboard.setDeleteProjectId(null)}
         onConfirm={dashboard.deleteProject}
       />

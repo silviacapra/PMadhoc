@@ -38,24 +38,8 @@ export default function FichaProyecto({ ficha }) {
       <span className="ficha-back" onClick={closeFicha}>
         ← Todos los proyectos
       </span>
-      <div className="ficha-header-row">
-        <div>
-          <h1 className="page-title">{project?.name}</h1>
-          <p className="page-subtitle">
-            {project ? `${project.phase} · ${METHODOLOGY_LABELS[project.methodology]}` : ""}
-          </p>
-        </div>
-        <div className="ficha-header-links">
-          <span className="ficha-header-link" onClick={() => openRiesgos(projectId)}>
-            <WarningIcon size={14} color="currentColor" />
-            Registro de riesgos
-          </span>
-          <span className="ficha-header-link" onClick={() => openLecciones(projectId)}>
-            <LightbulbIcon size={14} color="currentColor" />
-            Lecciones aprendidas
-          </span>
-        </div>
-      </div>
+      <h1 className="page-title">{project?.name}</h1>
+      <p className="page-subtitle">{project ? `${project.phase} · ${METHODOLOGY_LABELS[project.methodology]}` : ""}</p>
 
       <div className="ficha-tabs">
         {TABS.map((t) => (
@@ -63,6 +47,14 @@ export default function FichaProyecto({ ficha }) {
             {t.label}
           </span>
         ))}
+        <span className="ficha-tab" onClick={() => openRiesgos(projectId)}>
+          <WarningIcon size={13} color="currentColor" style={{ marginRight: 5, verticalAlign: -2 }} />
+          Registro de riesgos
+        </span>
+        <span className="ficha-tab" onClick={() => openLecciones(projectId)}>
+          <LightbulbIcon size={13} color="currentColor" style={{ marginRight: 5, verticalAlign: -2 }} />
+          Lecciones aprendidas
+        </span>
       </div>
 
       {tab === "roadmap" && <Roadmap roadmap={roadmap} />}

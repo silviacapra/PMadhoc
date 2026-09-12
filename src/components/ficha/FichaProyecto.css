@@ -43,39 +43,6 @@
   color: var(--text-muted);
 }
 
-.ficha-header-row {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.ficha-header-links {
-  display: flex;
-  gap: 10px;
-  flex-shrink: 0;
-  margin-top: 4px;
-}
-
-.ficha-header-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-muted);
-  background: var(--gray-light);
-  padding: 7px 12px;
-  border-radius: 20px;
-  cursor: pointer;
-}
-
-.ficha-header-link:hover {
-  background: var(--gray-dark);
-  color: #ffffff;
-}
-
 .ficha-tabs {
   display: flex;
   flex-wrap: wrap;

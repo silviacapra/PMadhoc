@@ -71,15 +71,6 @@ export function StatusReportIcon(props) {
   );
 }
 
-export function KnowledgeIcon(props) {
-  return (
-    <Svg {...props}>
-      <path d="M4 4h11a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3V4z" />
-      <path d="M18 4v16" />
-    </Svg>
-  );
-}
-
 export function WarningIcon(props) {
   return (
     <Svg {...props}>
@@ -218,6 +209,39 @@ export function SearchIcon(props) {
   );
 }
 
+export function GanttIcon(props) {
+  return (
+    <Svg {...props}>
+      <path d="M3 5h8" />
+      <path d="M3 12h13" />
+      <path d="M3 19h6" />
+      <path d="M13 5h8" />
+      <path d="M18 12h3" />
+      <path d="M11 19h10" />
+    </Svg>
+  );
+}
+
+export function DocumentIcon(props) {
+  return (
+    <Svg {...props}>
+      <path d="M7 3h7l4 4v14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" />
+      <path d="M14 3v4h4" />
+      <path d="M9 13h6M9 17h6" />
+    </Svg>
+  );
+}
+
+export function GraduationCapIcon(props) {
+  return (
+    <Svg {...props}>
+      <path d="M2 9l10-5 10 5-10 5-10-5z" />
+      <path d="M6 11.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-4.5" />
+      <path d="M22 9v6" />
+    </Svg>
+  );
+}
+
 export function LockIcon(props) {
   return (
     <Svg {...props}>
@@ -248,11 +272,13 @@ export const NAV_ICON_MAP = {
   dashboard: DashboardIcon,
   empresa: BuildingIcon,
   roadmap: RoadmapIcon,
+  gantt: GanttIcon,
   templates: TemplatesIcon,
   riesgos: WarningIcon,
+  documentacion: DocumentIcon,
   lecciones: LightbulbIcon,
   statusreport: StatusReportIcon,
   stakeholders: StakeholdersIcon,
-  knowledge: KnowledgeIcon,
+  knowledge: GraduationCapIcon,
   chatbot: ChatbotIcon,
 };

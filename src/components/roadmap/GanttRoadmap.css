@@ -1,0 +1,164 @@
+.gantt-card {
+  overflow-x: auto;
+}
+
+.gantt-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 16px;
+  cursor: pointer;
+}
+
+.gantt-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.gantt-legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 5px;
+  flex-shrink: 0;
+}
+
+.gantt-chart {
+  min-width: 640px;
+}
+
+.gantt-header-row,
+.gantt-row {
+  display: grid;
+  grid-template-columns: 190px 1fr;
+  align-items: center;
+}
+
+.gantt-label-spacer {
+  flex-shrink: 0;
+}
+
+.gantt-timeline-header {
+  position: relative;
+  height: 22px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.gantt-month-label {
+  position: absolute;
+  top: 0;
+  transform: translateX(2px);
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
+.gantt-phase-group {
+  border-top: 1px solid var(--border-lighter);
+  padding-top: 6px;
+  margin-top: 6px;
+}
+
+.gantt-phase-group:first-child {
+  border-top: none;
+  margin-top: 0;
+}
+
+.gantt-phase-label-row {
+  padding: 4px 0;
+}
+
+.gantt-phase-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--blue-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.gantt-row {
+  min-height: 34px;
+}
+
+.gantt-row-label {
+  font-size: 12px;
+  color: var(--gray-dark);
+  padding-right: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gantt-row-track {
+  position: relative;
+  height: 34px;
+}
+
+.gantt-gridline {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--border-lighter);
+}
+
+.gantt-no-dates {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+  color: var(--text-faint);
+  font-style: italic;
+}
+
+.gantt-bar-wrap {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 16px;
+  min-width: 10px;
+}
+
+.gantt-bar {
+  height: 100%;
+  border-radius: 8px;
+  box-shadow: 0 0 0 2px var(--white);
+}
+
+.gantt-bar-wrap:hover .gantt-bar {
+  filter: brightness(0.92);
+}
+
+.gantt-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 0;
+  z-index: 5;
+  background: var(--black);
+  color: var(--white);
+  padding: 8px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 11px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+}
+
+.gantt-tooltip strong {
+  font-size: 12px;
+}
+
+.gantt-tooltip span {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.gantt-bar-wrap:hover .gantt-tooltip {
+  display: flex;
+}

@@ -1,19 +1,50 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { METHODOLOGY_LABELS } from "../../data/projects";
 import "./NewProjectModal.css";
 
 const METHODOLOGY_OPTIONS = ["cascada", "agil", "hibrida"];
 
-export default function NewProjectModal({ open, onClose, sponsors, pms, departments, okrCatalog, onCreate }) {
-  const [name, setName] = useState("");
-  const [methodology, setMethodology] = useState("hibrida");
-  const [sponsor, setSponsor] = useState(sponsors[0]?.name || "");
-  const [pm, setPm] = useState(pms[0]?.name || "");
+const BLANK = { name: "", methodology: "hibrida", sponsor: "", pm: "", department: "", contributesTo: [], deadline: "", hitos: "", budget: "" };
+
+export default function ProjectModal({ open, onClose, sponsors, pms, departments, okrCatalog, onCreate, onSave, project }) {
+  const isEdit = !!project;
+  const [name, setName] = useState(BLANK.name);
+  const [methodology, setMethodology] = useState(BLANK.methodology);
+  const [sponsor, setSponsor] = useState("");
+  const [pm, setPm] = useState("");
   const [department, setDepartment] = useState(departments[0] || "");
-  const [selectedOkrIds, setSelectedOkrIds] = useState([]);
-  const [deadline, setDeadline] = useState("");
-  const [hitos, setHitos] = useState("");
-  const [budget, setBudget] = useState("");
+  const [selectedOkrIds, setSelectedOkrIds] = useState(BLANK.contributesTo);
+  const [deadline, setDeadline] = useState(BLANK.deadline);
+  const [hitos, setHitos] = useState(BLANK.hitos);
+  const [budget, setBudget] = useState(BLANK.budget);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!open) return;
+    setError("");
+    if (project) {
+      setName(project.name || "");
+      setMethodology(project.methodology || "hibrida");
+      setSponsor(project.sponsor || "");
+      setPm(project.pm || "");
+      setDepartment(project.department || departments[0] || "");
+      setSelectedOkrIds(project.contributesTo || []);
+      setDeadline(project.deadline || "");
+      setHitos(project.hitos || "");
+      setBudget(project.budgetTotal ? String(project.budgetTotal) : "");
+    } else {
+      setName(BLANK.name);
+      setMethodology(BLANK.methodology);
+      setSponsor("");
+      setPm("");
+      setDepartment(departments[0] || "");
+      setSelectedOkrIds(BLANK.contributesTo);
+      setDeadline(BLANK.deadline);
+      setHitos(BLANK.hitos);
+      setBudget(BLANK.budget);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, project]);
 
   if (!open) return null;
 
@@ -21,21 +52,22 @@ export default function NewProjectModal({ open, onClose, sponsors, pms, departme
     setSelectedOkrIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   }
 
-  function reset() {
-    setName("");
-    setMethodology("hibrida");
-    setSponsor(sponsors[0]?.name || "");
-    setPm(pms[0]?.name || "");
-    setDepartment(departments[0] || "");
-    setSelectedOkrIds([]);
-    setDeadline("");
-    setHitos("");
-    setBudget("");
-  }
+  function handleSubmit() {
+    const missing = [];
+    if (!name.trim()) missing.push("nombre del proyecto");
+    if (!pm) missing.push("gestor del proyecto (PM)");
+    if (!sponsor) missing.push("sponsor");
+    if (!deadline) missing.push("fecha límite prevista");
+    if (!budget) missing.push("presupuesto");
+    if (selectedOkrIds.length === 0) missing.push("al menos un objetivo (OKR)");
 
-  function handleCreate() {
-    if (!name.trim()) return;
-    onCreate({
+    if (missing.length > 0) {
+      setError(`Faltan campos obligatorios: ${missing.join(", ")}.`);
+      return;
+    }
+    setError("");
+
+    const payload = {
       name: name.trim(),
       methodology,
       sponsor,
@@ -45,22 +77,21 @@ export default function NewProjectModal({ open, onClose, sponsors, pms, departme
       deadline,
       hitos: hitos.trim(),
       budget,
-    });
-    reset();
-  }
-
-  function handleClose() {
-    reset();
-    onClose();
+    };
+    if (isEdit) {
+      onSave(project.id, payload);
+    } else {
+      onCreate(payload);
+    }
   }
 
   return (
-    <div className="modal-overlay" onClick={handleClose}>
+    <div className="modal-overlay" onClick={onClose}>
       <div className="modal-box" onClick={(e) => e.stopPropagation()}>
-        <h2 className="modal-title">Nuevo proyecto</h2>
+        <h2 className="modal-title">{isEdit ? "Editar proyecto" : "Nuevo proyecto"}</h2>
 
         <div className="modal-field">
-          <label>Nombre del proyecto</label>
+          <label>Nombre del proyecto *</label>
           <input type="text" placeholder="Ej: Implementación de ERP" value={name} onChange={(e) => setName(e.target.value)} />
         </div>
 
@@ -81,8 +112,9 @@ export default function NewProjectModal({ open, onClose, sponsors, pms, departme
 
         <div className="modal-field-row">
           <div className="modal-field">
-            <label>Gestor del proyecto (PM)</label>
+            <label>Gestor del proyecto (PM) *</label>
             <select value={pm} onChange={(e) => setPm(e.target.value)}>
+              <option value="">Selecciona un PM</option>
               {pms.map((p) => (
                 <option key={p.id} value={p.name}>
                   {p.name}
@@ -91,8 +123,9 @@ export default function NewProjectModal({ open, onClose, sponsors, pms, departme
             </select>
           </div>
           <div className="modal-field">
-            <label>Sponsor</label>
+            <label>Sponsor *</label>
             <select value={sponsor} onChange={(e) => setSponsor(e.target.value)}>
+              <option value="">Selecciona un sponsor</option>
               {sponsors.map((s) => (
                 <option key={s.id} value={s.name}>
                   {s.name}
@@ -114,13 +147,13 @@ export default function NewProjectModal({ open, onClose, sponsors, pms, departme
             </select>
           </div>
           <div className="modal-field">
-            <label>Fecha límite prevista</label>
+            <label>Fecha límite prevista *</label>
             <input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} />
           </div>
         </div>
 
         <div className="modal-field">
-          <label>Presupuesto (€)</label>
+          <label>Presupuesto (€) *</label>
           <input type="number" min="0" placeholder="Ej: 50000" value={budget} onChange={(e) => setBudget(e.target.value)} />
         </div>
 
@@ -135,7 +168,7 @@ export default function NewProjectModal({ open, onClose, sponsors, pms, departme
         </div>
 
         <div className="modal-field">
-          <label>Contribuye a estos objetivos estratégicos (OKR)</label>
+          <label>Contribuye a estos objetivos estratégicos (OKR) *</label>
           <div className="okr-checklist">
             {okrCatalog.map((o) => (
               <label key={o.id} className="okr-checklist-item">
@@ -148,12 +181,14 @@ export default function NewProjectModal({ open, onClose, sponsors, pms, departme
           </div>
         </div>
 
+        {error && <p className="modal-error">{error}</p>}
+
         <div className="modal-actions">
-          <button className="modal-btn modal-btn--ghost" onClick={handleClose}>
+          <button className="modal-btn modal-btn--ghost" onClick={onClose}>
             Cancelar
           </button>
-          <button className="modal-btn modal-btn--primary" onClick={handleCreate}>
-            Crear proyecto
+          <button className="modal-btn modal-btn--primary" onClick={handleSubmit}>
+            {isEdit ? "Guardar cambios" : "Crear proyecto"}
           </button>
         </div>
       </div>

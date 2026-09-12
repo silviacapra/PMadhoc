@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { PencilIcon } from "../icons/Icons";
+import { PencilIcon, TrashIcon } from "../icons/Icons";
+import { ROLE_RESPONSIBILITIES } from "../../data/roleResponsibilities";
+import ConfirmDeleteModal from "../shared/ConfirmDeleteModal";
 import "./Stakeholders.css";
 
-function StakeholderCard({ stakeholder, onUpdate }) {
+function StakeholderCard({ stakeholder, onUpdate, onDeleteRequest }) {
   const [editing, setEditing] = useState(false);
   const [rol, setRol] = useState(stakeholder.rol);
   const [ubicacion, setUbicacion] = useState(stakeholder.ubicacion);
@@ -31,9 +33,14 @@ function StakeholderCard({ stakeholder, onUpdate }) {
             .join("")
             .toUpperCase()}
         </div>
-        <button className="stakeholder-icon-btn" onClick={() => (editing ? handleCancel() : setEditing(true))}>
-          <PencilIcon size={14} color="currentColor" />
-        </button>
+        <div className="stakeholder-card-actions">
+          <button className="stakeholder-icon-btn" onClick={() => (editing ? handleCancel() : setEditing(true))}>
+            <PencilIcon size={14} color="currentColor" />
+          </button>
+          <button className="stakeholder-icon-btn stakeholder-icon-btn--danger" onClick={() => onDeleteRequest(stakeholder)}>
+            <TrashIcon size={14} color="currentColor" />
+          </button>
+        </div>
       </div>
       <h4>{stakeholder.name}</h4>
 
@@ -76,13 +83,25 @@ function StakeholderCard({ stakeholder, onUpdate }) {
             <span className="stakeholder-label">Plan de comunicación</span>
             <span>{stakeholder.planComunicacion}</span>
           </div>
+          {ROLE_RESPONSIBILITIES[stakeholder.rol] && (
+            <div className="stakeholder-field">
+              <span className="stakeholder-label">Responsabilidad del rol</span>
+              <ul className="stakeholder-responsibilities">
+                {ROLE_RESPONSIBILITIES[stakeholder.rol].map((r, i) => (
+                  <li key={i}>{r}</li>
+                ))}
+              </ul>
+            </div>
+          )}
         </>
       )}
     </div>
   );
 }
 
-export default function Stakeholders({ stakeholders, updateStakeholder }) {
+export default function Stakeholders({ stakeholders, updateStakeholder, deleteStakeholder }) {
+  const [deleteTarget, setDeleteTarget] = useState(null);
+
   return (
     <div>
       <h1 className="page-title">Stakeholders</h1>
@@ -90,9 +109,20 @@ export default function Stakeholders({ stakeholders, updateStakeholder }) {
 
       <div className="stakeholder-grid">
         {stakeholders.map((s) => (
-          <StakeholderCard key={s.id} stakeholder={s} onUpdate={updateStakeholder} />
+          <StakeholderCard key={s.id} stakeholder={s} onUpdate={updateStakeholder} onDeleteRequest={setDeleteTarget} />
         ))}
       </div>
+
+      <ConfirmDeleteModal
+        item={deleteTarget}
+        itemLabel="stakeholder"
+        itemName={deleteTarget?.name}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={(id) => {
+          deleteStakeholder(id);
+          setDeleteTarget(null);
+        }}
+      />
     </div>
   );
 }

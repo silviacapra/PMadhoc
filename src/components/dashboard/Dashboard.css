@@ -103,6 +103,12 @@
   color: rgba(255, 255, 255, 0.75);
 }
 
+.project-card-audit {
+  margin: 10px 0 0 0;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
 .project-card-stats {
   display: flex;
   gap: 32px;

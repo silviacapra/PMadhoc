@@ -1,5 +1,11 @@
 import { ROADMAP_CONTENT, PHASE_ORDER, DEFAULT_TASK_STATUS } from "../data/roadmapContent";
 
+// Los estados de ejemplo (done/green/yellow) solo son reales para los 3
+// proyectos de muestra originales. Cualquier otro proyecto (incluidos los que
+// crea el usuario) debe partir siempre de "notStarted", nunca heredar el
+// avance de la demo.
+const DEMO_SEED_PROJECT_IDS = new Set(["crm-migration", "client-portal", "sales-crm"]);
+
 export function buildPhases(selectedPhase, currentPhase) {
   const currentIndex = PHASE_ORDER.indexOf(currentPhase);
   return PHASE_ORDER.map((id, i) => {
@@ -18,12 +24,13 @@ export function buildPhases(selectedPhase, currentPhase) {
   });
 }
 
-export function buildRoadmapSteps(selectedPhase, taskAssignments, expandedStepKey) {
+export function buildRoadmapSteps(selectedPhase, taskAssignments, expandedStepKey, projectId) {
+  const useDemoDefaults = DEMO_SEED_PROJECT_IDS.has(projectId);
   return ROADMAP_CONTENT[selectedPhase].steps.map((step, idx) => {
     const key = `${selectedPhase}__${idx}`;
-    const defaults = DEFAULT_TASK_STATUS[key] || {};
+    const defaults = (useDemoDefaults && DEFAULT_TASK_STATUS[key]) || {};
     const meta = { ...defaults, ...(taskAssignments[key] || {}) };
-    const status = meta.status || null;
+    const status = meta.status || (useDemoDefaults ? null : "notStarted");
     const isDone = status === "done";
     const outputsMeta = meta.outputs || {};
     const outputs = (step.outputs || []).map((label, outIdx) => ({
@@ -57,6 +64,26 @@ export function buildRoadmapSteps(selectedPhase, taskAssignments, expandedStepKe
   });
 }
 
+export function buildGanttRows(taskAssignments, projectId) {
+  const useDemoDefaults = DEMO_SEED_PROJECT_IDS.has(projectId);
+  return PHASE_ORDER.map((phaseId) => ({
+    phaseId,
+    phaseLabel: ROADMAP_CONTENT[phaseId].label,
+    steps: ROADMAP_CONTENT[phaseId].steps.map((step, idx) => {
+      const key = `${phaseId}__${idx}`;
+      const defaults = (useDemoDefaults && DEFAULT_TASK_STATUS[key]) || {};
+      const meta = { ...defaults, ...(taskAssignments[key] || {}) };
+      return {
+        key,
+        title: step.title,
+        status: meta.status || (useDemoDefaults ? null : "notStarted"),
+        startDate: meta.startDate || "",
+        endDate: meta.endDate || "",
+      };
+    }),
+  }));
+}
+
 export function buildDocumentacionGroups(taskAssignments) {
   return PHASE_ORDER.map((phaseId) => {
     const docs = [];
@@ -84,14 +111,15 @@ export function buildInitialTaskAssignments() {
   return assignments;
 }
 
-export function getCurrentTaskStatus(currentPhase, taskAssignments) {
+export function getCurrentTaskStatus(currentPhase, taskAssignments, projectId) {
   if (!currentPhase || !ROADMAP_CONTENT[currentPhase]) return null;
   const steps = ROADMAP_CONTENT[currentPhase].steps;
   if (steps.length === 0) return null;
+  const useDemoDefaults = DEMO_SEED_PROJECT_IDS.has(projectId);
 
   const statusOf = (idx) => {
     const key = `${currentPhase}__${idx}`;
-    const defaults = DEFAULT_TASK_STATUS[key] || {};
+    const defaults = (useDemoDefaults && DEFAULT_TASK_STATUS[key]) || {};
     const meta = { ...defaults, ...(taskAssignments[key] || {}) };
     return meta.status || "notStarted";
   };

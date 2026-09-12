@@ -9,7 +9,7 @@ export const KB_CATEGORIES = [
 
 export const ARTICLES = [
   {
-    title: "Qué es la triple restricción y por qué te la piden en cada reunión",
+    title: "Triple restricción",
     category: "Fundamentos",
     readTime: "4 min",
     reference: "PMBOK® Guide – 6ª edición · Sección 1.2.6 \"Restricciones del proyecto\"",
@@ -42,7 +42,7 @@ export const ARTICLES = [
       "El truco para usarla en una reunión real: cuando alguien pida un cambio, dibuja el triángulo en voz alta. \"Vale, añadimos esto: ¿de dónde sacamos el tiempo o el presupuesto?\". Convierte una discusión emocional en una decisión de trade-off explícita.",
   },
   {
-    title: "Cómo montar un registro de riesgos que de verdad se usa",
+    title: "Registro de riesgos",
     category: "Riesgos",
     readTime: "6 min",
     reference: "PMBOK® Guide – 6ª edición · Capítulo 11 \"Gestión de los riesgos del proyecto\", sección 11.2",
@@ -73,7 +73,7 @@ export const ARTICLES = [
       "Revisa el registro en cada punto de control del roadmap (los \"gate review\"), no solo cuando algo ya ha pasado. Un riesgo bien gestionado es aburrido: se ve venir, se mitiga, y no aparece en ningún informe de estado en rojo.",
   },
   {
-    title: "Plan de comunicación: quién necesita saber qué, y cuándo",
+    title: "Plan de comunicación",
     category: "Comunicación",
     readTime: "5 min",
     reference: "PMBOK® Guide – 6ª edición · Capítulo 10 \"Gestión de las comunicaciones del proyecto\", sección 10.1",
@@ -101,7 +101,7 @@ export const ARTICLES = [
       "Un buen indicador de que el plan de comunicación funciona: nadie se sorprende en una reunión de comité. Si el sponsor se entera en la reunión mensual de un riesgo que el equipo conocía desde hace tres semanas, el plan de comunicación ha fallado, no el proyecto.",
   },
   {
-    title: "Scrum vs. Waterfall: cuándo conviene cada uno",
+    title: "Scrum vs. Waterfall",
     category: "Agile",
     readTime: "7 min",
     reference: "PMI Agile Practice Guide · Sección 2 \"Ciclos de vida ágiles y ciclos de vida híbridos\"",
@@ -129,7 +129,7 @@ export const ARTICLES = [
       "Por eso en la app puedes marcar cada proyecto como Cascada, Ágil o Híbrida, y las plantillas se adaptan a esa elección.",
   },
   {
-    title: "La matriz RACI explicada sin jerga",
+    title: "Matriz RACI",
     category: "Fundamentos",
     readTime: "3 min",
     reference: "PMBOK® Guide – 6ª edición · Capítulo 9 \"Gestión de los recursos del proyecto\", sección 9.1.2.2",
@@ -158,7 +158,7 @@ export const ARTICLES = [
       "Rellenar un RACI al principio del proyecto (durante la fase de Planificar) evita después la típica frase: \"pensé que eso lo llevabas tú\".",
   },
   {
-    title: "Cómo priorizar el backlog cuando todo es 'urgente'",
+    title: "Priorización del backlog",
     category: "Agile",
     readTime: "5 min",
     reference: "PMI Agile Practice Guide · Sección 5 \"Implementación ágil\"",
@@ -185,7 +185,7 @@ export const ARTICLES = [
       "Sea cual sea el método, la priorización tiene que revisarse cada sprint, no fijarse una vez y olvidarse. El backlog es un documento vivo, no un contrato.",
   },
   {
-    title: "WBS: cómo desglosar un proyecto sin perderte en el intento",
+    title: "WBS del proyecto",
     category: "Cronograma",
     readTime: "6 min",
     reference: "PMBOK® Guide – 6ª edición · Capítulo 5 \"Gestión del alcance del proyecto\", sección 5.4 \"Crear la EDT/WBS\"",
@@ -207,7 +207,7 @@ export const ARTICLES = [
     ],
   },
   {
-    title: "Gate review: qué es y por qué el botón de avanzar de fase está bloqueado",
+    title: "Gate review",
     category: "Calidad",
     readTime: "4 min",
     reference: "PMBOK® Guide – 6ª edición · Sección 1.2.4.3 \"Fases del proyecto\" (phase gates)",
@@ -225,7 +225,7 @@ export const ARTICLES = [
     ],
   },
   {
-    title: "Gestión de stakeholders: mapear antes de comunicar",
+    title: "Gestión de stakeholders",
     category: "Comunicación",
     readTime: "5 min",
     reference: "PMBOK® Guide – 6ª edición · Capítulo 13 \"Gestión de los interesados del proyecto\", sección 13.1",
@@ -246,7 +246,7 @@ export const ARTICLES = [
       "La sección de Stakeholders de esta app recoge exactamente esto: quién es cada persona, cómo se le localiza, y cuál es su plan de comunicación acordado — para no tener que reconstruirlo de memoria en cada proyecto nuevo.",
   },
   {
-    title: "Lecciones aprendidas: por qué conviene registrarlas sobre la marcha",
+    title: "Lecciones aprendidas",
     category: "Fundamentos",
     readTime: "4 min",
     reference: "PMBOK® Guide – 6ª edición · Sección 4.4 \"Gestionar el conocimiento del proyecto\"",

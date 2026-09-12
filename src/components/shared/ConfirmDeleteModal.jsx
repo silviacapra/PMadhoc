@@ -1,10 +1,10 @@
 import { useState } from "react";
-import "./NewProjectModal.css";
+import "../dashboard/NewProjectModal.css";
 
-export default function DeleteProjectModal({ project, onClose, onConfirm }) {
+export default function ConfirmDeleteModal({ item, itemLabel, itemName, onClose, onConfirm }) {
   const [confirmText, setConfirmText] = useState("");
 
-  if (!project) return null;
+  if (!item) return null;
 
   function handleClose() {
     setConfirmText("");
@@ -13,16 +13,16 @@ export default function DeleteProjectModal({ project, onClose, onConfirm }) {
 
   function handleConfirm() {
     if (confirmText !== "Delete") return;
-    onConfirm(project.id);
+    onConfirm(item.id);
     setConfirmText("");
   }
 
   return (
     <div className="modal-overlay" onClick={handleClose}>
       <div className="modal-box" onClick={(e) => e.stopPropagation()}>
-        <h2 className="modal-title">Eliminar proyecto</h2>
+        <h2 className="modal-title">Eliminar {itemLabel}</h2>
         <p className="delete-modal-text">
-          Vas a eliminar <strong>{project.name}</strong>. Esta acción no se puede deshacer. Para confirmar, escribe la
+          Vas a eliminar <strong>{itemName}</strong>. Esta acción no se puede deshacer. Para confirmar, escribe la
           palabra <strong>Delete</strong> abajo.
         </p>
         <div className="modal-field">

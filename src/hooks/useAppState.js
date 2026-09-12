@@ -16,6 +16,7 @@ import { ROLE_PERMISSIONS, ROLE_LABELS, defaultViewForRole } from "../data/roles
 import { PHASE_ORDER, ROADMAP_CONTENT } from "../data/roadmapContent";
 import { GATE_REQUIREMENTS } from "../data/roadmapGates";
 import { TEAM_MEMBERS, INITIAL_STAKEHOLDERS } from "../data/team";
+import { RISK_CATEGORIES, PROBABILIDAD_OPTIONS, RIESGO_ESTADO_OPTIONS } from "../data/riesgos";
 import { PHASE_FILTER_DEFS, METHODOLOGY_FILTER_DEFS, TYPE_FILTER_DEFS, ALL_TEMPLATES } from "../data/templates";
 import { INITIAL_PROJECTS } from "../data/projects";
 import { STATUS_REPORTS } from "../data/statusReport";
@@ -27,6 +28,7 @@ import {
   buildPhases,
   buildRoadmapSteps,
   buildDocumentacionGroups,
+  buildGanttRows,
   buildInitialTaskAssignments,
   getCurrentTaskStatus,
   nextPhase,
@@ -37,8 +39,18 @@ import { riskLevel, slugify } from "../utils/projects";
 
 const INITIAL_AUTH_FORM = { name: "", email: "", password: "", role: "pm" };
 const INITIAL_PASSWORD_FORM = { current: "", next: "", confirm: "" };
-const INITIAL_REGISTRY_FORM = { desc: "", impact: "medio", owner: "", status: "" };
-const INITIAL_LECCION_FORM = { texto: "" };
+const INITIAL_REGISTRY_FORM = {
+  nombre: "",
+  desc: "",
+  categoria: RISK_CATEGORIES[0],
+  probabilidad: PROBABILIDAD_OPTIONS[0],
+  impacto: "medio",
+  mitigacion: "",
+  prioridad: "",
+  propietario: TEAM_MEMBERS[0]?.name || "",
+  estado: RIESGO_ESTADO_OPTIONS[0],
+};
+const INITIAL_LECCION_FORM = { texto: "", fase: "generica", autor: TEAM_MEMBERS[0]?.name || "" };
 const DEFAULT_REPORT_CATEGORIES = [
   { label: "Alcance", status: "onTrack", note: "" },
   { label: "Cronograma", status: "onTrack", note: "" },
@@ -112,6 +124,8 @@ export function useAppState() {
   const [fichaExpandedStepKey, setFichaExpandedStepKey] = useState(null);
 
   const [stakeholders, setStakeholders] = useState([]);
+  const [customArticles, setCustomArticles] = useState([]);
+  const [addArticleOpen, setAddArticleOpen] = useState(false);
 
   const [deleteProjectId, setDeleteProjectId] = useState(null);
 
@@ -129,6 +143,12 @@ export function useAppState() {
   const [leccionesSelectedProjectId, setLeccionesSelectedProjectId] = useState("");
   const [leccionesItems, setLeccionesItems] = useState([]);
   const [leccionesForm, setLeccionesForm] = useState(INITIAL_LECCION_FORM);
+
+  const [documentacionSelectedProjectId, setDocumentacionSelectedProjectId] = useState("");
+  const [documentacionRoadmapData, setDocumentacionRoadmapData] = useState(null);
+
+  const [ganttSelectedProjectId, setGanttSelectedProjectId] = useState("");
+  const [ganttRoadmapData, setGanttRoadmapData] = useState(null);
 
   // Sesión: se queda escuchando si hay alguien conectado (y sigue conectado tras recargar la página).
   useEffect(() => {
@@ -193,6 +213,18 @@ export function useAppState() {
     })();
   }, [user]);
 
+  // Traslada los artículos de la base de conocimiento a Firestore (solo si faltan) para que se puedan editar.
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      for (const a of ARTICLES) {
+        const id = slugify(a.title);
+        const snap = await getDoc(doc(db, "knowledgeArticles", id));
+        if (!snap.exists()) await setDoc(doc(db, "knowledgeArticles", id), a);
+      }
+    })();
+  }, [user]);
+
   // Escucha en tiempo real los datos compartidos y el perfil/chat de este usuario.
   useEffect(() => {
     if (!user) return;
@@ -205,6 +237,7 @@ export function useAppState() {
       onSnapshot(collection(db, "projects"), (snap) => setProjects(snap.docs.map((d) => ({ id: d.id, ...d.data() })))),
       onSnapshot(collection(db, "templates"), (snap) => setTemplatesList(snap.docs.map((d) => ({ id: d.id, ...d.data() })))),
       onSnapshot(collection(db, "stakeholders"), (snap) => setStakeholders(snap.docs.map((d) => ({ id: d.id, ...d.data() })))),
+      onSnapshot(collection(db, "knowledgeArticles"), (snap) => setCustomArticles(snap.docs.map((d) => ({ id: d.id, ...d.data() })))),
       onSnapshot(doc(db, "users", user.uid), (snap) => {
         if (snap.exists()) setProfile(snap.data());
       }),
@@ -226,13 +259,22 @@ export function useAppState() {
     }
   }, [profile]);
 
-  // Elige un proyecto por defecto en Status Report, Riesgos y Lecciones en cuanto llegan los proyectos.
+  // Elige un proyecto por defecto en Status Report, Riesgos, Documentación, Lecciones y Roadmap (Gantt) en cuanto llegan los proyectos.
   useEffect(() => {
     if (projects.length === 0) return;
     if (!statusSelectedProjectId) setStatusSelectedProjectId(projects[0].id);
     if (!riesgosSelectedProjectId) setRiesgosSelectedProjectId(projects[0].id);
     if (!leccionesSelectedProjectId) setLeccionesSelectedProjectId(projects[0].id);
-  }, [projects, statusSelectedProjectId, riesgosSelectedProjectId, leccionesSelectedProjectId]);
+    if (!documentacionSelectedProjectId) setDocumentacionSelectedProjectId(projects[0].id);
+    if (!ganttSelectedProjectId) setGanttSelectedProjectId(projects[0].id);
+  }, [
+    projects,
+    statusSelectedProjectId,
+    riesgosSelectedProjectId,
+    leccionesSelectedProjectId,
+    documentacionSelectedProjectId,
+    ganttSelectedProjectId,
+  ]);
 
   // Informe de estado y roadmap (para los datos automáticos) del proyecto elegido en Status Report.
   useEffect(() => {
@@ -265,6 +307,24 @@ export function useAppState() {
     );
     return unsub;
   }, [user, leccionesSelectedProjectId]);
+
+  // Roadmap del proyecto elegido en Documentación (para sacar los entregables enlazados).
+  useEffect(() => {
+    if (!user || !documentacionSelectedProjectId) return;
+    const unsub = onSnapshot(doc(db, "projects", documentacionSelectedProjectId, "roadmap", "main"), (snap) => {
+      setDocumentacionRoadmapData(snap.exists() ? snap.data() : null);
+    });
+    return unsub;
+  }, [user, documentacionSelectedProjectId]);
+
+  // Roadmap del proyecto elegido en la vista Gantt.
+  useEffect(() => {
+    if (!user || !ganttSelectedProjectId) return;
+    const unsub = onSnapshot(doc(db, "projects", ganttSelectedProjectId, "roadmap", "main"), (snap) => {
+      setGanttRoadmapData(snap.exists() ? snap.data() : null);
+    });
+    return unsub;
+  }, [user, ganttSelectedProjectId]);
 
   // Al abrir la ficha de un proyecto: si es la primera vez, crea su roadmap con la fase
   // que ya tenía el proyecto; luego escucha en tiempo real su roadmap.
@@ -473,18 +533,19 @@ export function useAppState() {
     await deleteDoc(doc(db, "okrs", id));
   }
 
+  function daysLeftFromDeadline(deadline, fallback) {
+    if (!deadline) return fallback;
+    const diffMs = new Date(deadline).getTime() - Date.now();
+    return Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+  }
+
   async function addProject({ name, methodology, sponsor, pm, department, contributesTo, deadline, hitos, budget }) {
     const id = `${slugify(name)}-${Date.now()}`;
-    let daysLeft = 90;
-    if (deadline) {
-      const diffMs = new Date(deadline).getTime() - Date.now();
-      daysLeft = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
-    }
     await setDoc(doc(db, "projects", id), {
       name,
       phase: "Pre-proyecto",
       progress: 0,
-      daysLeft,
+      daysLeft: daysLeftFromDeadline(deadline, 90),
       risks: 0,
       status: "onTrack",
       methodology,
@@ -496,6 +557,26 @@ export function useAppState() {
       hitos: hitos || "",
       budgetTotal: Number(budget) || 0,
       budgetSpent: 0,
+      createdAt: new Date().toISOString(),
+      createdBy: profile?.name || "Usuario",
+    });
+  }
+
+  async function updateProject(id, { name, methodology, sponsor, pm, department, contributesTo, deadline, hitos, budget }) {
+    const existing = projects.find((p) => p.id === id);
+    await updateDoc(doc(db, "projects", id), {
+      name,
+      methodology,
+      sponsor,
+      pm,
+      department,
+      contributesTo,
+      deadline: deadline || "",
+      hitos: hitos || "",
+      budgetTotal: Number(budget) || 0,
+      daysLeft: daysLeftFromDeadline(deadline, existing?.daysLeft ?? 90),
+      lastModifiedBy: profile?.name || "Usuario",
+      lastModifiedAt: new Date().toISOString(),
     });
   }
 
@@ -508,9 +589,10 @@ export function useAppState() {
   }
 
   async function addRiesgo() {
-    if (!riesgosForm.desc.trim() || !riesgosSelectedProjectId) return;
+    if (!riesgosForm.nombre.trim() || !riesgosSelectedProjectId) return;
     await addDoc(collection(db, "projects", riesgosSelectedProjectId, "riesgos"), {
       ...riesgosForm,
+      nombre: riesgosForm.nombre.trim(),
       desc: riesgosForm.desc.trim(),
       fecha: todayStr(),
     });
@@ -525,7 +607,8 @@ export function useAppState() {
     if (!leccionesForm.texto.trim() || !leccionesSelectedProjectId) return;
     await addDoc(collection(db, "projects", leccionesSelectedProjectId, "lecciones"), {
       texto: leccionesForm.texto.trim(),
-      autor: profile?.name || "Usuario",
+      fase: leccionesForm.fase,
+      autor: leccionesForm.autor || profile?.name || "Usuario",
       fecha: todayStr(),
     });
     setLeccionesForm(INITIAL_LECCION_FORM);
@@ -573,6 +656,41 @@ export function useAppState() {
     await updateDoc(doc(db, "stakeholders", id), patch);
   }
 
+  async function deleteStakeholder(id) {
+    await deleteDoc(doc(db, "stakeholders", id));
+  }
+
+  async function deleteArticle(id) {
+    await deleteDoc(doc(db, "knowledgeArticles", id));
+  }
+
+  function estimateReadTime(body) {
+    return `${Math.max(1, Math.round(body.join(" ").split(/\s+/).length / 200))} min`;
+  }
+
+  async function addArticle({ title, category, body }) {
+    await addDoc(collection(db, "knowledgeArticles"), {
+      title,
+      category,
+      readTime: estimateReadTime(body),
+      body,
+      autor: profile?.name || "Usuario",
+      fecha: todayStr(),
+    });
+    setAddArticleOpen(false);
+  }
+
+  async function updateArticle(id, { title, category, body }) {
+    await setDoc(doc(db, "knowledgeArticles", id), {
+      title,
+      category,
+      readTime: estimateReadTime(body),
+      body,
+      autor: profile?.name || "Usuario",
+      fecha: todayStr(),
+    });
+  }
+
   async function deleteProject(id) {
     await deleteDoc(doc(db, "projects", id));
     setDeleteProjectId(null);
@@ -616,7 +734,8 @@ export function useAppState() {
   const seedReport = STATUS_REPORTS[statusSelectedProject?.id];
   const currentTask = getCurrentTaskStatus(
     statusRoadmapData?.currentPhase || phaseLabelToKey(statusSelectedProject?.phase),
-    statusRoadmapData?.taskAssignments || {}
+    statusRoadmapData?.taskAssignments || {},
+    statusSelectedProject?.id
   );
   const budgetTotal = statusSelectedProject?.budgetTotal || 0;
   const budgetSpent = statusReportDoc?.budgetSpent ?? statusSelectedProject?.budgetSpent ?? 0;
@@ -669,8 +788,10 @@ export function useAppState() {
       canEmpresa: can("empresa"),
       canKnowledge: can("knowledge"),
       canRoadmap: can("roadmap"),
+      canGantt: can("gantt"),
       canTemplates: can("templates"),
       canRiesgos: can("riesgos"),
+      canDocumentacion: can("documentacion"),
       canLecciones: can("lecciones"),
       canChatbot: can("chatbot"),
       canStatusReport: can("statusreport"),
@@ -680,6 +801,7 @@ export function useAppState() {
     dashboard: {
       projects,
       addProject,
+      updateProject,
       okrCatalog,
       openFicha,
       deleteProjectId,
@@ -707,7 +829,12 @@ export function useAppState() {
       openLecciones,
       roadmap: {
         phases: buildPhases(fichaRoadmapPhase || fichaCurrentPhase || "preproyecto", fichaCurrentPhase || "preproyecto"),
-        steps: buildRoadmapSteps(fichaRoadmapPhase || fichaCurrentPhase || "preproyecto", fichaTaskAssignments, fichaExpandedStepKey),
+        steps: buildRoadmapSteps(
+          fichaRoadmapPhase || fichaCurrentPhase || "preproyecto",
+          fichaTaskAssignments,
+          fichaExpandedStepKey,
+          fichaProjectId
+        ),
         selectedPhase: fichaRoadmapPhase || fichaCurrentPhase || "preproyecto",
         isCurrentPhase: (fichaRoadmapPhase || fichaCurrentPhase) === fichaCurrentPhase,
         isLastPhase: (fichaRoadmapPhase || fichaCurrentPhase) === PHASE_ORDER[PHASE_ORDER.length - 1],
@@ -726,6 +853,7 @@ export function useAppState() {
     },
     stakeholders,
     updateStakeholder,
+    deleteStakeholder,
     templates: {
       phaseFilters: PHASE_FILTER_DEFS,
       methodologyFilters: METHODOLOGY_FILTER_DEFS,
@@ -777,6 +905,7 @@ export function useAppState() {
       form: riesgosForm,
       updateField: updateRiesgoField,
       add: addRiesgo,
+      teamMembers: TEAM_MEMBERS,
     },
     lecciones: {
       projects,
@@ -786,8 +915,29 @@ export function useAppState() {
       form: leccionesForm,
       updateField: updateLeccionField,
       add: addLeccion,
+      teamMembers: TEAM_MEMBERS,
     },
-    knowledge: { categories: KB_CATEGORIES, articles: ARTICLES },
+    documentacionPage: {
+      projects,
+      selectedProjectId: documentacionSelectedProjectId,
+      setSelectedProjectId: setDocumentacionSelectedProjectId,
+      groups: buildDocumentacionGroups(documentacionRoadmapData?.taskAssignments || {}),
+    },
+    ganttPage: {
+      projects,
+      selectedProjectId: ganttSelectedProjectId,
+      setSelectedProjectId: setGanttSelectedProjectId,
+      phases: buildGanttRows(ganttRoadmapData?.taskAssignments || {}, ganttSelectedProjectId),
+    },
+    knowledge: {
+      categories: KB_CATEGORIES,
+      articles: customArticles,
+      addArticleOpen,
+      setAddArticleOpen,
+      addArticle,
+      updateArticle,
+      deleteArticle,
+    },
     chatbot: { messages, chatInput, setChatInput, sendMessage, loading: chatLoading, error: chatError },
     profile: {
       current: profile || { name: "", email: "" },
