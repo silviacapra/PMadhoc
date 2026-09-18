@@ -8,7 +8,7 @@ export default function DocumentacionPage({ documentacionPage }) {
 
   return (
     <div>
-      <h1 className="page-title">Documentación</h1>
+      <h1 className="page-title">Repositorio documental</h1>
 
       <div className="doc-disclaimer">
         ℹ️ Esta sección se rellena automáticamente desde el apartado <strong>Roadmap Proyecto</strong>: en cuanto marcas un

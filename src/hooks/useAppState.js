@@ -58,6 +58,9 @@ const DEFAULT_REPORT_CATEGORIES = [
   { label: "Equipo", status: "onTrack", note: "" },
 ];
 
+const ALLOWED_EMAILS = new Set(["silvia.capra.90@gmail.com", "sil_star@hotmail.it"]);
+const NOT_ALLOWED_MESSAGE = "Esta app está en acceso restringido de momento. Este correo no tiene permiso para entrar.";
+
 const AUTH_ERROR_MESSAGES = {
   "auth/email-already-in-use": "Ese correo ya está registrado. Prueba a iniciar sesión.",
   "auth/invalid-email": "El correo electrónico no es válido.",
@@ -151,6 +154,14 @@ export function useAppState() {
   // Sesión: se queda escuchando si hay alguien conectado (y sigue conectado tras recargar la página).
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => {
+      if (u && !ALLOWED_EMAILS.has((u.email || "").toLowerCase())) {
+        signOut(auth);
+        setAuthError(NOT_ALLOWED_MESSAGE);
+        setUser(null);
+        setAuthReady(true);
+        profileLoadedRef.current = false;
+        return;
+      }
       setUser(u);
       setAuthReady(true);
       if (!u) profileLoadedRef.current = false;
@@ -382,9 +393,13 @@ export function useAppState() {
 
   async function submitAuth() {
     setAuthError("");
+    const email = authForm.email.trim();
+    if (!ALLOWED_EMAILS.has(email.toLowerCase())) {
+      setAuthError(NOT_ALLOWED_MESSAGE);
+      return;
+    }
     setAuthBusy(true);
     try {
-      const email = authForm.email.trim();
       if (authMode === "signup") {
         const name = authForm.name.trim();
         const roleField = authForm.role || "pm";

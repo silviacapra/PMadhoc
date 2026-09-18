@@ -31,11 +31,11 @@ export function defaultViewForRole(role) {
 export const NAV_ITEMS = [
   { id: "dashboard", label: "Dashboard", icon: "dashboard", group: "main" },
   { id: "roadmap", label: "Roadmap Proyectos", icon: "roadmap", group: "main" },
-  { id: "documentacion", label: "Documentación", icon: "documentacion", group: "main" },
+  { id: "documentacion", label: "Repositorio documental", icon: "documentacion", group: "main" },
   { id: "riesgos", label: "Registro de riesgos", icon: "riesgos", group: "main" },
   { id: "lecciones", label: "Lecciones aprendidas", icon: "lecciones", group: "main" },
   { id: "statusreport", label: "Status Report", icon: "statusreport", group: "main" },
-  { id: "templates", label: "Plantillas", icon: "templates", group: "secondary" },
+  { id: "templates", label: "Mis Plantillas", icon: "templates", group: "secondary" },
   { id: "knowledge", label: "Base de conocimiento", icon: "knowledge", group: "secondary" },
   { id: "stakeholders", label: "Stakeholders", icon: "stakeholders", group: "secondary" },
   { id: "empresa", label: "Empresa y OKR", icon: "empresa", group: "secondary" },

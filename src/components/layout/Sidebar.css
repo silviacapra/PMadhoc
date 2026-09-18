@@ -27,9 +27,9 @@
 }
 
 .sidebar-nav--secondary {
-  padding-top: 12px;
-  margin-top: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 16px;
+  margin-top: auto;
+  border-top: 1px solid #ffffff;
 }
 
 .nav-item {
