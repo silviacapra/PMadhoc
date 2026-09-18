@@ -13,34 +13,59 @@
 
 .ficha-picker-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 18px;
 }
 
 .ficha-picker-card {
+  display: flex;
+  flex-direction: column;
   background: var(--white);
-  border-radius: 12px;
-  padding: 18px;
+  border-radius: 14px;
+  overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   cursor: pointer;
   transition: box-shadow 0.15s ease, transform 0.15s ease;
 }
 
 .ficha-picker-card:hover {
-  box-shadow: 0 6px 18px rgba(0, 45, 98, 0.12);
-  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0, 45, 98, 0.14);
+  transform: translateY(-3px);
+}
+
+.ficha-picker-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 88px;
+}
+
+.ficha-picker-body {
+  padding: 14px 16px 16px;
+  border-top: 1px solid var(--border-light);
 }
 
 .ficha-picker-card h4 {
-  margin: 0 0 6px 0;
-  font-size: 15px;
+  margin: 0 0 10px 0;
+  font-size: 14.5px;
   font-weight: 700;
-  color: var(--blue-primary);
+  color: var(--gray-dark);
 }
 
-.ficha-picker-card span {
-  font-size: 12px;
+.ficha-picker-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ficha-picker-tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
   color: var(--text-muted);
+  background: var(--gray-light);
+  padding: 4px 10px;
+  border-radius: 20px;
 }
 
 .ficha-tabs {
@@ -59,13 +84,24 @@
   border-radius: 8px;
   font-size: 12.5px;
   font-weight: 600;
-  color: var(--text-muted);
+  color: #000000;
   cursor: pointer;
 }
 
 .ficha-tab--active {
   background: var(--white);
+  color: #000000;
+  font-weight: 700;
+}
+
+.doc-disclaimer {
+  background: rgba(0, 45, 98, 0.06);
   color: var(--blue-primary);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  margin-bottom: 18px;
 }
 
 .registry-empty {
@@ -79,9 +115,18 @@
 }
 
 .doc-row {
-  display: block;
-  font-size: 13px;
-  font-weight: 600;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--border-lighter);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--blue-primary);
+}
+
+.doc-row:hover {
+  text-decoration: underline;
+}
+
+.doc-row svg {
+  flex-shrink: 0;
 }

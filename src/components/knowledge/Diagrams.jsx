@@ -110,6 +110,184 @@ export function StakeholderMatrixDiagram() {
   );
 }
 
+export function CommPlanDiagram() {
+  const rows = [
+    { who: "Sponsor", freq: "Quincenal", canal: "Comité" },
+    { who: "Equipo", freq: "Diario", canal: "Tablero" },
+    { who: "Cliente", freq: "Mensual", canal: "Informe" },
+  ];
+  return (
+    <svg viewBox="0 0 360 170" className="kb-diagram">
+      <rect x="10" y="10" width="340" height="34" fill="var(--blue-primary)" rx="6" />
+      {["Stakeholder", "Frecuencia", "Canal"].map((h, i) => (
+        <text key={h} x={30 + i * 115} y="32" fontSize="12" fontWeight="700" fill="#FFFFFF">
+          {h}
+        </text>
+      ))}
+      {rows.map((r, i) => (
+        <g key={r.who} transform={`translate(0, ${52 + i * 38})`}>
+          <rect x="10" y="0" width="340" height="30" fill={i % 2 === 0 ? "var(--gray-light)" : "#FFFFFF"} rx="4" />
+          <text x="30" y="20" fontSize="11.5" fontWeight="600" fill="var(--gray-dark)">
+            {r.who}
+          </text>
+          <text x="145" y="20" fontSize="11.5" fill="var(--text-muted)">
+            {r.freq}
+          </text>
+          <text x="260" y="20" fontSize="11.5" fill="var(--text-muted)">
+            {r.canal}
+          </text>
+        </g>
+      ))}
+    </svg>
+  );
+}
+
+export function ScrumWaterfallDiagram() {
+  const waterfall = ["Requisitos", "Diseño", "Desarrollo", "Pruebas"];
+  return (
+    <svg viewBox="0 0 360 190" className="kb-diagram">
+      <text x="10" y="18" fontSize="11" fontWeight="700" fill="var(--blue-primary)">
+        Waterfall
+      </text>
+      {waterfall.map((label, i) => (
+        <g key={label}>
+          <rect x={10 + i * 88} y="26" width="78" height="34" fill="var(--blue-primary)" rx="5" />
+          <text x={49 + i * 88} y="47" textAnchor="middle" fontSize="9.5" fontWeight="700" fill="#FFFFFF">
+            {label}
+          </text>
+          {i < waterfall.length - 1 && (
+            <text x={92 + i * 88} y="48" fontSize="14" fill="var(--text-faint)">
+              →
+            </text>
+          )}
+        </g>
+      ))}
+      <text x="10" y="100" fontSize="11" fontWeight="700" fill="var(--accent)">
+        Scrum
+      </text>
+      {[0, 1, 2].map((i) => (
+        <g key={i} transform={`translate(${20 + i * 110}, 112)`}>
+          <circle cx="30" cy="30" r="30" fill="none" stroke="var(--accent)" strokeWidth="4" strokeDasharray="10 6" />
+          <text x="30" y="35" textAnchor="middle" fontSize="10.5" fontWeight="700" fill="var(--accent)">
+            Sprint {i + 1}
+          </text>
+        </g>
+      ))}
+    </svg>
+  );
+}
+
+export function WbsDiagram() {
+  const fases = [
+    { x: 30, label: "Fase 1" },
+    { x: 140, label: "Fase 2" },
+    { x: 250, label: "Fase 3" },
+  ];
+  return (
+    <svg viewBox="0 0 360 190" className="kb-diagram">
+      <rect x="130" y="10" width="100" height="32" fill="var(--blue-primary)" rx="5" />
+      <text x="180" y="31" textAnchor="middle" fontSize="11" fontWeight="700" fill="#FFFFFF">
+        Proyecto
+      </text>
+      {fases.map((f) => (
+        <line key={f.label} x1="180" y1="42" x2={f.x + 40} y2="66" stroke="var(--border-light)" strokeWidth="2" />
+      ))}
+      {fases.map((f) => (
+        <g key={f.label}>
+          <rect x={f.x} y="66" width="80" height="30" fill="var(--accent)" rx="5" />
+          <text x={f.x + 40} y="86" textAnchor="middle" fontSize="10.5" fontWeight="700" fill="#FFFFFF">
+            {f.label}
+          </text>
+          {[0, 1].map((j) => (
+            <line
+              key={j}
+              x1={f.x + 40}
+              y1="96"
+              x2={f.x + 20 + j * 40}
+              y2="126"
+              stroke="var(--border-light)"
+              strokeWidth="2"
+            />
+          ))}
+          {[0, 1].map((j) => (
+            <rect key={j} x={f.x + j * 40} y="126" width="36" height="26" fill="var(--gray-light)" stroke="var(--border-light)" rx="4" />
+          ))}
+        </g>
+      ))}
+    </svg>
+  );
+}
+
+export function GateReviewDiagram() {
+  const fases = ["Iniciar", "Planificar", "Ejecutar"];
+  return (
+    <svg viewBox="0 0 360 120" className="kb-diagram">
+      {fases.map((label, i) => (
+        <g key={label}>
+          <rect x={10 + i * 122} y="30" width="96" height="40" fill="var(--gray-light)" stroke="var(--blue-primary)" strokeWidth="1.5" rx="6" />
+          <text x={58 + i * 122} y="54" textAnchor="middle" fontSize="11" fontWeight="700" fill="var(--blue-primary)">
+            {label}
+          </text>
+          {i < fases.length - 1 && (
+            <g transform={`translate(${106 + i * 122}, 50)`}>
+              <polygon points="0,-14 16,0 0,14 -16,0" fill="var(--accent)" />
+              <text x="0" y="4" textAnchor="middle" fontSize="12" fontWeight="700" fill="#FFFFFF">
+                ✓
+              </text>
+            </g>
+          )}
+        </g>
+      ))}
+    </svg>
+  );
+}
+
+export function LessonsLearnedDiagram() {
+  const steps = [
+    { lines: ["Proyecto", "en curso"], angle: -90 },
+    { lines: ["Se apunta", "la lección"], angle: 0 },
+    { lines: ["Se", "comparte"], angle: 90 },
+    { lines: ["Próximo", "proyecto"], angle: 180 },
+  ];
+  const cx = 180;
+  const cy = 105;
+  const r = 68;
+  return (
+    <svg viewBox="0 0 360 210" className="kb-diagram">
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke="var(--border-light)" strokeWidth="2" strokeDasharray="6 5" />
+      {steps.map((s) => {
+        const rad = (s.angle * Math.PI) / 180;
+        const x = cx + r * Math.cos(rad);
+        const y = cy + r * Math.sin(rad);
+        return (
+          <g key={s.lines.join(" ")}>
+            <circle cx={x} cy={y} r="32" fill="var(--blue-primary)" />
+            <text x={x} y={y} textAnchor="middle" fontSize="9" fontWeight="700" fill="#FFFFFF">
+              {s.lines.map((line, i) => (
+                <tspan key={i} x={x} dy={i === 0 ? -2 : 12}>
+                  {line}
+                </tspan>
+              ))}
+            </text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+export function DocumentPreviewDiagram() {
+  return (
+    <svg viewBox="0 0 360 220" className="kb-diagram">
+      <rect x="60" y="10" width="240" height="200" fill="#FFFFFF" stroke="var(--border-light)" strokeWidth="2" rx="8" />
+      <rect x="84" y="34" width="130" height="12" fill="var(--blue-primary)" rx="3" />
+      {[70, 96, 122, 148, 174].map((y) => (
+        <rect key={y} x="84" y={y} width={y === 174 ? 120 : 192} height="8" fill="var(--gray-light)" rx="3" />
+      ))}
+    </svg>
+  );
+}
+
 export function MoscowDiagram() {
   const rows = [
     { label: "Must — imprescindible", width: 300, color: "#b3261e" },

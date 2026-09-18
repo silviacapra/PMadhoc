@@ -21,51 +21,126 @@
   min-width: 240px;
 }
 
-.registry-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.registry-table-wrap {
+  overflow-x: auto;
   margin-bottom: 20px;
-}
-
-.registry-row {
-  display: flex;
-  gap: 14px;
-  padding: 12px;
-  background: var(--gray-light);
+  border: 1px solid var(--border-light);
   border-radius: 10px;
 }
 
-.registry-impact {
-  flex-shrink: 0;
-  font-size: 11px;
+.registry-table {
+  width: 100%;
+  min-width: 640px;
+  border-collapse: collapse;
+}
+
+.registry-table th {
+  text-align: left;
+  font-size: 10.5px;
   font-weight: 700;
   text-transform: uppercase;
-}
-
-.registry-desc {
-  margin: 0 0 4px 0;
-  font-size: 13px;
-  color: var(--gray-dark);
-}
-
-.registry-priority {
-  margin-left: 8px;
-  font-size: 11px;
-  font-weight: 600;
+  letter-spacing: 0.3px;
   color: var(--text-faint);
+  background: var(--gray-light);
+  padding: 10px 14px;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border-light);
 }
 
-.registry-note {
-  margin: 0 0 4px 0;
-  font-size: 12px;
+.registry-table td {
+  padding: 12px 14px;
+  font-size: 12.5px;
+  color: var(--gray-dark);
+  border-bottom: 1px solid var(--border-lighter);
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.registry-table tr:last-child td {
+  border-bottom: none;
+}
+
+.registry-table-name {
+  font-weight: 700;
+  color: var(--gray-dark);
+  white-space: normal;
+  min-width: 200px;
+}
+
+.registry-table-desc {
+  font-size: 11.5px;
+  font-weight: 400;
   color: var(--text-muted);
+  margin-top: 3px;
   line-height: 1.5;
 }
 
-.registry-meta {
+.tag-pill {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.tag-pill--neutral {
+  background: var(--gray-light);
+  color: var(--text-muted);
+}
+
+.tag-pill--green {
+  background: var(--status-ontrack-bg);
+  color: var(--status-ontrack-color);
+}
+
+.tag-pill--amber {
+  background: var(--status-atrisk-bg);
+  color: var(--status-atrisk-color);
+}
+
+.tag-pill--red {
+  background: var(--status-critical-bg);
+  color: var(--status-critical-color);
+}
+
+.tag-pill--blue {
+  background: rgba(0, 45, 98, 0.08);
+  color: var(--blue-primary);
+}
+
+.registry-date-pill {
   font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.registry-row-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.registry-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 12px;
+  border: none;
+  background: var(--gray-light);
   color: var(--text-faint);
+  flex-shrink: 0;
+}
+
+.registry-icon-btn:hover {
+  background: var(--gray-dark);
+  color: #ffffff;
+}
+
+.registry-icon-btn--danger:hover {
+  background: var(--status-critical-color);
+  color: #ffffff;
 }
 
 .registry-form {

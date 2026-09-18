@@ -11,7 +11,6 @@ export default function Chatbot({ chatbot }) {
   return (
     <div className="chatbot-page">
       <h1 className="page-title">Pregunta al PM virtual</h1>
-      <p className="page-subtitle">Preguntas puntuales del día a día, respondidas al momento por IA (Gemini).</p>
 
       <div className="chatbot-panel">
         <div className="chatbot-messages">

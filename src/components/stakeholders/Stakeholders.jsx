@@ -4,6 +4,19 @@ import { ROLE_RESPONSIBILITIES } from "../../data/roleResponsibilities";
 import ConfirmDeleteModal from "../shared/ConfirmDeleteModal";
 import "./Stakeholders.css";
 
+const AVATAR_TINTS = [
+  "linear-gradient(135deg, #002d62, #01458f)",
+  "linear-gradient(135deg, #2f8f68, #4caf88)",
+  "linear-gradient(135deg, #9a6300, #c08a00)",
+  "linear-gradient(135deg, #4a2f7a, #7a5cc7)",
+  "linear-gradient(135deg, #0a2733, #1a4d5c)",
+];
+
+function tintFor(name) {
+  const hash = [...(name || "")].reduce((acc, c) => acc + c.charCodeAt(0), 0);
+  return AVATAR_TINTS[hash % AVATAR_TINTS.length];
+}
+
 function StakeholderCard({ stakeholder, onUpdate, onDeleteRequest }) {
   const [editing, setEditing] = useState(false);
   const [rol, setRol] = useState(stakeholder.rol);
@@ -22,27 +35,30 @@ function StakeholderCard({ stakeholder, onUpdate, onDeleteRequest }) {
     setEditing(false);
   }
 
+  const initials = stakeholder.name
+    .split(" ")
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase();
+
   return (
-    <div className="section-card stakeholder-card">
-      <div className="stakeholder-card-head">
-        <div className="stakeholder-avatar">
-          {stakeholder.name
-            .split(" ")
-            .slice(0, 2)
-            .map((w) => w[0])
-            .join("")
-            .toUpperCase()}
-        </div>
-        <div className="stakeholder-card-actions">
-          <button className="stakeholder-icon-btn" onClick={() => (editing ? handleCancel() : setEditing(true))}>
-            <PencilIcon size={14} color="currentColor" />
-          </button>
-          <button className="stakeholder-icon-btn stakeholder-icon-btn--danger" onClick={() => onDeleteRequest(stakeholder)}>
-            <TrashIcon size={14} color="currentColor" />
-          </button>
-        </div>
+    <div className="stakeholder-card">
+      <div className="stakeholder-preview" style={{ background: tintFor(stakeholder.name) }}>
+        <div className="stakeholder-preview-initials">{initials}</div>
       </div>
-      <h4>{stakeholder.name}</h4>
+      <div className="section-card stakeholder-card-body">
+        <div className="stakeholder-card-head">
+          <h4>{stakeholder.name}</h4>
+          <div className="stakeholder-card-actions">
+            <button className="stakeholder-icon-btn" onClick={() => (editing ? handleCancel() : setEditing(true))}>
+              <PencilIcon size={14} color="currentColor" />
+            </button>
+            <button className="stakeholder-icon-btn stakeholder-icon-btn--danger" onClick={() => onDeleteRequest(stakeholder)}>
+              <TrashIcon size={14} color="currentColor" />
+            </button>
+          </div>
+        </div>
 
       {editing ? (
         <div className="stakeholder-edit">
@@ -69,15 +85,14 @@ function StakeholderCard({ stakeholder, onUpdate, onDeleteRequest }) {
         </div>
       ) : (
         <>
-          <span className="stakeholder-role">{stakeholder.rol}</span>
+          <div className="stakeholder-tags">
+            <span className="tag-pill tag-pill--blue">{stakeholder.rol}</span>
+            {stakeholder.ubicacion && <span className="tag-pill tag-pill--neutral">{stakeholder.ubicacion}</span>}
+          </div>
 
           <div className="stakeholder-field">
             <span className="stakeholder-label">Correo</span>
             <span>{stakeholder.email}</span>
-          </div>
-          <div className="stakeholder-field">
-            <span className="stakeholder-label">Ubicación</span>
-            <span>{stakeholder.ubicacion}</span>
           </div>
           <div className="stakeholder-field">
             <span className="stakeholder-label">Plan de comunicación</span>
@@ -95,6 +110,7 @@ function StakeholderCard({ stakeholder, onUpdate, onDeleteRequest }) {
           )}
         </>
       )}
+      </div>
     </div>
   );
 }
@@ -105,7 +121,6 @@ export default function Stakeholders({ stakeholders, updateStakeholder, deleteSt
   return (
     <div>
       <h1 className="page-title">Stakeholders</h1>
-      <p className="page-subtitle">Ficha de cada persona del equipo, con sus datos de contacto y su plan de comunicación.</p>
 
       <div className="stakeholder-grid">
         {stakeholders.map((s) => (

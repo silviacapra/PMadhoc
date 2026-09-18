@@ -1,15 +1,9 @@
 .page-title {
-  margin: 0 0 6px 0;
-  font-size: 26px;
-  font-weight: 700;
-  color: var(--blue-primary);
-  letter-spacing: -0.4px;
-}
-
-.page-subtitle {
   margin: 0 0 24px 0;
-  font-size: 14px;
-  color: var(--text-muted);
+  font-size: 30px;
+  font-weight: 300;
+  color: #000000;
+  letter-spacing: -0.4px;
 }
 
 .section-card {

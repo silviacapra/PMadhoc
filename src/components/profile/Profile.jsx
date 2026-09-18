@@ -29,7 +29,6 @@ export default function Profile({ profile }) {
   return (
     <div className="profile-page">
       <h1 className="page-title">Configuración de perfil</h1>
-      <p className="page-subtitle">Actualiza tu nombre y tu correo electrónico.</p>
 
       <div className="profile-card">
         <div className="profile-summary">

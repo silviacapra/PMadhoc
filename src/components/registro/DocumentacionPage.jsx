@@ -1,3 +1,4 @@
+import { ExternalLinkIcon } from "../icons/Icons";
 import "./Registro.css";
 import "../ficha/FichaProyecto.css";
 
@@ -8,9 +9,11 @@ export default function DocumentacionPage({ documentacionPage }) {
   return (
     <div>
       <h1 className="page-title">Documentación</h1>
-      <p className="page-subtitle">
-        Se rellena sola con los entregables que se marcan como hechos y se enlazan en el Roadmap de cada proyecto.
-      </p>
+
+      <div className="doc-disclaimer">
+        ℹ️ Esta sección se rellena automáticamente desde el apartado <strong>Roadmap Proyecto</strong>: en cuanto marcas un
+        entregable como hecho y le añades un enlace en Fases del proyecto, aparece aquí agrupado por fase.
+      </div>
 
       <div className="registro-project-picker">
         <label>Proyecto</label>
@@ -30,16 +33,37 @@ export default function DocumentacionPage({ documentacionPage }) {
           {groups.length === 0 ? (
             <p className="registry-empty">Todavía no hay ningún entregable marcado como hecho con un documento enlazado.</p>
           ) : (
-            groups.map((g) => (
-              <div key={g.phaseId} className="doc-group">
-                <span className="okr-year-label">{g.phaseLabel}</span>
-                {g.docs.map((d) => (
-                  <a key={d.id} href={d.url} target="_blank" rel="noreferrer" className="doc-row">
-                    {d.titulo}
-                  </a>
-                ))}
-              </div>
-            ))
+            <div className="registry-table-wrap">
+              <table className="registry-table">
+                <thead>
+                  <tr>
+                    <th>Fase</th>
+                    <th>Paso</th>
+                    <th>Documento</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {groups.map((g) =>
+                    g.docs.map((d) => (
+                      <tr key={d.id}>
+                        <td>
+                          <span className="tag-pill tag-pill--blue">{g.phaseLabel}</span>
+                        </td>
+                        <td>{d.stepTitle}</td>
+                        <td className="registry-table-name">{d.titulo}</td>
+                        <td>
+                          <a href={d.url} target="_blank" rel="noreferrer" className="doc-row">
+                            <ExternalLinkIcon size={13} color="currentColor" />
+                            Abrir
+                          </a>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       )}

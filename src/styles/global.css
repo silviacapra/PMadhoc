@@ -13,7 +13,7 @@ body,
 
 body {
   margin: 0;
-  font-family: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "DM Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: var(--gray-dark);
   background: var(--white);
 }
@@ -48,4 +48,42 @@ select {
 ::-webkit-scrollbar-thumb {
   background: #d8d8d8;
   border-radius: 8px;
+}
+
+@page {
+  size: A4;
+  margin: 14mm;
+}
+
+@media print {
+  .app-header,
+  .sidebar,
+  .status-report-toolbar {
+    display: none !important;
+  }
+
+  .app-shell,
+  .content-area {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+
+  body {
+    background: #ffffff !important;
+  }
+
+  .section-card,
+  .report-category,
+  .project-card {
+    box-shadow: none !important;
+    border: 1px solid var(--border-light);
+  }
+
+  .report-top-grid,
+  .report-categories,
+  .report-columns-cards {
+    break-inside: avoid;
+  }
 }

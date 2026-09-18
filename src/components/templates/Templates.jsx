@@ -2,6 +2,7 @@ import { DownloadIcon, SearchIcon, PlusIcon } from "../icons/Icons";
 import { TEMPLATE_CATEGORY_STYLES } from "../../data/statusStyles";
 import { TYPE_LABELS } from "../../data/templates";
 import AddTemplateModal from "./AddTemplateModal";
+import FilterDropdown from "../shared/FilterDropdown";
 import "./Templates.css";
 
 function TemplateCard({ tpl }) {
@@ -48,9 +49,12 @@ export default function Templates({ templates }) {
     disponibleOnly,
     searchQuery,
     filteredTemplates,
-    pickPhaseFilter,
-    setMethodologyFilter,
-    setTypeFilter,
+    togglePhaseFilter,
+    toggleMethodologyFilter,
+    toggleTypeFilter,
+    clearPhaseFilter,
+    clearMethodologyFilter,
+    clearTypeFilter,
     setSostenibleOnly,
     setDisponibleOnly,
     setSearchQuery,
@@ -59,12 +63,28 @@ export default function Templates({ templates }) {
     addTemplate,
   } = templates;
 
+  const hasActiveFilters =
+    activePhaseFilter.length > 0 ||
+    activeMethodologyFilter.length > 0 ||
+    activeTypeFilter.length > 0 ||
+    sostenibleOnly ||
+    disponibleOnly ||
+    searchQuery.trim().length > 0;
+
+  function resetAllFilters() {
+    clearPhaseFilter();
+    clearMethodologyFilter();
+    clearTypeFilter();
+    setSostenibleOnly(false);
+    setDisponibleOnly(false);
+    setSearchQuery("");
+  }
+
   return (
     <div>
       <div className="template-page-header">
         <div>
           <h1 className="page-title">Repositorio de plantillas</h1>
-          <p className="page-subtitle">Documentos y artefactos del PMI, listos para usar sin partir de cero.</p>
         </div>
         <button className="new-project-btn" onClick={() => setAddTemplateOpen(true)}>
           <PlusIcon size={16} color="currentColor" />
@@ -82,52 +102,33 @@ export default function Templates({ templates }) {
         />
       </div>
 
-      <div className="template-filter-label">Fase</div>
-      <div className="phase-filter-row">
-        {phaseFilters.map((pf) => {
-          const active = pf.id === activePhaseFilter;
-          return (
-            <span
-              key={pf.id}
-              className={`phase-filter-pill ${active ? "phase-filter-pill--active" : ""}`}
-              onClick={() => pickPhaseFilter(pf.id)}
-            >
-              {pf.label}
-            </span>
-          );
-        })}
-      </div>
-
-      <div className="template-filter-label">Tipo de proyecto</div>
-      <div className="phase-filter-row">
-        {methodologyFilters.map((mf) => {
-          const active = mf.id === activeMethodologyFilter;
-          return (
-            <span
-              key={mf.id}
-              className={`phase-filter-pill ${active ? "phase-filter-pill--active" : ""}`}
-              onClick={() => setMethodologyFilter(mf.id)}
-            >
-              {mf.label}
-            </span>
-          );
-        })}
-      </div>
-
-      <div className="template-filter-label">Tipo de plantilla</div>
-      <div className="phase-filter-row">
-        {typeFilters.map((tf) => {
-          const active = tf.id === activeTypeFilter;
-          return (
-            <span
-              key={tf.id}
-              className={`phase-filter-pill ${active ? "phase-filter-pill--active" : ""}`}
-              onClick={() => setTypeFilter(tf.id)}
-            >
-              {tf.label}
-            </span>
-          );
-        })}
+      <div className="template-filter-row-dropdowns">
+        <FilterDropdown
+          label="Fase"
+          options={phaseFilters.filter((pf) => pf.id !== "todas")}
+          selected={activePhaseFilter}
+          onToggle={togglePhaseFilter}
+          onClear={clearPhaseFilter}
+        />
+        <FilterDropdown
+          label="Tipo de proyecto"
+          options={methodologyFilters.filter((mf) => mf.id !== "todas")}
+          selected={activeMethodologyFilter}
+          onToggle={toggleMethodologyFilter}
+          onClear={clearMethodologyFilter}
+        />
+        <FilterDropdown
+          label="Tipo de plantilla"
+          options={typeFilters.filter((tf) => tf.id !== "todos")}
+          selected={activeTypeFilter}
+          onToggle={toggleTypeFilter}
+          onClear={clearTypeFilter}
+        />
+        {hasActiveFilters && (
+          <button className="template-reset-btn" onClick={resetAllFilters}>
+            Restablecer filtros
+          </button>
+        )}
       </div>
 
       <div className="template-filter-label">Otros</div>

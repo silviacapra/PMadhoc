@@ -129,6 +129,14 @@
   font-weight: 600;
 }
 
+.roadmap-step-meta--date {
+  color: var(--text-faint);
+}
+
+.roadmap-step-meta--count {
+  font-size: 13.5px;
+}
+
 .roadmap-step-status-pill {
   flex-shrink: 0;
   font-size: 10.5px;
@@ -246,6 +254,9 @@
 }
 
 .output-upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font-size: 11.5px;
   font-weight: 600;
   padding: 6px 12px;

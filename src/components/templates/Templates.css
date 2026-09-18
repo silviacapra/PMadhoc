@@ -41,6 +41,28 @@
   margin-bottom: 18px;
 }
 
+.template-filter-row-dropdowns {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.template-reset-btn {
+  background: none;
+  border: none;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-faint);
+  cursor: pointer;
+  padding: 9px 4px;
+}
+
+.template-reset-btn:hover {
+  color: var(--status-critical-color);
+}
+
 .phase-filter-pill {
   cursor: pointer;
   font-size: 12px;
@@ -63,8 +85,20 @@
 
 .template-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
+}
+
+@media (min-width: 900px) {
+  .template-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1200px) {
+  .template-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
 }
 
 .template-card {

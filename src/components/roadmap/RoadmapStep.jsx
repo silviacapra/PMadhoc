@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CheckIcon, ChevronDownIcon, PencilIcon } from "../icons/Icons";
+import { CheckIcon, ChevronDownIcon, PencilIcon, ExternalLinkIcon } from "../icons/Icons";
 import { ROADMAP_STEP_STATUS_DEFS } from "../../data/statusStyles";
 
 function OutputRow({ output, stepKey, onUpdate }) {
@@ -31,7 +31,7 @@ function OutputRow({ output, stepKey, onUpdate }) {
             type="text"
             autoFocus
             value={draft}
-            placeholder="https://..."
+            placeholder="Pega aquí el enlace externo (Drive, Notion, Confluence...)"
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && saveLink()}
           />
@@ -43,11 +43,12 @@ function OutputRow({ output, stepKey, onUpdate }) {
         <div className="output-actions" onClick={(e) => e.stopPropagation()}>
           {output.link ? (
             <a href={output.link} target="_blank" rel="noreferrer" className="output-upload-btn output-upload-btn--set">
-              Ver documento
+              <ExternalLinkIcon size={12} color="currentColor" />
+              Abrir
             </a>
           ) : (
             <button className="output-upload-btn output-upload-btn--empty" onClick={startEdit}>
-              No disponible
+              Añadir enlace
             </button>
           )}
           <button className="output-edit-btn" onClick={startEdit} title="Editar enlace">
@@ -81,7 +82,14 @@ export default function RoadmapStep({ step, teamMembers, onToggle, onUpdate, onU
             {step.title}
           </span>
           <span className="roadmap-step-detail">{step.detail}</span>
-          {step.hasMeta && <span className="roadmap-step-meta">{step.metaSummary}</span>}
+          {step.hasMeta && (
+            <>
+              {step.metaDateLine && <span className="roadmap-step-meta roadmap-step-meta--date">{step.metaDateLine}</span>}
+              {step.metaEntregablesLine && (
+                <span className="roadmap-step-meta roadmap-step-meta--count">{step.metaEntregablesLine}</span>
+              )}
+            </>
+          )}
         </div>
         {step.hasStatus && (
           <span className="roadmap-step-status-pill" style={{ background: activeDef.bg, color: activeDef.color }}>

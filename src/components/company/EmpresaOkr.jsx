@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PencilIcon, TrashIcon } from "../icons/Icons";
+import { PencilIcon, TrashIcon, PlusIcon } from "../icons/Icons";
 import "./EmpresaOkr.css";
 
 function OkrCard({ okr, onUpdate, onDelete }) {
@@ -93,6 +93,7 @@ export default function EmpresaOkr({ company, okr }) {
   const { catalog, addOkr, updateOkr, deleteOkr } = okr;
 
   const [editingCompany, setEditingCompany] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
   const [year, setYear] = useState(String(new Date().getFullYear()));
   const [objective, setObjective] = useState("");
   const [keyResultsText, setKeyResultsText] = useState("");
@@ -108,12 +109,12 @@ export default function EmpresaOkr({ company, okr }) {
     addOkr({ year: Number(year), objective: objective.trim(), keyResults });
     setObjective("");
     setKeyResultsText("");
+    setAddOpen(false);
   }
 
   return (
     <div>
       <h1 className="page-title">Empresa y OKR</h1>
-      <p className="page-subtitle">Datos generales de la empresa y catálogo de objetivos estratégicos. Cada proyecto se vincula a uno o varios de estos objetivos.</p>
 
       <div className="section-card okr-company-card">
         <div className="section-head-row">
@@ -180,31 +181,50 @@ export default function EmpresaOkr({ company, okr }) {
         </div>
       ))}
 
-      <div className="section-card okr-add-card">
-        <h3 className="section-heading">Añadir nuevo objetivo al catálogo</h3>
-        <div className="okr-add-fields">
-          <div className="okr-field okr-field--year">
-            <label>Año</label>
-            <input type="number" value={year} onChange={(e) => setYear(e.target.value)} />
+      {addOpen ? (
+        <div className="section-card okr-add-card">
+          <div className="section-head-row">
+            <h3 className="section-heading" style={{ margin: 0 }}>
+              Añadir nuevo objetivo al catálogo
+            </h3>
+            <span className="cancel-link" onClick={() => setAddOpen(false)}>
+              Cancelar
+            </span>
+          </div>
+          <div className="okr-add-fields">
+            <div className="okr-field okr-field--year">
+              <label>Año</label>
+              <input type="number" value={year} onChange={(e) => setYear(e.target.value)} />
+            </div>
+            <div className="okr-field">
+              <label>Objetivo</label>
+              <input
+                type="text"
+                placeholder="Ej: Mejorar la retención de clientes"
+                value={objective}
+                onChange={(e) => setObjective(e.target.value)}
+              />
+            </div>
           </div>
           <div className="okr-field">
-            <label>Objetivo</label>
-            <input type="text" placeholder="Ej: Mejorar la retención de clientes" value={objective} onChange={(e) => setObjective(e.target.value)} />
+            <label>Resultados clave (uno por línea)</label>
+            <textarea
+              rows={3}
+              placeholder={"Ej: Subir la retención del 80% al 90%\nReducir las cancelaciones en un 10%"}
+              value={keyResultsText}
+              onChange={(e) => setKeyResultsText(e.target.value)}
+            />
           </div>
+          <button className="okr-add-btn" onClick={handleAdd}>
+            Añadir objetivo
+          </button>
         </div>
-        <div className="okr-field">
-          <label>Resultados clave (uno por línea)</label>
-          <textarea
-            rows={3}
-            placeholder={"Ej: Subir la retención del 80% al 90%\nReducir las cancelaciones en un 10%"}
-            value={keyResultsText}
-            onChange={(e) => setKeyResultsText(e.target.value)}
-          />
-        </div>
-        <button className="okr-add-btn" onClick={handleAdd}>
+      ) : (
+        <button className="new-project-btn" onClick={() => setAddOpen(true)}>
+          <PlusIcon size={16} color="currentColor" />
           Añadir objetivo
         </button>
-      </div>
+      )}
     </div>
   );
 }

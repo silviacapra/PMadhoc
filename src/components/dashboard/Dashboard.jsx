@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { PlusIcon, RoadmapIcon, StatusReportIcon, TrashIcon, PencilIcon } from "../icons/Icons";
+import { PlusIcon, StatusReportIcon, TrashIcon, PencilIcon, ArrowRightIcon, TriDotIcon } from "../icons/Icons";
 import StatusBadge from "../shared/StatusBadge";
 import ProjectModal from "./ProjectModal";
 import ConfirmDeleteModal from "../shared/ConfirmDeleteModal";
-import { METHODOLOGY_LABELS } from "../../data/projects";
+import { METHODOLOGY_LABELS, METHODOLOGY_TINT } from "../../data/projects";
 import { TEAM_MEMBERS, DEPARTMENTS } from "../../data/team";
 import "./Dashboard.css";
 
@@ -48,10 +48,13 @@ export default function Dashboard({ dashboard, permissions, session, nav, status
 
   return (
     <div>
+      <p className="dashboard-greeting">
+        Hola {session.profile.firstName}, bienvenido a tu espacio de gestión de proyectos.
+      </p>
+
       <div className="dashboard-header">
         <div>
           <h1 className="page-title">Overview de proyectos</h1>
-          <p className="page-subtitle">Buenos días, {session.profile.firstName}. Así está el estado general de tus proyectos.</p>
         </div>
         <button className="new-project-btn" onClick={() => setModalOpen(true)}>
           <PlusIcon size={16} color="currentColor" />
@@ -62,68 +65,77 @@ export default function Dashboard({ dashboard, permissions, session, nav, status
       <div className="project-cards">
         {dashboard.projects.map((proj) => (
           <div key={proj.id} className="project-card">
-            <div className="project-card-header">
-              <div className="project-card-title">
-                <span className={`status-dot status-dot--${proj.status}`} />
-                <h2>{proj.name}</h2>
+            <div className="project-card-banner" style={{ background: METHODOLOGY_TINT[proj.methodology] || METHODOLOGY_TINT.hibrida }}>
+              <StatusBadge status={proj.status} style={{ position: "relative", zIndex: 1 }} />
+              <TriDotIcon size={40} color="rgba(255,255,255,0.5)" style={{ position: "absolute", right: 18, bottom: 14 }} />
+            </div>
+
+            <div className="project-card-body">
+              <div className="project-card-top">
+                <h2 className="project-card-name">{proj.name}</h2>
+                <div className="project-card-icons">
+                  <button className="project-card-icon-btn" title="Editar proyecto" onClick={() => setEditingProject(proj)}>
+                    <PencilIcon size={14} color="currentColor" />
+                  </button>
+                  <button className="project-card-icon-btn" title="Ir al status report" onClick={() => goToStatusReport(proj)}>
+                    <StatusReportIcon size={15} color="currentColor" />
+                  </button>
+                  <button
+                    className="project-card-icon-btn project-card-icon-btn--danger"
+                    title="Eliminar proyecto"
+                    onClick={() => dashboard.setDeleteProjectId(proj.id)}
+                  >
+                    <TrashIcon size={15} color="currentColor" />
+                  </button>
+                </div>
               </div>
+
               <div className="project-card-badges">
-                <StatusBadge status={proj.status} />
                 <span className="phase-pill">Fase: {proj.phase}</span>
                 <span className="phase-pill">{METHODOLOGY_LABELS[proj.methodology]}</span>
-                <button className="project-card-icon-btn" title="Editar proyecto" onClick={() => setEditingProject(proj)}>
-                  <PencilIcon size={14} color="currentColor" />
-                </button>
-                <button className="project-card-icon-btn" title="Ir al roadmap" onClick={() => goToRoadmap(proj)}>
-                  <RoadmapIcon size={15} color="currentColor" />
-                </button>
-                <button className="project-card-icon-btn" title="Ir al status report" onClick={() => goToStatusReport(proj)}>
-                  <StatusReportIcon size={15} color="currentColor" />
-                </button>
-                <button
-                  className="project-card-icon-btn project-card-icon-btn--danger"
-                  title="Eliminar proyecto"
-                  onClick={() => dashboard.setDeleteProjectId(proj.id)}
-                >
-                  <TrashIcon size={15} color="currentColor" />
-                </button>
               </div>
+
+              <p className="project-card-objective">{objectiveLabel(proj.contributesTo)}</p>
+              {(proj.budgetTotal > 0 || proj.deadline || proj.hitos) && (
+                <div className="project-card-meta">
+                  {proj.budgetTotal > 0 && <span>💰 {proj.budgetTotal.toLocaleString("es-ES")} €</span>}
+                  {proj.deadline && <span>📅 {formatDate(proj.deadline)}</span>}
+                  {proj.hitos && <span>🏁 {proj.hitos}</span>}
+                </div>
+              )}
+              <div className="project-card-stats">
+                <div>
+                  <span className="stat-value">{proj.progress}%</span>
+                  <span className="stat-label">avance</span>
+                </div>
+                <div>
+                  <span className="stat-value">{proj.daysLeft}</span>
+                  <span className="stat-label">días restantes</span>
+                </div>
+                <div>
+                  <span className="stat-value">{proj.risks}</span>
+                  <span className="stat-label">riesgos abiertos</span>
+                </div>
+              </div>
+              <div className="project-progress-track">
+                <div className="project-progress-fill" style={{ width: `${proj.progress}%` }} />
+              </div>
+              {proj.createdAt && (
+                <p className="project-card-audit">
+                  Creado{proj.createdBy ? ` por ${proj.createdBy}` : ""} · {formatDateTime(proj.createdAt)}
+                </p>
+              )}
+              {proj.lastModifiedBy && (
+                <p className="project-card-audit">
+                  Editado por {proj.lastModifiedBy} · {formatDateTime(proj.lastModifiedAt)}
+                </p>
+              )}
+
+              <button className="project-card-cta" onClick={() => goToRoadmap(proj)}>
+                Ver roadmap
+                <ArrowRightIcon size={14} color="currentColor" />
+              </button>
             </div>
-            <p className="project-card-objective">{objectiveLabel(proj.contributesTo)}</p>
-            {(proj.budgetTotal > 0 || proj.deadline || proj.hitos) && (
-              <div className="project-card-meta">
-                {proj.budgetTotal > 0 && <span>💰 {proj.budgetTotal.toLocaleString("es-ES")} €</span>}
-                {proj.deadline && <span>📅 {formatDate(proj.deadline)}</span>}
-                {proj.hitos && <span>🏁 {proj.hitos}</span>}
-              </div>
-            )}
-            <div className="project-card-stats">
-              <div>
-                <span className="stat-value">{proj.progress}%</span>
-                <span className="stat-label">avance</span>
-              </div>
-              <div>
-                <span className="stat-value">{proj.daysLeft}</span>
-                <span className="stat-label">días restantes</span>
-              </div>
-              <div>
-                <span className="stat-value">{proj.risks}</span>
-                <span className="stat-label">riesgos abiertos</span>
-              </div>
-            </div>
-            <div className="project-progress-track">
-              <div className="project-progress-fill" style={{ width: `${proj.progress}%` }} />
-            </div>
-            {proj.createdAt && (
-              <p className="project-card-audit">
-                Creado{proj.createdBy ? ` por ${proj.createdBy}` : ""} · {formatDateTime(proj.createdAt)}
-              </p>
-            )}
-            {proj.lastModifiedBy && (
-              <p className="project-card-audit">
-                Editado por {proj.lastModifiedBy} · {formatDateTime(proj.lastModifiedAt)}
-              </p>
-            )}
           </div>
         ))}
       </div>

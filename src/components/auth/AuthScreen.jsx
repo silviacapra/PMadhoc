@@ -23,7 +23,7 @@ export default function AuthScreen({ auth }) {
       <div className="auth-screen">
         <div className="auth-card">
           <div className="auth-brand">
-            <Logo variant="dark" size={50} />
+            <Logo variant="dark" size={50} textSize={14} />
           </div>
 
           <h2 className="auth-reset-title">Recuperar contraseña</h2>
@@ -68,7 +68,7 @@ export default function AuthScreen({ auth }) {
     <div className="auth-screen">
       <div className="auth-card">
         <div className="auth-brand">
-          <Logo variant="dark" size={50} />
+          <Logo variant="dark" size={50} textSize={14} />
         </div>
 
         <div className="auth-tabs">

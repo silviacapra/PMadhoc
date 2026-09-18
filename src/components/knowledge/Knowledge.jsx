@@ -1,8 +1,21 @@
 import { useState } from "react";
-import { GraduationCapIcon, ChevronRightIcon, PlusIcon, PencilIcon, TrashIcon } from "../icons/Icons";
-import { TripleRestriccionDiagram, RiesgosMatrixDiagram, RaciDiagram, StakeholderMatrixDiagram, MoscowDiagram } from "./Diagrams";
+import { ChevronRightIcon, PlusIcon, PencilIcon, TrashIcon } from "../icons/Icons";
+import {
+  TripleRestriccionDiagram,
+  RiesgosMatrixDiagram,
+  RaciDiagram,
+  StakeholderMatrixDiagram,
+  MoscowDiagram,
+  CommPlanDiagram,
+  ScrumWaterfallDiagram,
+  WbsDiagram,
+  GateReviewDiagram,
+  LessonsLearnedDiagram,
+  DocumentPreviewDiagram,
+} from "./Diagrams";
 import ArticleModal from "./ArticleModal";
 import ConfirmDeleteModal from "../shared/ConfirmDeleteModal";
+import KnowledgeAssistant from "./KnowledgeAssistant";
 import "./Knowledge.css";
 
 const DIAGRAMS = {
@@ -11,7 +24,14 @@ const DIAGRAMS = {
   raci: RaciDiagram,
   "stakeholder-matriz": StakeholderMatrixDiagram,
   moscow: MoscowDiagram,
+  "comm-plan": CommPlanDiagram,
+  "scrum-waterfall": ScrumWaterfallDiagram,
+  wbs: WbsDiagram,
+  "gate-review": GateReviewDiagram,
+  "lessons-learned": LessonsLearnedDiagram,
 };
+
+const TINTS = ["kb-tint-a", "kb-tint-b", "kb-tint-c"];
 
 function ArticlePost({ article, onBack, onEdit, onDeleteRequest }) {
   const Diagram = DIAGRAMS[article.diagram];
@@ -35,7 +55,7 @@ function ArticlePost({ article, onBack, onEdit, onDeleteRequest }) {
         </div>
       </div>
       <h1 className="page-title">{article.title}</h1>
-      <p className="page-subtitle">
+      <p className="kb-post-meta">
         {article.category} · {article.readTime} de lectura{article.autor ? ` · Editado por ${article.autor}` : ""}
       </p>
       <div className="section-card kb-post">
@@ -125,15 +145,14 @@ export default function Knowledge({ knowledge }) {
       <div className="kb-header-row">
         <div>
           <h1 className="page-title">Base de conocimiento</h1>
-          <p className="page-subtitle">
-            Conceptos, procesos y buenas prácticas de project management, explicados sin la densidad de un manual de certificación.
-          </p>
         </div>
         <button className="new-project-btn" onClick={() => setAddArticleOpen(true)}>
           <PlusIcon size={16} color="currentColor" />
           Añadir artículo
         </button>
       </div>
+
+      <KnowledgeAssistant articles={articles} />
 
       <div className="kb-categories">
         {categories.map((cat) => {
@@ -151,23 +170,28 @@ export default function Knowledge({ knowledge }) {
         })}
       </div>
 
-      <div className="kb-articles">
-        {visibleArticles.map((art) => (
-          <div key={art.id || art.title} className="kb-article" onClick={() => setOpenArticle(art)}>
-            <div className="kb-article-main">
-              <div className="kb-article-icon">
-                <GraduationCapIcon size={18} color="var(--blue-primary)" />
+      <div className="kb-grid">
+        {visibleArticles.map((art, i) => {
+          const cat = categories.find((c) => c.label === art.category);
+          const Diagram = DIAGRAMS[art.diagram] || DocumentPreviewDiagram;
+          return (
+            <div key={art.id || art.title} className="kb-card" onClick={() => setOpenArticle(art)}>
+              <div className={`kb-card-preview ${TINTS[i % TINTS.length]}`}>
+                <Diagram />
               </div>
-              <div>
-                <span className="kb-article-title">{art.title}</span>
-                <span className="kb-article-meta">
-                  {art.category} · {art.readTime}
+              <div className="kb-card-body">
+                <div className="kb-card-title-row">
+                  <span className="kb-card-title">{art.title}</span>
+                  <ChevronRightIcon size={16} color="#B7B7B7" />
+                </div>
+                {art.preview && <p className="kb-card-subtitle">{art.preview}</p>}
+                <span className="kb-card-tag">
+                  {cat?.emoji} {art.category}
                 </span>
               </div>
             </div>
-            <ChevronRightIcon size={18} color="#B7B7B7" />
-          </div>
-        ))}
+          );
+        })}
         {visibleArticles.length === 0 && <p className="kb-empty">No hay artículos en esta categoría todavía.</p>}
       </div>
 

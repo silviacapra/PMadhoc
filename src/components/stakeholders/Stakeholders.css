@@ -7,26 +7,49 @@
 .stakeholder-card {
   display: flex;
   flex-direction: column;
+  background: var(--white);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.stakeholder-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 78px;
+}
+
+.stakeholder-preview-initials {
+  width: 48px;
+  height: 48px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.stakeholder-card-body {
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .stakeholder-card-head {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+  margin-bottom: 10px;
 }
 
-.stakeholder-avatar {
-  width: 44px;
-  height: 44px;
-  border-radius: 22px;
-  background: var(--accent);
-  color: var(--white);
+.stakeholder-tags {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 15px;
-  font-weight: 700;
-  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
 }
 
 .stakeholder-icon-btn {
@@ -101,14 +124,6 @@
   font-size: 15px;
   font-weight: 700;
   color: var(--gray-dark);
-}
-
-.stakeholder-role {
-  display: inline-block;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--accent);
-  margin-bottom: 14px;
 }
 
 .stakeholder-field {

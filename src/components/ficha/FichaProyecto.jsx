@@ -1,29 +1,36 @@
 import Roadmap from "../roadmap/Roadmap";
 import Documentacion from "./Documentacion";
-import { WarningIcon, LightbulbIcon } from "../icons/Icons";
-import { METHODOLOGY_LABELS } from "../../data/projects";
+import GanttChart from "../roadmap/GanttChart";
+import { WarningIcon, LightbulbIcon, TriDotIcon } from "../icons/Icons";
+import { METHODOLOGY_LABELS, METHODOLOGY_TINT } from "../../data/projects";
 import "./FichaProyecto.css";
 
 const TABS = [
   { id: "roadmap", label: "Fases del proyecto" },
+  { id: "gantt", label: "Roadmap" },
   { id: "documentacion", label: "Documentación" },
 ];
 
 export default function FichaProyecto({ ficha }) {
-  const { projects, projectId, setProjectId, closeFicha, tab, setTab, roadmap, documentacion, openRiesgos, openLecciones } = ficha;
+  const { projects, projectId, setProjectId, closeFicha, tab, setTab, roadmap, documentacion, gantt, openRiesgos, openLecciones } = ficha;
 
   if (!projectId) {
     return (
       <div>
-        <h1 className="page-title">Roadmap Proyecto</h1>
-        <p className="page-subtitle">Elige un proyecto para ver sus fases y su documentación.</p>
+        <h1 className="page-title">Roadmap Proyectos</h1>
         <div className="ficha-picker-grid">
           {projects.map((p) => (
             <div key={p.id} className="ficha-picker-card" onClick={() => setProjectId(p.id)}>
-              <h4>{p.name}</h4>
-              <span>
-                Fase: {p.phase} · {METHODOLOGY_LABELS[p.methodology]}
-              </span>
+              <div className="ficha-picker-preview" style={{ background: METHODOLOGY_TINT[p.methodology] || METHODOLOGY_TINT.hibrida }}>
+                <TriDotIcon size={40} color="rgba(255,255,255,0.55)" />
+              </div>
+              <div className="ficha-picker-body">
+                <h4>{p.name}</h4>
+                <div className="ficha-picker-tags">
+                  <span className="ficha-picker-tag">{p.phase}</span>
+                  <span className="ficha-picker-tag">{METHODOLOGY_LABELS[p.methodology]}</span>
+                </div>
+              </div>
             </div>
           ))}
         </div>
@@ -39,7 +46,6 @@ export default function FichaProyecto({ ficha }) {
         ← Todos los proyectos
       </span>
       <h1 className="page-title">{project?.name}</h1>
-      <p className="page-subtitle">{project ? `${project.phase} · ${METHODOLOGY_LABELS[project.methodology]}` : ""}</p>
 
       <div className="ficha-tabs">
         {TABS.map((t) => (
@@ -58,6 +64,7 @@ export default function FichaProyecto({ ficha }) {
       </div>
 
       {tab === "roadmap" && <Roadmap roadmap={roadmap} />}
+      {tab === "gantt" && <GanttChart phases={gantt.phases} />}
       {tab === "documentacion" && <Documentacion documentacion={documentacion} />}
     </div>
   );

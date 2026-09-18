@@ -1,5 +1,22 @@
-.okr-company-card {
+.okr-company-card.section-card {
   margin-bottom: 28px;
+  background: var(--black);
+}
+
+.okr-company-card .section-heading {
+  color: var(--white);
+}
+
+.okr-company-card .okr-company-readonly-label {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.okr-company-card .okr-company-readonly span:last-child {
+  color: var(--white);
+}
+
+.okr-company-card .okr-field label {
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .okr-company-fields {

@@ -4,6 +4,12 @@ export const METHODOLOGY_LABELS = {
   hibrida: "Híbrida",
 };
 
+export const METHODOLOGY_TINT = {
+  cascada: "linear-gradient(135deg, #002d62, #01458f)",
+  agil: "linear-gradient(135deg, #2f8f68, #4caf88)",
+  hibrida: "linear-gradient(135deg, #002d62, #4caf88)",
+};
+
 export const INITIAL_PROJECTS = [
   {
     id: "crm-migration",

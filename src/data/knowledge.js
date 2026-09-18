@@ -12,6 +12,7 @@ export const ARTICLES = [
     title: "Triple restricción",
     category: "Fundamentos",
     readTime: "4 min",
+    preview: "Alcance, tiempo y coste tirando entre sí.",
     reference: "PMBOK® Guide – 6ª edición · Sección 1.2.6 \"Restricciones del proyecto\"",
     intro:
       "La triple restricción (o \"triángulo de hierro\") dice que todo proyecto se mueve entre tres variables que tiran unas de otras: alcance, tiempo y coste. Si tocas una, las otras dos se resienten.",
@@ -45,6 +46,7 @@ export const ARTICLES = [
     title: "Registro de riesgos",
     category: "Riesgos",
     readTime: "6 min",
+    preview: "Lo que puede salir mal, con dueño y plan.",
     reference: "PMBOK® Guide – 6ª edición · Capítulo 11 \"Gestión de los riesgos del proyecto\", sección 11.2",
     intro:
       "Un registro de riesgos que nadie mira es papeleo. Uno que se revisa cada semana es una de las herramientas más rentables de todo el proyecto: cuesta minutos y evita sorpresas que cuestan semanas.",
@@ -76,9 +78,11 @@ export const ARTICLES = [
     title: "Plan de comunicación",
     category: "Comunicación",
     readTime: "5 min",
+    preview: "Quién necesita saber qué, y cuándo.",
     reference: "PMBOK® Guide – 6ª edición · Capítulo 10 \"Gestión de las comunicaciones del proyecto\", sección 10.1",
     intro:
       "La mayoría de \"problemas de gestión de proyectos\" son en realidad problemas de comunicación disfrazados: alguien no sabía algo que debería haber sabido, o se enteró demasiado tarde.",
+    diagram: "comm-plan",
     points: [
       {
         term: "Qué necesita saber",
@@ -104,9 +108,11 @@ export const ARTICLES = [
     title: "Scrum vs. Waterfall",
     category: "Agile",
     readTime: "7 min",
+    preview: "Cascada o sprints: cuándo usar cada uno.",
     reference: "PMI Agile Practice Guide · Sección 2 \"Ciclos de vida ágiles y ciclos de vida híbridos\"",
     intro:
       "Waterfall (cascada) planifica todo el proyecto por adelantado y avanza fase a fase. Scrum (ágil) divide el trabajo en sprints cortos con entregas incrementales. Ninguno es \"mejor\" en abstracto.",
+    diagram: "scrum-waterfall",
     points: [
       {
         term: "Cuándo conviene Waterfall",
@@ -132,6 +138,7 @@ export const ARTICLES = [
     title: "Matriz RACI",
     category: "Fundamentos",
     readTime: "3 min",
+    preview: "Quién hace, aprueba, opina y se entera.",
     reference: "PMBOK® Guide – 6ª edición · Capítulo 9 \"Gestión de los recursos del proyecto\", sección 9.1.2.2",
     intro:
       "RACI son las siglas de Responsable, Aprobador (Accountable), Consultado e Informado. Es una tabla con las tareas en filas y las personas en columnas, y en cada celda se marca qué papel tiene cada persona en cada tarea.",
@@ -161,6 +168,7 @@ export const ARTICLES = [
     title: "Priorización del backlog",
     category: "Agile",
     readTime: "5 min",
+    preview: "Decidir qué va primero, de verdad.",
     reference: "PMI Agile Practice Guide · Sección 5 \"Implementación ágil\"",
     intro:
       "Cuando todo el backlog está marcado como \"alta prioridad\", en la práctica no hay prioridades — hay una lista desordenada con una etiqueta encima. Priorizar de verdad significa decir que algo es más importante que otra cosa, con un criterio explícito.",
@@ -188,9 +196,11 @@ export const ARTICLES = [
     title: "WBS del proyecto",
     category: "Cronograma",
     readTime: "6 min",
+    preview: "El proyecto convertido en tareas asignables.",
     reference: "PMBOK® Guide – 6ª edición · Capítulo 5 \"Gestión del alcance del proyecto\", sección 5.4 \"Crear la EDT/WBS\"",
     intro:
       "El WBS (Work Breakdown Structure, o desglose de tareas) es el mapa que convierte \"hay que hacer el proyecto\" en una lista de tareas concretas, asignables y medibles. Sin un buen WBS, el cronograma se construye sobre arena.",
+    diagram: "wbs",
     points: [
       {
         term: "La regla del 8/80",
@@ -210,9 +220,11 @@ export const ARTICLES = [
     title: "Gate review",
     category: "Calidad",
     readTime: "4 min",
+    preview: "El punto de control antes de avanzar de fase.",
     reference: "PMBOK® Guide – 6ª edición · Sección 1.2.4.3 \"Fases del proyecto\" (phase gates)",
     intro:
       "Un gate review (revisión de puerta) es un punto de control obligatorio antes de pasar de una fase del proyecto a la siguiente: no avances a Ejecutar si el plan de Planificar todavía tiene huecos, porque cada fallo que se cuela se vuelve más caro de arreglar cuanto más tarde se detecta.",
+    diagram: "gate-review",
     points: [
       {
         term: "Por qué el botón está bloqueado",
@@ -228,6 +240,7 @@ export const ARTICLES = [
     title: "Gestión de stakeholders",
     category: "Comunicación",
     readTime: "5 min",
+    preview: "Quién puede frenar tu proyecto si no lo tienes de tu lado.",
     reference: "PMBOK® Guide – 6ª edición · Capítulo 13 \"Gestión de los interesados del proyecto\", sección 13.1",
     intro:
       "Antes de escribir un solo informe de estado, conviene mapear a los stakeholders del proyecto: quién tiene poder de decisión, quién se ve afectado por el resultado, y quién puede bloquear el proyecto si no está de tu lado.",
@@ -249,9 +262,11 @@ export const ARTICLES = [
     title: "Lecciones aprendidas",
     category: "Fundamentos",
     readTime: "4 min",
+    preview: "La lección más cara es la que se repite.",
     reference: "PMBOK® Guide – 6ª edición · Sección 4.4 \"Gestionar el conocimiento del proyecto\"",
     intro:
       "La lección aprendida más cara es la que se repite. Y se repite, casi siempre, porque solo se documentó al cerrar el proyecto — cuando ya nadie se acuerda de los detalles importantes ni tiene tiempo de escribirlos con cuidado.",
+    diagram: "lessons-learned",
     points: [
       {
         term: "Apúntalas en caliente",

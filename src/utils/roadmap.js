@@ -40,11 +40,11 @@ export function buildRoadmapSteps(selectedPhase, taskAssignments, expandedStepKe
       link: outputsMeta[outIdx]?.link || "",
     }));
 
-    const metaParts = [];
-    if (meta.assignee) metaParts.push(meta.assignee);
-    if (meta.startDate || meta.endDate) metaParts.push(`${meta.startDate || "¿?"} → ${meta.endDate || "¿?"}`);
+    const dateLineParts = [];
+    if (meta.assignee) dateLineParts.push(meta.assignee);
+    if (meta.startDate || meta.endDate) dateLineParts.push(`${meta.startDate || "¿?"} → ${meta.endDate || "¿?"}`);
     const doneOutputs = outputs.filter((o) => o.done).length;
-    if (outputs.length > 0) metaParts.push(`${doneOutputs}/${outputs.length} entregables`);
+    const entregablesLine = outputs.length > 0 ? `${doneOutputs}/${outputs.length} entregables` : "";
 
     return {
       key,
@@ -54,8 +54,9 @@ export function buildRoadmapSteps(selectedPhase, taskAssignments, expandedStepKe
       isDone,
       hasStatus: !!status && !isDone,
       expanded: expandedStepKey === key,
-      hasMeta: metaParts.length > 0,
-      metaSummary: metaParts.join(" · "),
+      hasMeta: dateLineParts.length > 0 || !!entregablesLine,
+      metaDateLine: dateLineParts.join(" · "),
+      metaEntregablesLine: entregablesLine,
       assignee: meta.assignee || "",
       startDate: meta.startDate || "",
       endDate: meta.endDate || "",
