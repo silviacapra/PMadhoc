@@ -124,15 +124,6 @@ export default function Templates({ templates }) {
           onToggle={toggleTypeFilter}
           onClear={clearTypeFilter}
         />
-        {hasActiveFilters && (
-          <button className="template-reset-btn" onClick={resetAllFilters}>
-            Restablecer filtros
-          </button>
-        )}
-      </div>
-
-      <div className="template-filter-label">Otros</div>
-      <div className="phase-filter-row">
         <span
           className={`phase-filter-pill ${sostenibleOnly ? "phase-filter-pill--active" : ""}`}
           onClick={() => setSostenibleOnly(!sostenibleOnly)}
@@ -145,6 +136,11 @@ export default function Templates({ templates }) {
         >
           ✅ Solo disponibles
         </span>
+        {hasActiveFilters && (
+          <button className="template-reset-btn" onClick={resetAllFilters}>
+            Restablecer filtros
+          </button>
+        )}
       </div>
 
       {filteredTemplates.length > 0 ? (

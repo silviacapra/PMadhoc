@@ -84,10 +84,6 @@ export default function Lecciones({ lecciones }) {
     <div>
       <h1 className="page-title">Lecciones aprendidas</h1>
 
-      <div className="doc-disclaimer">
-        ℹ️ Cualquiera puede añadir lecciones, pero solo quien creó cada lección puede editarla o eliminarla.
-      </div>
-
       <div className="registro-project-picker">
         <label>Proyecto</label>
         <select value={selectedProjectId} onChange={(e) => setSelectedProjectId(e.target.value)}>
@@ -97,6 +93,10 @@ export default function Lecciones({ lecciones }) {
             </option>
           ))}
         </select>
+      </div>
+
+      <div className="doc-disclaimer">
+        ℹ️ Cualquiera puede añadir lecciones, pero solo quien creó cada lección puede editarla o eliminarla.
       </div>
 
       {!project ? (

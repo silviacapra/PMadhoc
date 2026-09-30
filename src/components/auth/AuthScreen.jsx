@@ -100,9 +100,9 @@ export default function AuthScreen({ auth }) {
             <div className="auth-field">
               <label>Rol</label>
               <select value={form.role} onChange={(e) => updateField("role", e.target.value)}>
-                <option value="sponsor">Sponsor</option>
-                <option value="pm">Project manager</option>
-                <option value="team">Team</option>
+                <option value="sponsor">Patrocinador</option>
+                <option value="pm">Gestor de proyecto</option>
+                <option value="team">Equipo</option>
                 <option value="expert">Experto</option>
               </select>
               <span className="auth-hint">Tu rol determina a qué secciones de la app tienes acceso.</span>

@@ -84,13 +84,13 @@ export const STATUS_REPORTS = {
       { label: "Equipo", status: "atRisk", note: "Falta confirmar al arquitecto de integración." },
     ],
     achievements: [
-      "Business case y caso de negocio aprobados por el sponsor.",
+      "Business case y caso de negocio aprobados por el patrocinador.",
       "Selección del proveedor de integración completada.",
     ],
     nextSteps: [
       "Cerrar el WBS y el cronograma definitivo.",
       "Confirmar la incorporación del arquitecto de integración.",
-      "Revisar con el sponsor los 2 requisitos nuevos antes del gate review.",
+      "Revisar con el patrocinador los 2 requisitos nuevos antes del gate review.",
     ],
     risks: [
       { desc: "Ampliación de alcance no presupuestada", impact: "alto", owner: "Elena Ruiz", status: "Escalado" },

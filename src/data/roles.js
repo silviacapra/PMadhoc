@@ -1,7 +1,7 @@
 export const ROLE_LABELS = {
-  sponsor: "Sponsor",
-  pm: "Project manager",
-  team: "Team",
+  sponsor: "Patrocinador",
+  pm: "Gestor de proyecto",
+  team: "Equipo",
   expert: "Experto",
 };
 
@@ -29,15 +29,15 @@ export function defaultViewForRole(role) {
 }
 
 export const NAV_ITEMS = [
-  { id: "dashboard", label: "Dashboard", icon: "dashboard", group: "main" },
-  { id: "roadmap", label: "Roadmap Proyectos", icon: "roadmap", group: "main" },
+  { id: "dashboard", label: "Panel", icon: "dashboard", group: "main" },
+  { id: "roadmap", label: "Proyectos por fases", icon: "roadmap", group: "main" },
   { id: "documentacion", label: "Repositorio documental", icon: "documentacion", group: "main" },
   { id: "riesgos", label: "Registro de riesgos", icon: "riesgos", group: "main" },
   { id: "lecciones", label: "Lecciones aprendidas", icon: "lecciones", group: "main" },
-  { id: "statusreport", label: "Status Report", icon: "statusreport", group: "main" },
+  { id: "statusreport", label: "Informe de estado del proyecto", icon: "statusreport", group: "main" },
   { id: "templates", label: "Mis Plantillas", icon: "templates", group: "secondary" },
   { id: "knowledge", label: "Base de conocimiento", icon: "knowledge", group: "secondary" },
-  { id: "stakeholders", label: "Stakeholders", icon: "stakeholders", group: "secondary" },
-  { id: "empresa", label: "Empresa y OKR", icon: "empresa", group: "secondary" },
+  { id: "stakeholders", label: "Contactos clave", icon: "stakeholders", group: "secondary" },
+  { id: "empresa", label: "Objetivos de Empresa", icon: "empresa", group: "secondary" },
   { id: "chatbot", label: "Pregunta al PM virtual", icon: "chatbot", group: "secondary" },
 ];

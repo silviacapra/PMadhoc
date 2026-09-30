@@ -3,16 +3,18 @@ import { PlusIcon, StatusReportIcon, TrashIcon, PencilIcon, ArrowRightIcon, TriD
 import StatusBadge from "../shared/StatusBadge";
 import ProjectModal from "./ProjectModal";
 import ConfirmDeleteModal from "../shared/ConfirmDeleteModal";
+import Confetti from "../shared/Confetti";
 import { METHODOLOGY_LABELS, METHODOLOGY_TINT } from "../../data/projects";
 import { TEAM_MEMBERS, DEPARTMENTS } from "../../data/team";
 import "./Dashboard.css";
 
-const SPONSORS = TEAM_MEMBERS.filter((t) => t.roleLabel === "Sponsor");
-const PMS = TEAM_MEMBERS.filter((t) => t.roleLabel === "Project manager");
+const SPONSORS = TEAM_MEMBERS.filter((t) => t.roleLabel === "Patrocinador");
+const PMS = TEAM_MEMBERS.filter((t) => t.roleLabel === "Gestor de proyecto");
 
 export default function Dashboard({ dashboard, permissions, session, nav, statusReport }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
+  const [confettiFire, setConfettiFire] = useState(0);
 
   function formatDate(dateStr) {
     if (!dateStr) return "";
@@ -54,12 +56,14 @@ export default function Dashboard({ dashboard, permissions, session, nav, status
 
       <div className="dashboard-header">
         <div>
-          <h1 className="page-title">Overview de proyectos</h1>
+          <h1 className="page-title">Panel</h1>
         </div>
-        <button className="new-project-btn" onClick={() => setModalOpen(true)}>
-          <PlusIcon size={16} color="currentColor" />
-          Nuevo proyecto
-        </button>
+        {permissions?.canCreateProject && (
+          <button className="new-project-btn" onClick={() => setModalOpen(true)}>
+            <PlusIcon size={16} color="currentColor" />
+            Nuevo proyecto
+          </button>
+        )}
       </div>
 
       <div className="project-cards">
@@ -77,7 +81,7 @@ export default function Dashboard({ dashboard, permissions, session, nav, status
                   <button className="project-card-icon-btn" title="Editar proyecto" onClick={() => setEditingProject(proj)}>
                     <PencilIcon size={14} color="currentColor" />
                   </button>
-                  <button className="project-card-icon-btn" title="Ir al status report" onClick={() => goToStatusReport(proj)}>
+                  <button className="project-card-icon-btn" title="Ir al informe de estado del proyecto" onClick={() => goToStatusReport(proj)}>
                     <StatusReportIcon size={15} color="currentColor" />
                   </button>
                   <button
@@ -150,8 +154,10 @@ export default function Dashboard({ dashboard, permissions, session, nav, status
         onCreate={(project) => {
           dashboard.addProject(project);
           setModalOpen(false);
+          setConfettiFire((n) => n + 1);
         }}
       />
+      <Confetti fire={confettiFire} />
 
       <ProjectModal
         open={!!editingProject}

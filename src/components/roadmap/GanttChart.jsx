@@ -107,6 +107,7 @@ export default function GanttChart({ phases }) {
       <div className="gantt-chart">
         <div className="gantt-header-row">
           <div className="gantt-label-spacer" />
+          <div className="gantt-status-spacer">Estado</div>
           <div className="gantt-timeline-header">
             {monthTicks.map((m) => (
               <span key={m.toISOString()} className="gantt-month-label" style={{ left: `${toPct(m, range)}%` }}>
@@ -124,10 +125,16 @@ export default function GanttChart({ phases }) {
                 <div className="gantt-phase-label-row">
                   <span className="gantt-phase-label">{phase.phaseLabel}</span>
                 </div>
-                {phase.steps.map((step) => (
+                {phase.steps.map((step) => {
+                  const statusDef = ROADMAP_STEP_STATUS_DEFS[step.status] || ROADMAP_STEP_STATUS_DEFS.notStarted;
+                  return (
                   <div key={step.key} className="gantt-row">
                     <div className="gantt-row-label" title={step.title}>
                       {step.title}
+                    </div>
+                    <div className="gantt-row-status" style={{ color: statusDef.color }}>
+                      <span className="gantt-row-status-dot" style={{ background: statusDef.dot }} />
+                      {statusDef.label}
                     </div>
                     <div className="gantt-row-track">
                       {monthTicks.map((m) => (
@@ -136,7 +143,8 @@ export default function GanttChart({ phases }) {
                       <GanttBar step={step} range={range} />
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             ))}
         </div>

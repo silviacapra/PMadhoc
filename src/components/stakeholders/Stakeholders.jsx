@@ -120,7 +120,7 @@ export default function Stakeholders({ stakeholders, updateStakeholder, deleteSt
 
   return (
     <div>
-      <h1 className="page-title">Stakeholders</h1>
+      <h1 className="page-title">Contactos clave</h1>
 
       <div className="stakeholder-grid">
         {stakeholders.map((s) => (
@@ -130,7 +130,7 @@ export default function Stakeholders({ stakeholders, updateStakeholder, deleteSt
 
       <ConfirmDeleteModal
         item={deleteTarget}
-        itemLabel="stakeholder"
+        itemLabel="contacto clave"
         itemName={deleteTarget?.name}
         onClose={() => setDeleteTarget(null)}
         onConfirm={(id) => {

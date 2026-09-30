@@ -35,7 +35,7 @@ export const ARTICLES = [
         text: "Muchos frameworks modernos la añaden en el centro del triángulo, como resultado de cómo se gestionan las otras tres — no como una cuarta variable independiente.",
         subitems: [
           "Si se recorta tiempo o coste sin tocar el alcance, la calidad suele ser la que paga la diferencia.",
-          "Por eso el Status Report de esta app usa siempre estas cuatro categorías en semáforo: alcance, cronograma, presupuesto y calidad.",
+          "Por eso el Informe de estado del proyecto de esta app usa siempre estas cuatro categorías en semáforo: alcance, cronograma, presupuesto y calidad.",
         ],
       },
     ],
@@ -86,11 +86,11 @@ export const ARTICLES = [
     points: [
       {
         term: "Qué necesita saber",
-        text: "El contenido relevante para ese stakeholder concreto — no el mismo informe para todos.",
+        text: "El contenido relevante para ese contacto clave concreto — no el mismo informe para todos.",
       },
       {
         term: "Con qué frecuencia",
-        text: "No es lo mismo el sponsor (informe quincenal + reunión de comité) que el equipo (seguimiento diario en el tablero).",
+        text: "No es lo mismo el patrocinador (informe quincenal + reunión de comité) que el equipo (seguimiento diario en el tablero).",
       },
       {
         term: "Por qué canal",
@@ -98,11 +98,11 @@ export const ARTICLES = [
       },
       {
         term: "Quién se lo cuenta",
-        text: "Una matriz de comunicación sencilla, una fila por stakeholder, evita el error más común: tratar a todo el mundo igual.",
+        text: "Una matriz de comunicación sencilla, una fila por contacto clave, evita el error más común: tratar a todo el mundo igual.",
       },
     ],
     closing:
-      "Un buen indicador de que el plan de comunicación funciona: nadie se sorprende en una reunión de comité. Si el sponsor se entera en la reunión mensual de un riesgo que el equipo conocía desde hace tres semanas, el plan de comunicación ha fallado, no el proyecto.",
+      "Un buen indicador de que el plan de comunicación funciona: nadie se sorprende en una reunión de comité. Si el patrocinador se entera en la reunión mensual de un riesgo que el equipo conocía desde hace tres semanas, el plan de comunicación ha fallado, no el proyecto.",
   },
   {
     title: "Scrum vs. Waterfall",
@@ -150,7 +150,7 @@ export const ARTICLES = [
       },
       {
         term: "Aprobador (A)",
-        text: "Quien responde por el resultado ante el sponsor, aunque no lo haya hecho con sus manos. Regla de oro: cada tarea debe tener exactamente UN aprobador — si dos personas lo son, en la práctica nadie lo es.",
+        text: "Quien responde por el resultado ante el patrocinador, aunque no lo haya hecho con sus manos. Regla de oro: cada tarea debe tener exactamente UN aprobador — si dos personas lo son, en la práctica nadie lo es.",
       },
       {
         term: "Consultado (C)",
@@ -186,7 +186,7 @@ export const ARTICLES = [
       },
       {
         term: "Valor frente a esfuerzo",
-        text: "Dibuja cada historia de usuario en una matriz 2x2 (alto/bajo valor, alto/bajo esfuerzo). Las de alto valor y bajo esfuerzo van primero — son las victorias rápidas que generan confianza en el equipo y el sponsor.",
+        text: "Dibuja cada historia de usuario en una matriz 2x2 (alto/bajo valor, alto/bajo esfuerzo). Las de alto valor y bajo esfuerzo van primero — son las victorias rápidas que generan confianza en el equipo y el patrocinador.",
       },
     ],
     closing:
@@ -237,13 +237,13 @@ export const ARTICLES = [
     ],
   },
   {
-    title: "Gestión de stakeholders",
+    title: "Gestión de contactos clave",
     category: "Comunicación",
     readTime: "5 min",
     preview: "Quién puede frenar tu proyecto si no lo tienes de tu lado.",
     reference: "PMBOK® Guide – 6ª edición · Capítulo 13 \"Gestión de los interesados del proyecto\", sección 13.1",
     intro:
-      "Antes de escribir un solo informe de estado, conviene mapear a los stakeholders del proyecto: quién tiene poder de decisión, quién se ve afectado por el resultado, y quién puede bloquear el proyecto si no está de tu lado.",
+      "Antes de escribir un solo informe de estado, conviene mapear a los contactos clave del proyecto: quién tiene poder de decisión, quién se ve afectado por el resultado, y quién puede bloquear el proyecto si no está de tu lado.",
     diagram: "stakeholder-matriz",
     points: [
       {
@@ -251,12 +251,12 @@ export const ARTICLES = [
         text: "A quién tiene mucho poder y mucho interés hay que gestionarlo de cerca (reuniones frecuentes, involucrarlo en decisiones); a quién tiene mucho poder pero poco interés, hay que mantenerlo satisfecho con informes puntuales, sin saturarlo (ver diagrama).",
       },
       {
-        term: "El sponsor no es un stakeholder cualquiera",
+        term: "El patrocinador no es un contacto clave cualquiera",
         text: "Es quien firma el caso de negocio y quien responde ante el resto de la organización si el proyecto no entrega valor. Por eso su plan de comunicación normalmente incluye una reunión de comité de dirección, no solo un informe por email.",
       },
     ],
     closing:
-      "La sección de Stakeholders de esta app recoge exactamente esto: quién es cada persona, cómo se le localiza, y cuál es su plan de comunicación acordado — para no tener que reconstruirlo de memoria en cada proyecto nuevo.",
+      "La sección de Contactos clave de esta app recoge exactamente esto: quién es cada persona, cómo se le localiza, y cuál es su plan de comunicación acordado — para no tener que reconstruirlo de memoria en cada proyecto nuevo.",
   },
   {
     title: "Lecciones aprendidas",

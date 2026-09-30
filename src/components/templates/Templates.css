@@ -65,22 +65,27 @@
 
 .phase-filter-pill {
   cursor: pointer;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 600;
-  padding: 7px 14px;
+  padding: 8px 16px;
   border-radius: 20px;
-  background: var(--gray-light);
-  color: #6b6b6b;
+  background: var(--black);
+  color: #ffffff;
+  transition: background 0.15s ease;
 }
 
 .phase-filter-pill--active {
   background: var(--accent);
   color: #ffffff;
+  font-weight: 700;
 }
 
 .phase-filter-pill:hover {
   background: var(--gray-dark);
-  color: #ffffff;
+}
+
+.phase-filter-pill--active:hover {
+  background: var(--accent);
 }
 
 .template-grid {

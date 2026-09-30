@@ -118,7 +118,7 @@
 
 .roadmap-step-detail {
   font-size: 12px;
-  color: var(--text-faint);
+  color: #000000;
 }
 
 .roadmap-step-meta {
@@ -133,9 +133,6 @@
   color: var(--text-faint);
 }
 
-.roadmap-step-meta--count {
-  font-size: 13.5px;
-}
 
 .roadmap-step-status-pill {
   flex-shrink: 0;
@@ -151,30 +148,40 @@
   padding: 16px;
   background: var(--gray-light);
   border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 20px;
+}
+
+.editor-field--full {
+  grid-column: 1 / -1;
 }
 
 .roadmap-step-editor label {
   display: block;
   font-size: 11.5px;
   font-weight: 600;
-  color: var(--text-muted);
+  color: #000000;
   margin-bottom: 7px;
 }
 
 .roadmap-step-editor select,
-.roadmap-step-editor input {
+.roadmap-step-editor input,
+.roadmap-step-editor textarea {
   width: 100%;
   border: 1px solid var(--border-light);
   border-radius: 8px;
   padding: 8px 10px;
   font-size: 13px;
   font-family: inherit;
-  color: var(--gray-dark);
+  color: #000000;
   outline: none;
   background: var(--white);
+}
+
+.roadmap-step-editor textarea {
+  resize: vertical;
+  line-height: 1.5;
 }
 
 .status-options {
@@ -240,10 +247,44 @@
 }
 
 .output-label {
-  flex: 1;
   min-width: 140px;
-  font-size: 12.5px;
-  color: var(--gray-dark);
+  font-size: 13px;
+  font-weight: 400;
+  color: #000000;
+}
+
+.readonly-field {
+  width: 100%;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 13px;
+  color: #000000;
+  background: var(--gray-light);
+}
+
+.pencil-field-display {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  cursor: pointer;
+  min-height: 36px;
+  padding: 8px 10px;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  background: var(--white);
+}
+
+.pencil-field-text {
+  flex: 1;
+  font-size: 13px;
+  color: #000000;
+  white-space: pre-wrap;
+}
+
+.pencil-field-text--empty {
+  color: var(--text-faint);
 }
 
 .output-actions {

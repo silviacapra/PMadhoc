@@ -10,11 +10,6 @@ export default function DocumentacionPage({ documentacionPage }) {
     <div>
       <h1 className="page-title">Repositorio documental</h1>
 
-      <div className="doc-disclaimer">
-        ℹ️ Esta sección se rellena automáticamente desde el apartado <strong>Roadmap Proyecto</strong>: en cuanto marcas un
-        entregable como hecho y le añades un enlace en Fases del proyecto, aparece aquí agrupado por fase.
-      </div>
-
       <div className="registro-project-picker">
         <label>Proyecto</label>
         <select value={selectedProjectId} onChange={(e) => setSelectedProjectId(e.target.value)}>
@@ -24,6 +19,11 @@ export default function DocumentacionPage({ documentacionPage }) {
             </option>
           ))}
         </select>
+      </div>
+
+      <div className="doc-disclaimer">
+        ℹ️ Esta sección se rellena automáticamente desde el apartado <strong>Roadmap Proyecto</strong>: en cuanto marcas un
+        entregable como hecho y le añades un enlace en Fases del proyecto, aparece aquí agrupado por fase.
       </div>
 
       {!project ? (

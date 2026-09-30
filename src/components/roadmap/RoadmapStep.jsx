@@ -1,6 +1,84 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CheckIcon, ChevronDownIcon, PencilIcon, ExternalLinkIcon } from "../icons/Icons";
 import { ROADMAP_STEP_STATUS_DEFS } from "../../data/statusStyles";
+
+function EditableField({ value, onSave, placeholder, multiline, rows }) {
+  const [draft, setDraft] = useState(value);
+
+  useEffect(() => {
+    setDraft(value);
+  }, [value]);
+
+  function commit() {
+    if (draft !== value) onSave(draft);
+  }
+
+  if (multiline) {
+    return (
+      <textarea
+        rows={rows || 3}
+        value={draft}
+        placeholder={placeholder}
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={commit}
+      />
+    );
+  }
+
+  return (
+    <input
+      type="text"
+      value={draft}
+      placeholder={placeholder}
+      onChange={(e) => setDraft(e.target.value)}
+      onBlur={commit}
+    />
+  );
+}
+
+function PencilEditField({ value, onSave, placeholder, multiline }) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(value);
+
+  function startEdit() {
+    setDraft(value);
+    setEditing(true);
+  }
+
+  function save() {
+    if (draft.trim() !== value) onSave(draft.trim());
+    setEditing(false);
+  }
+
+  if (!editing) {
+    return (
+      <div className="pencil-field-display" onClick={startEdit}>
+        <span className={value ? "pencil-field-text" : "pencil-field-text pencil-field-text--empty"}>{value || placeholder}</span>
+        <button className="output-edit-btn" onClick={startEdit} title="Editar">
+          <PencilIcon size={12} color="currentColor" />
+        </button>
+      </div>
+    );
+  }
+
+  const Tag = multiline ? "textarea" : "input";
+  return (
+    <div className="output-edit">
+      <Tag
+        autoFocus
+        rows={multiline ? 2 : undefined}
+        type={multiline ? undefined : "text"}
+        value={draft}
+        placeholder={placeholder}
+        onChange={(e) => setDraft(e.target.value)}
+        onKeyDown={(e) => !multiline && e.key === "Enter" && save()}
+      />
+      <button className="output-save-btn" onClick={save}>
+        Guardar
+      </button>
+    </div>
+  );
+}
 
 function OutputRow({ output, stepKey, onUpdate }) {
   const [editing, setEditing] = useState(false);
@@ -75,7 +153,7 @@ export default function RoadmapStep({ step, teamMembers, onToggle, onUpdate, onU
           <span
             className="roadmap-step-title"
             style={{
-              color: step.isDone ? "#A0A0A0" : "var(--gray-dark)",
+              color: step.isDone ? "#A0A0A0" : "#000000",
               textDecoration: step.isDone ? "line-through" : "none",
             }}
           >
@@ -86,7 +164,12 @@ export default function RoadmapStep({ step, teamMembers, onToggle, onUpdate, onU
             <>
               {step.metaDateLine && <span className="roadmap-step-meta roadmap-step-meta--date">{step.metaDateLine}</span>}
               {step.metaEntregablesLine && (
-                <span className="roadmap-step-meta roadmap-step-meta--count">{step.metaEntregablesLine}</span>
+                <span
+                  className="roadmap-step-meta roadmap-step-meta--count"
+                  style={{ color: step.entregablesDone ? "var(--accent)" : "var(--status-critical-color)" }}
+                >
+                  {step.metaEntregablesLine}
+                </span>
               )}
             </>
           )}
@@ -105,8 +188,28 @@ export default function RoadmapStep({ step, teamMembers, onToggle, onUpdate, onU
 
       {step.expanded && (
         <div className="roadmap-step-editor">
-          <div>
-            <label>Estado</label>
+          <div className="editor-field editor-field--full">
+            <label>Título del work package</label>
+            <PencilEditField value={step.title} onSave={(v) => onUpdate(step.key, { title: v })} placeholder="Título" />
+          </div>
+
+          <div className="editor-field editor-field--full">
+            <label>Descripción</label>
+            <PencilEditField
+              value={step.detail}
+              onSave={(v) => onUpdate(step.key, { detail: v })}
+              placeholder="Descripción breve de este work package"
+              multiline
+            />
+          </div>
+
+          <div className="editor-field editor-field--full">
+            <label>ID del work package</label>
+            <div className="readonly-field">{step.workPackageId}</div>
+          </div>
+
+          <div className="editor-field editor-field--full">
+            <label>Estado *</label>
             <div className="status-options">
               {Object.entries(ROADMAP_STEP_STATUS_DEFS).map(([id, def]) => {
                 const active = step.status === id;
@@ -128,9 +231,13 @@ export default function RoadmapStep({ step, teamMembers, onToggle, onUpdate, onU
             </div>
           </div>
 
-          <div>
-            <label>Responsable</label>
-            <select value={step.assignee} onChange={(e) => onUpdate(step.key, { assignee: e.target.value })}>
+          <div className="editor-field">
+            <label>Responsable *</label>
+            <select
+              value={step.assignee}
+              onChange={(e) => onUpdate(step.key, { assignee: e.target.value })}
+              style={!step.assignee ? { borderColor: "var(--status-critical-color)" } : undefined}
+            >
               <option value="">Sin asignar</option>
               {teamMembers.map((tm) => (
                 <option key={tm.id} value={tm.name}>
@@ -140,20 +247,45 @@ export default function RoadmapStep({ step, teamMembers, onToggle, onUpdate, onU
             </select>
           </div>
 
-          <div className="roadmap-step-dates">
+          <div className="editor-field roadmap-step-dates">
             <div>
               <label>Fecha inicio</label>
               <input type="date" value={step.startDate} onChange={(e) => onUpdate(step.key, { startDate: e.target.value })} />
             </div>
             <div>
-              <label>Fecha fin (deadline)</label>
-              <input type="date" value={step.endDate} onChange={(e) => onUpdate(step.key, { endDate: e.target.value })} />
+              <label>Fecha fin (deadline) *</label>
+              <input
+                type="date"
+                value={step.endDate}
+                onChange={(e) => onUpdate(step.key, { endDate: e.target.value })}
+                style={!step.endDate ? { borderColor: "var(--status-critical-color)" } : undefined}
+              />
             </div>
           </div>
 
+          <div className="editor-field">
+            <label>Criterios de aceptación</label>
+            <EditableField
+              value={step.acceptanceCriteria}
+              onSave={(v) => onUpdate(step.key, { acceptanceCriteria: v })}
+              placeholder="Criterios que se usarán para aceptar este work package"
+              multiline
+            />
+          </div>
+
+          <div className="editor-field">
+            <label>Información técnica</label>
+            <EditableField
+              value={step.technicalInfo}
+              onSave={(v) => onUpdate(step.key, { technicalInfo: v })}
+              placeholder="Información técnica o referencia a documentación técnica"
+              multiline
+            />
+          </div>
+
           {step.outputs.length > 0 && (
-            <div>
-              <label>Entregables</label>
+            <div className="editor-field editor-field--full">
+              <label>Entregables recomendados</label>
               <div className="output-list">
                 {step.outputs.map((output) => (
                   <OutputRow key={output.index} output={output} stepKey={step.key} onUpdate={onUpdateOutput} />

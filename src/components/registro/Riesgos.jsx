@@ -140,10 +140,6 @@ export default function Riesgos({ riesgos }) {
     <div>
       <h1 className="page-title">Registro de riesgos</h1>
 
-      <div className="doc-disclaimer">
-        ℹ️ Cualquiera puede añadir riesgos, pero solo quien creó cada riesgo puede editarlo o eliminarlo.
-      </div>
-
       <div className="registro-project-picker">
         <label>Proyecto</label>
         <select value={selectedProjectId} onChange={(e) => setSelectedProjectId(e.target.value)}>
@@ -153,6 +149,10 @@ export default function Riesgos({ riesgos }) {
             </option>
           ))}
         </select>
+      </div>
+
+      <div className="doc-disclaimer">
+        ℹ️ Cualquiera puede añadir riesgos, pero solo quien creó cada riesgo puede editarlo o eliminarlo.
       </div>
 
       {!project ? (

@@ -31,6 +31,7 @@ import {
   buildGanttRows,
   buildInitialTaskAssignments,
   getCurrentTaskStatus,
+  arePhaseWorkPackagesReady,
   nextPhase,
   phaseLabelToKey,
 } from "../utils/roadmap";
@@ -138,6 +139,7 @@ export function useAppState() {
   const [statusSelectedProjectId, setStatusSelectedProjectId] = useState("");
   const [statusReportDoc, setStatusReportDoc] = useState(null);
   const [statusRoadmapData, setStatusRoadmapData] = useState(null);
+  const [statusRiesgosItems, setStatusRiesgosItems] = useState([]);
 
   const [riesgosSelectedProjectId, setRiesgosSelectedProjectId] = useState("");
   const [riesgosItems, setRiesgosItems] = useState([]);
@@ -210,14 +212,20 @@ export function useAppState() {
     })();
   }, [user]);
 
-  // Crea los stakeholders que falten (por si la base de datos ya existía de antes).
+  // Crea los stakeholders que falten (por si la base de datos ya existía de antes), y traduce
+  // el rol de los que ya existían con las etiquetas antiguas en inglés (Sponsor/Project manager/Team).
   useEffect(() => {
     if (!user) return;
     (async () => {
+      const OLD_ROLE_LABELS = { Sponsor: "Patrocinador", "Project manager": "Gestor de proyecto", Team: "Equipo" };
       for (const s of INITIAL_STAKEHOLDERS) {
         const { id, ...rest } = s;
         const snap = await getDoc(doc(db, "stakeholders", id));
-        if (!snap.exists()) await setDoc(doc(db, "stakeholders", id), rest);
+        if (!snap.exists()) {
+          await setDoc(doc(db, "stakeholders", id), rest);
+        } else if (OLD_ROLE_LABELS[snap.data().rol]) {
+          await updateDoc(doc(db, "stakeholders", id), { rol: OLD_ROLE_LABELS[snap.data().rol] });
+        }
       }
     })();
   }, [user]);
@@ -294,6 +302,9 @@ export function useAppState() {
       onSnapshot(doc(db, "projects", statusSelectedProjectId, "roadmap", "main"), (snap) => {
         setStatusRoadmapData(snap.exists() ? snap.data() : null);
       }),
+      onSnapshot(collection(db, "projects", statusSelectedProjectId, "riesgos"), (snap) =>
+        setStatusRiesgosItems(snap.docs.map((d) => ({ id: d.id, ...d.data() })))
+      ),
     ];
     return () => unsubs.forEach((unsub) => unsub());
   }, [user, statusSelectedProjectId]);
@@ -674,6 +685,23 @@ export function useAppState() {
     updateStatusReportField("categories", updated);
   }
 
+  function updateStatusProjectField(field, value) {
+    const existing = projects.find((p) => p.id === statusSelectedProjectId);
+    if (!existing) return;
+    updateProject(statusSelectedProjectId, {
+      name: existing.name,
+      methodology: existing.methodology,
+      sponsor: existing.sponsor,
+      pm: existing.pm,
+      department: existing.department,
+      contributesTo: existing.contributesTo,
+      deadline: existing.deadline,
+      hitos: existing.hitos,
+      budget: existing.budgetTotal,
+      [field]: value,
+    });
+  }
+
   function toggleFichaGateItem(index) {
     const updated = { ...(fichaGateChecks[fichaRoadmapPhase] || {}), [index]: !(fichaGateChecks[fichaRoadmapPhase] || {})[index] };
     updateDoc(doc(db, "projects", fichaProjectId, "roadmap", "main"), { [`gateChecks.${fichaRoadmapPhase}`]: updated });
@@ -682,7 +710,9 @@ export function useAppState() {
   const fichaGateItemsForCurrentPhase = GATE_REQUIREMENTS[fichaCurrentPhase] || [];
   const fichaGateCheckedForCurrentPhase = fichaGateChecks[fichaCurrentPhase] || {};
   const fichaCanAdvance =
-    fichaGateItemsForCurrentPhase.length > 0 && fichaGateItemsForCurrentPhase.every((_, i) => fichaGateCheckedForCurrentPhase[i]);
+    fichaGateItemsForCurrentPhase.length > 0 &&
+    fichaGateItemsForCurrentPhase.every((_, i) => fichaGateCheckedForCurrentPhase[i]) &&
+    arePhaseWorkPackagesReady(fichaCurrentPhase, fichaTaskAssignments, fichaProjectId);
 
   function advanceFichaPhase() {
     const next = nextPhase(fichaCurrentPhase);
@@ -777,10 +807,36 @@ export function useAppState() {
     statusRoadmapData?.taskAssignments || {},
     statusSelectedProject?.id
   );
+
+  // Datos automáticos para el informe: cronograma y próximos pasos salen directamente del roadmap
+  // real del proyecto (igual que en "Roadmap"), no hace falta rellenarlos a mano.
+  const statusGanttPhases = buildGanttRows(statusRoadmapData?.taskAssignments || {}, statusSelectedProject?.id);
+  const allStatusSteps = statusGanttPhases.flatMap((ph) => ph.steps.map((s) => ({ ...s, phaseLabel: ph.phaseLabel })));
+  const today = new Date();
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  const lastMonthSteps = allStatusSteps.filter((s) => {
+    if (!s.startDate && !s.endDate) return false;
+    const end = s.endDate ? new Date(`${s.endDate}T00:00:00`) : new Date(`${s.startDate}T00:00:00`);
+    const start = s.startDate ? new Date(`${s.startDate}T00:00:00`) : end;
+    return end >= thirtyDaysAgo && start <= today;
+  });
+  const autoNextSteps = allStatusSteps
+    .filter((s) => s.status === "notStarted")
+    .slice(0, 3)
+    .map((s) => `${s.title} (${s.phaseLabel})`);
+  const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().slice(0, 10);
+  const lastMonthRiesgos = statusRiesgosItems.filter((r) => r.fecha && r.fecha >= thirtyDaysAgoStr);
+
   const budgetTotal = statusSelectedProject?.budgetTotal || 0;
   const budgetSpent = statusReportDoc?.budgetSpent ?? statusSelectedProject?.budgetSpent ?? 0;
   const report = {
     projectName: statusSelectedProject?.name || "",
+    pm: statusSelectedProject?.pm || "",
+    sponsor: statusSelectedProject?.sponsor || "",
+    department: statusSelectedProject?.department || "",
+    methodology: statusSelectedProject?.methodology || "",
+    deadline: statusSelectedProject?.deadline || "",
     createdAt: statusReportDoc?.createdAt || "",
     createdBy: statusReportDoc?.createdBy || "",
     period: statusReportDoc?.period ?? seedReport?.period ?? "Este mes",
@@ -788,7 +844,10 @@ export function useAppState() {
     overallStatus: statusReportDoc?.overallStatus ?? seedReport?.overallStatus ?? statusSelectedProject?.status ?? "onTrack",
     categories: statusReportDoc?.categories ?? seedReport?.categories ?? DEFAULT_REPORT_CATEGORIES,
     achievements: statusReportDoc?.achievements ?? seedReport?.achievements ?? [],
-    nextSteps: statusReportDoc?.nextSteps ?? seedReport?.nextSteps ?? [],
+    nextSteps: statusReportDoc?.nextSteps ?? seedReport?.nextSteps ?? autoNextSteps,
+    comments: statusReportDoc?.comments ?? "",
+    lastMonthSteps,
+    lastMonthRiesgos,
     budgetTotal,
     budgetSpent,
     budgetPct: budgetTotal > 0 ? Math.round((budgetSpent / budgetTotal) * 100) : 0,
@@ -840,6 +899,7 @@ export function useAppState() {
       canChatbot: can("chatbot"),
       canStatusReport: can("statusreport"),
       canStakeholders: can("stakeholders"),
+      canCreateProject: role === "pm" || role === "sponsor",
     },
     nav: { view, setView },
     dashboard: {
@@ -872,7 +932,12 @@ export function useAppState() {
       openRiesgos,
       openLecciones,
       roadmap: {
-        phases: buildPhases(fichaRoadmapPhase || fichaCurrentPhase || "preproyecto", fichaCurrentPhase || "preproyecto"),
+        phases: buildPhases(
+          fichaRoadmapPhase || fichaCurrentPhase || "preproyecto",
+          fichaCurrentPhase || "preproyecto",
+          fichaTaskAssignments,
+          fichaProjectId
+        ),
         steps: buildRoadmapSteps(
           fichaRoadmapPhase || fichaCurrentPhase || "preproyecto",
           fichaTaskAssignments,
@@ -942,6 +1007,10 @@ export function useAppState() {
       updateAchievements: (lines) => updateStatusReportField("achievements", lines),
       updateNextSteps: (lines) => updateStatusReportField("nextSteps", lines),
       updateBudgetSpent: (value) => updateStatusReportField("budgetSpent", Number(value) || 0),
+      updateComments: (value) => updateStatusReportField("comments", value),
+      updatePeriod: (value) => updateStatusReportField("period", value),
+      updatePreparedBy: (value) => updateStatusReportField("preparedBy", value),
+      updateProjectField: updateStatusProjectField,
       goToRiesgos: () => openRiesgos(statusSelectedProject?.id),
       goToLecciones: () => openLecciones(statusSelectedProject?.id),
     },

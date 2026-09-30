@@ -9,14 +9,46 @@
   align-self: flex-start;
   background: var(--black);
   padding: 20px 0;
-  overflow-x: hidden;
-  overflow-y: auto;
   transition: width 0.18s ease;
   z-index: 15;
 }
 
-.sidebar:hover {
+.sidebar--expanded {
   width: 240px;
+}
+
+.sidebar-scroll {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.sidebar-toggle {
+  position: absolute;
+  top: 50%;
+  right: -13px;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 44px;
+  border-radius: 0 8px 8px 0;
+  border: none;
+  background: var(--black);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 16;
+}
+
+.sidebar-toggle svg {
+  transition: transform 0.18s ease;
+}
+
+.sidebar-toggle:hover {
+  background: var(--accent);
 }
 
 .sidebar-nav {
@@ -35,13 +67,19 @@
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 14px;
+  justify-content: center;
+  gap: 0;
   padding: 11px 12px;
   border-radius: 8px;
   cursor: pointer;
   background: transparent;
   transition: background 0.15s ease;
   white-space: nowrap;
+}
+
+.sidebar--expanded .nav-item {
+  justify-content: flex-start;
+  gap: 14px;
 }
 
 .nav-item svg {
@@ -61,11 +99,17 @@
   font-size: 13.5px;
   font-weight: 500;
   opacity: 0;
+  width: 0;
+  overflow: hidden;
+  white-space: nowrap;
   transition: opacity 0.12s ease;
 }
 
-.sidebar:hover .nav-item-label {
+.sidebar--expanded .nav-item-label {
   opacity: 1;
+  width: auto;
+  white-space: normal;
+  line-height: 1.25;
 }
 
 .nav-item--active .nav-item-label {

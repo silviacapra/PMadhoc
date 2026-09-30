@@ -67,6 +67,27 @@
   font-size: 11px;
 }
 
+.app-header-new-project-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--white);
+  color: var(--blue-primary);
+  border: none;
+  border-radius: 25px;
+  padding: 9px 18px;
+  font-size: 13.5px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.app-header-new-project-btn:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+  transform: translateY(-1px);
+}
+
 .app-header-logout {
   display: flex;
   align-items: center;

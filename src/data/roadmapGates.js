@@ -2,7 +2,7 @@ const STANDARD_GATE = [
   "Todos los entregables necesarios de esta fase están creados",
   "Registro de riesgos revisado",
   "Lecciones aprendidas revisadas",
-  "Revisión con los stakeholders principales realizada",
+  "Revisión con los contactos clave principales realizada",
 ];
 
 export const GATE_REQUIREMENTS = {

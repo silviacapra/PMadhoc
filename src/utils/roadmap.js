@@ -6,7 +6,52 @@ import { ROADMAP_CONTENT, PHASE_ORDER, DEFAULT_TASK_STATUS } from "../data/roadm
 // avance de la demo.
 const DEMO_SEED_PROJECT_IDS = new Set(["crm-migration", "client-portal", "sales-crm"]);
 
-export function buildPhases(selectedPhase, currentPhase) {
+const PHASE_ID_CODE = {
+  preproyecto: "PP",
+  iniciar: "IN",
+  planificar: "PL",
+  ejecutar: "EJ",
+  controlar: "CO",
+  cerrar: "CI",
+};
+
+function buildWorkPackageId(phaseId, idx) {
+  const code = PHASE_ID_CODE[phaseId] || phaseId.slice(0, 2).toUpperCase();
+  return `WP-${code}-${String(idx + 1).padStart(2, "0")}`;
+}
+
+// Peor estado entre los work packages de una fase: "red" > "yellow" > null (todo sano).
+// Se usa para pintar el circulito de la fase en el timeline con el color real de cómo se cerró.
+export function getPhaseHealth(phaseId, taskAssignments, projectId) {
+  const useDemoDefaults = DEMO_SEED_PROJECT_IDS.has(projectId);
+  const steps = ROADMAP_CONTENT[phaseId]?.steps || [];
+  let worst = null;
+  steps.forEach((step, idx) => {
+    const key = `${phaseId}__${idx}`;
+    const defaults = (useDemoDefaults && DEFAULT_TASK_STATUS[key]) || {};
+    const meta = { ...defaults, ...(taskAssignments[key] || {}) };
+    const status = meta.status || (useDemoDefaults ? null : "notStarted");
+    if (status === "red") worst = "red";
+    else if (status === "yellow" && worst !== "red") worst = "yellow";
+  });
+  return worst;
+}
+
+// Todos los work packages de la fase deben estar en un estado "cerrado" (Completado, Atención o
+// Crítico) para poder avanzar. "Sin empezar" o "En curso" bloquean el avance.
+export function arePhaseWorkPackagesReady(phaseId, taskAssignments, projectId) {
+  const useDemoDefaults = DEMO_SEED_PROJECT_IDS.has(projectId);
+  const steps = ROADMAP_CONTENT[phaseId]?.steps || [];
+  return steps.every((step, idx) => {
+    const key = `${phaseId}__${idx}`;
+    const defaults = (useDemoDefaults && DEFAULT_TASK_STATUS[key]) || {};
+    const meta = { ...defaults, ...(taskAssignments[key] || {}) };
+    const status = meta.status || (useDemoDefaults ? null : "notStarted");
+    return status === "done" || status === "yellow" || status === "red";
+  });
+}
+
+export function buildPhases(selectedPhase, currentPhase, taskAssignments = {}, projectId) {
   const currentIndex = PHASE_ORDER.indexOf(currentPhase);
   return PHASE_ORDER.map((id, i) => {
     const isSelected = id === selectedPhase;
@@ -20,6 +65,7 @@ export function buildPhases(selectedPhase, currentPhase) {
       locked: i > currentIndex,
       showLine: i < PHASE_ORDER.length - 1,
       isLineFilled: i < currentIndex,
+      health: isPastOrCurrent ? getPhaseHealth(id, taskAssignments, projectId) : null,
     };
   });
 }
@@ -48,8 +94,8 @@ export function buildRoadmapSteps(selectedPhase, taskAssignments, expandedStepKe
 
     return {
       key,
-      title: step.title,
-      detail: step.detail,
+      title: meta.title || step.title,
+      detail: meta.detail || step.detail,
       status,
       isDone,
       hasStatus: !!status && !isDone,
@@ -57,10 +103,14 @@ export function buildRoadmapSteps(selectedPhase, taskAssignments, expandedStepKe
       hasMeta: dateLineParts.length > 0 || !!entregablesLine,
       metaDateLine: dateLineParts.join(" · "),
       metaEntregablesLine: entregablesLine,
+      entregablesDone: outputs.length > 0 && doneOutputs === outputs.length,
       assignee: meta.assignee || "",
       startDate: meta.startDate || "",
       endDate: meta.endDate || "",
       outputs,
+      workPackageId: buildWorkPackageId(selectedPhase, idx),
+      acceptanceCriteria: meta.acceptanceCriteria || "",
+      technicalInfo: meta.technicalInfo || "",
     };
   });
 }
@@ -76,7 +126,7 @@ export function buildGanttRows(taskAssignments, projectId) {
       const meta = { ...defaults, ...(taskAssignments[key] || {}) };
       return {
         key,
-        title: step.title,
+        title: meta.title || step.title,
         status: meta.status || (useDemoDefaults ? null : "notStarted"),
         startDate: meta.startDate || "",
         endDate: meta.endDate || "",
@@ -90,11 +140,12 @@ export function buildDocumentacionGroups(taskAssignments) {
     const docs = [];
     ROADMAP_CONTENT[phaseId].steps.forEach((step, idx) => {
       const key = `${phaseId}__${idx}`;
-      const outputsMeta = taskAssignments[key]?.outputs || {};
+      const stepMeta = taskAssignments[key] || {};
+      const outputsMeta = stepMeta.outputs || {};
       (step.outputs || []).forEach((label, outIdx) => {
         const meta = outputsMeta[outIdx];
         if (meta?.done && meta?.link) {
-          docs.push({ id: `${key}__${outIdx}`, titulo: label, url: meta.link, stepTitle: step.title });
+          docs.push({ id: `${key}__${outIdx}`, titulo: label, url: meta.link, stepTitle: stepMeta.title || step.title });
         }
       });
     });

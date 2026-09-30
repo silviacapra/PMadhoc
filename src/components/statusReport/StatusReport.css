@@ -10,7 +10,7 @@
   padding: 8px 12px;
   font-size: 12.5px;
   font-family: inherit;
-  color: var(--gray-dark);
+  color: #000000;
   outline: none;
 }
 
@@ -25,10 +25,20 @@
 
 .portfolio-row {
   display: grid;
-  grid-template-columns: 1.8fr 0.8fr 0.7fr 0.9fr 1.4fr 0.9fr;
+  grid-template-columns: 28px 1.8fr 0.8fr 0.7fr 0.9fr 1.4fr 0.9fr;
   align-items: center;
   padding: 13px 16px;
   border-top: 1px solid var(--border-lighter);
+}
+
+.portfolio-row--global {
+  grid-template-columns: 1.8fr 0.8fr 0.7fr 0.9fr 1.4fr 0.9fr;
+}
+
+.portfolio-row-checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
 }
 
 .portfolio-row--clickable {
@@ -47,7 +57,7 @@
   padding: 12px 16px;
   font-size: 11px;
   font-weight: 700;
-  color: var(--text-faint);
+  color: #000000;
   letter-spacing: 0.4px;
   border-top: none;
 }
@@ -55,12 +65,12 @@
 .portfolio-name {
   font-size: 13px;
   font-weight: 600;
-  color: var(--gray-dark);
+  color: #000000;
 }
 
 .portfolio-cell {
   font-size: 12.5px;
-  color: var(--text-muted);
+  color: #000000;
 }
 
 .status-report-toolbar {
@@ -85,6 +95,12 @@
 
 .report-export-btn:hover {
   background: var(--gray-dark);
+}
+
+.report-export-btn:disabled {
+  background: var(--border-light);
+  color: var(--text-faint);
+  cursor: not-allowed;
 }
 
 .report-overall-badge {
@@ -115,14 +131,40 @@
 
 .report-score-period {
   font-size: 12px;
-  color: var(--text-muted);
+  color: #000000;
 }
 
 .report-glance-card h4 {
   margin: 0 0 14px 0;
   font-size: 13px;
   font-weight: 700;
-  color: var(--blue-primary);
+  color: #000000;
+}
+
+.report-glance-card--full {
+  width: 100%;
+}
+
+.report-glance-cols {
+  display: grid;
+  grid-template-columns: auto 1fr 1fr;
+  gap: 28px;
+  align-items: center;
+  margin-bottom: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border-lighter);
+}
+
+.report-glance-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.report-glance-col--score {
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
 }
 
 .report-glance-grid {
@@ -140,12 +182,12 @@
 .report-glance-value {
   font-size: 18px;
   font-weight: 700;
-  color: var(--gray-dark);
+  color: #000000;
 }
 
 .report-glance-label {
   font-size: 11px;
-  color: var(--text-faint);
+  color: #000000;
 }
 
 .report-glance-task {
@@ -155,7 +197,7 @@
   padding-top: 14px;
   border-top: 1px solid var(--border-lighter);
   font-size: 12.5px;
-  color: var(--gray-dark);
+  color: #000000;
 }
 
 .report-categories {
@@ -182,7 +224,7 @@
 .report-category-head span:last-child {
   font-size: 12.5px;
   font-weight: 700;
-  color: var(--gray-dark);
+  color: #000000;
 }
 
 .report-category-note-input {
@@ -190,7 +232,7 @@
   border: none;
   background: transparent;
   font-size: 11.5px;
-  color: var(--text-muted);
+  color: #000000;
   line-height: 1.5;
   padding: 0;
   font-family: inherit;
@@ -198,7 +240,7 @@
 
 .report-category-note-input:focus {
   outline: none;
-  color: var(--gray-dark);
+  color: #000000;
 }
 
 .report-columns-cards {
@@ -230,7 +272,7 @@
   padding: 10px 12px;
   font-size: 12.5px;
   font-family: inherit;
-  color: var(--gray-dark);
+  color: #000000;
   resize: vertical;
 }
 
@@ -248,7 +290,7 @@
 
 .report-list-item span {
   font-size: 12.5px;
-  color: var(--gray-dark);
+  color: #000000;
   line-height: 1.5;
 }
 
@@ -258,7 +300,7 @@
   gap: 8px;
   font-size: 12.5px;
   font-weight: 600;
-  color: var(--blue-primary);
+  color: #000000;
   background: var(--gray-light);
   padding: 10px 16px;
   border-radius: 20px;
@@ -278,7 +320,7 @@
   padding: 4px 8px;
   font-size: 12.5px;
   font-family: inherit;
-  color: var(--gray-dark);
+  color: #000000;
   margin-right: 4px;
 }
 
@@ -303,6 +345,147 @@
 
 .budget-label {
   font-size: 12.5px;
-  color: var(--text-muted);
+  color: #000000;
   white-space: nowrap;
+}
+
+/* ---------- Informe en marco A4 oscuro ---------- */
+
+.page-subtitle {
+  font-size: 13px;
+  color: #000000;
+  margin: -14px 0 20px 0;
+}
+
+.status-report-a4 {
+  max-width: 860px;
+  margin: 0 auto 40px;
+  background: #e2e2e4;
+  border-radius: 16px;
+  padding: 34px 36px 40px;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.status-report-a4 .section-heading {
+  color: #000000;
+}
+
+.report-info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px 24px;
+  margin-bottom: 20px;
+}
+
+.report-info-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.report-info-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #000000;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.report-info-value {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #000000;
+  cursor: pointer;
+  width: fit-content;
+}
+
+.report-info-value svg {
+  opacity: 0.5;
+}
+
+.report-info-value:hover svg {
+  opacity: 1;
+}
+
+.report-info-edit {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.report-info-edit input {
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #000000;
+}
+
+.report-info-date {
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #000000;
+  width: fit-content;
+}
+
+.mini-gantt {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mini-gantt-row {
+  display: grid;
+  grid-template-columns: 190px 1fr;
+  align-items: center;
+  gap: 12px;
+}
+
+.mini-gantt-label {
+  font-size: 12px;
+  color: #000000;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mini-gantt-track {
+  position: relative;
+  height: 16px;
+  background: var(--gray-light);
+  border-radius: 8px;
+}
+
+.mini-gantt-bar {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  border-radius: 8px;
+  min-width: 10px;
+}
+
+.report-comments-textarea {
+  width: 100%;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #000000;
+  resize: vertical;
+  min-height: 80px;
+}
+
+@media print {
+  .status-report-a4 {
+    background: #e2e2e4 !important;
+  }
 }

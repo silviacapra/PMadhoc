@@ -46,7 +46,7 @@ export default function App() {
 
   return (
     <div className="app-root">
-      <Header session={session} nav={nav} />
+      <Header session={session} nav={nav} dashboard={state.dashboard} permissions={permissions} />
       <div className="app-shell">
         <Sidebar nav={nav} permissions={permissions} />
         <main className="content-area">

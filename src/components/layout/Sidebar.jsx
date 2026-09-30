@@ -1,9 +1,11 @@
-import { NAV_ICON_MAP } from "../icons/Icons";
+import { useState } from "react";
+import { NAV_ICON_MAP, ChevronRightIcon } from "../icons/Icons";
 import { NAV_ITEMS } from "../../data/roles";
 import "./Sidebar.css";
 
 export default function Sidebar({ nav, permissions }) {
   const { view, setView } = nav;
+  const [expanded, setExpanded] = useState(false);
   const canFor = {
     dashboard: permissions.canDashboard,
     empresa: permissions.canEmpresa,
@@ -25,7 +27,14 @@ export default function Sidebar({ nav, permissions }) {
     const Icon = NAV_ICON_MAP[item.icon];
     const active = item.id === view;
     return (
-      <div key={item.id} className={`nav-item ${active ? "nav-item--active" : ""}`} onClick={() => setView(item.id)}>
+      <div
+        key={item.id}
+        className={`nav-item ${active ? "nav-item--active" : ""}`}
+        onClick={() => {
+          setView(item.id);
+          setExpanded(true);
+        }}
+      >
         <Icon size={20} color="#FFFFFF" />
         <span className="nav-item-label">{item.label}</span>
       </div>
@@ -33,9 +42,18 @@ export default function Sidebar({ nav, permissions }) {
   };
 
   return (
-    <div className="sidebar">
-      <div className="sidebar-nav">{mainItems.map(renderNavItem)}</div>
-      {secondaryItems.length > 0 && <div className="sidebar-nav sidebar-nav--secondary">{secondaryItems.map(renderNavItem)}</div>}
+    <div className={`sidebar ${expanded ? "sidebar--expanded" : ""}`}>
+      <div className="sidebar-scroll">
+        <div className="sidebar-nav">{mainItems.map(renderNavItem)}</div>
+        {secondaryItems.length > 0 && <div className="sidebar-nav sidebar-nav--secondary">{secondaryItems.map(renderNavItem)}</div>}
+      </div>
+      <button
+        className="sidebar-toggle"
+        onClick={() => setExpanded((prev) => !prev)}
+        title={expanded ? "Contraer menú" : "Expandir menú"}
+      >
+        <ChevronRightIcon size={13} color="#FFFFFF" style={{ transform: expanded ? "rotate(180deg)" : "rotate(0deg)" }} />
+      </button>
     </div>
   );
 }

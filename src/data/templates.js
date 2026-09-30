@@ -47,7 +47,7 @@ export const ALL_TEMPLATES = [
   {
     category: "Fundamentos",
     format: "DOCX",
-    title: "OKR de ejemplo: proyecto Muévete",
+    title: "KPIs de ejemplo: proyecto Muévete",
     desc: "Un caso de referencia para ver cómo se redactan objetivos y resultados clave medibles.",
     phase: "iniciar",
     tipo: "artefacto",

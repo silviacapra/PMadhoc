@@ -112,14 +112,14 @@ export function StakeholderMatrixDiagram() {
 
 export function CommPlanDiagram() {
   const rows = [
-    { who: "Sponsor", freq: "Quincenal", canal: "Comité" },
+    { who: "Patrocinador", freq: "Quincenal", canal: "Comité" },
     { who: "Equipo", freq: "Diario", canal: "Tablero" },
     { who: "Cliente", freq: "Mensual", canal: "Informe" },
   ];
   return (
     <svg viewBox="0 0 360 170" className="kb-diagram">
       <rect x="10" y="10" width="340" height="34" fill="var(--blue-primary)" rx="6" />
-      {["Stakeholder", "Frecuencia", "Canal"].map((h, i) => (
+      {["Contacto clave", "Frecuencia", "Canal"].map((h, i) => (
         <text key={h} x={30 + i * 115} y="32" fontSize="12" fontWeight="700" fill="#FFFFFF">
           {h}
         </text>

@@ -33,13 +33,13 @@ export const ROADMAP_CONTENT = {
     steps: [
       {
         title: "Definir el goal del proyecto",
-        detail: "Objetivos SMART a largo plazo, u OKR a corto plazo.",
-        outputs: ["Objetivos SMART / OKR del proyecto"],
+        detail: "Objetivos SMART a largo plazo, o KPIs a corto plazo.",
+        outputs: ["Objetivos SMART / KPIs del proyecto"],
       },
       {
-        title: "Mapear stakeholders y equipo",
-        detail: "Sponsor, clientes, usuario final, PM y roles del equipo.",
-        outputs: ["Registro de stakeholders", "Matriz de asignación de responsabilidades (RACI)"],
+        title: "Mapear contactos clave y equipo",
+        detail: "Patrocinador, clientes, usuario final, gestor de proyecto y roles del equipo.",
+        outputs: ["Registro de contactos clave", "Matriz de asignación de responsabilidades (RACI)"],
       },
       {
         title: "Redactar el estatuto del proyecto (Charter)",
@@ -53,7 +53,7 @@ export const ROADMAP_CONTENT = {
     steps: [
       {
         title: "Kickoff meeting",
-        detail: "Alinear a todo el equipo y stakeholders con una agenda clara.",
+        detail: "Alinear a todo el equipo y contactos clave con una agenda clara.",
         outputs: ["Agenda de kickoff meeting"],
       },
       {
@@ -88,7 +88,7 @@ export const ROADMAP_CONTENT = {
       },
       {
         title: "Gestionar cambios y riesgos",
-        detail: "Categorizar con ROAM y actualizar el project status report.",
+        detail: "Categorizar con ROAM y actualizar el informe de estado del proyecto.",
         outputs: ["Registro de cambios", "Solicitudes de cambio aprobadas"],
       },
       {

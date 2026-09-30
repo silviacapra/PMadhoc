@@ -25,7 +25,14 @@ export default function Roadmap({ roadmap }) {
   return (
     <div>
       <div className="phase-timeline">
-        {phases.map((phase, i) => (
+        {phases.map((phase, i) => {
+          const healthColor =
+            phase.health === "red"
+              ? "var(--status-critical-dot)"
+              : phase.health === "yellow"
+              ? "var(--status-atrisk-dot)"
+              : "var(--accent)";
+          return (
           <div key={phase.id} className="phase-timeline-item">
             <div
               className={`phase-dot-wrap ${phase.locked ? "phase-dot-wrap--locked" : ""}`}
@@ -35,9 +42,9 @@ export default function Roadmap({ roadmap }) {
               <div
                 className="phase-dot"
                 style={{
-                  background: phase.isSelected ? "var(--accent)" : "var(--white)",
-                  color: phase.isSelected ? "#FFFFFF" : phase.isPastOrCurrent ? "var(--accent)" : "#B7B7B7",
-                  borderColor: phase.isSelected ? "var(--accent)" : phase.isPastOrCurrent ? "var(--accent)" : "#DADADA",
+                  background: phase.isSelected ? healthColor : "var(--white)",
+                  color: phase.isSelected ? "#FFFFFF" : phase.isPastOrCurrent ? healthColor : "#B7B7B7",
+                  borderColor: phase.isSelected ? healthColor : phase.isPastOrCurrent ? healthColor : "#DADADA",
                 }}
               >
                 {phase.locked ? <LockIcon size={13} color="#B7B7B7" /> : phase.index}
@@ -51,7 +58,8 @@ export default function Roadmap({ roadmap }) {
             </div>
             {phase.showLine && <div className="phase-line" style={{ background: phase.isLineFilled ? "var(--accent)" : "#E0E0E0" }} />}
           </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="section-card">
@@ -84,7 +92,10 @@ export default function Roadmap({ roadmap }) {
       {isCurrentPhase && !isLastPhase && (
         <div className="section-card gate-card">
           <h3 className="section-heading">Gate review · requisitos para avanzar de fase</h3>
-          <p className="gate-subtitle">Marca cada requisito antes de poder avanzar a la siguiente fase del roadmap.</p>
+          <p className="gate-subtitle">
+            Marca cada requisito y deja todos los work packages de esta fase en "Completado", "Atención" o "Crítico"
+            (ninguno en "Sin empezar" o "En curso") para poder avanzar a la siguiente fase.
+          </p>
           <div className="gate-checklist">
             {gateItems.map((item, i) => (
               <label key={item} className="gate-checklist-item">
