@@ -9,11 +9,9 @@ import Templates from "./components/templates/Templates";
 import Riesgos from "./components/registro/Riesgos";
 import DocumentacionPage from "./components/registro/DocumentacionPage";
 import Lecciones from "./components/registro/Lecciones";
-import Cambios from "./components/registro/Cambios";
 import StatusReport from "./components/statusReport/StatusReport";
 import Stakeholders from "./components/stakeholders/Stakeholders";
 import Knowledge from "./components/knowledge/Knowledge";
-import Chatbot from "./components/chatbot/Chatbot";
 import Profile from "./components/profile/Profile";
 import "./components/layout/AppShell.css";
 
@@ -38,11 +36,9 @@ export default function App() {
     riesgos: permissions.canRiesgos,
     documentacion: permissions.canDocumentacion,
     lecciones: permissions.canLecciones,
-    cambios: permissions.canCambios,
     statusreport: permissions.canStatusReport,
     stakeholders: permissions.canStakeholders,
     knowledge: permissions.canKnowledge,
-    chatbot: permissions.canChatbot,
     profile: true,
   };
 
@@ -61,7 +57,6 @@ export default function App() {
           {view === "riesgos" && canShow.riesgos && <Riesgos riesgos={state.riesgos} />}
           {view === "documentacion" && canShow.documentacion && <DocumentacionPage documentacionPage={state.documentacionPage} />}
           {view === "lecciones" && canShow.lecciones && <Lecciones lecciones={state.lecciones} />}
-          {view === "cambios" && canShow.cambios && <Cambios cambios={state.cambios} />}
           {view === "statusreport" && canShow.statusreport && <StatusReport statusReport={state.statusReport} />}
           {view === "stakeholders" && canShow.stakeholders && (
             <Stakeholders
@@ -71,7 +66,6 @@ export default function App() {
             />
           )}
           {view === "knowledge" && canShow.knowledge && <Knowledge knowledge={state.knowledge} />}
-          {view === "chatbot" && canShow.chatbot && <Chatbot chatbot={state.chatbot} />}
           {view === "profile" && <Profile profile={state.profile} />}
         </main>
       </div>

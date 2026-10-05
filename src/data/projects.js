@@ -1,14 +1,4 @@
-export const METHODOLOGY_LABELS = {
-  cascada: "Cascada",
-  agil: "Ágil",
-  hibrida: "Híbrida",
-};
-
-export const METHODOLOGY_TINT = {
-  cascada: "linear-gradient(135deg, #002d62, #01458f)",
-  agil: "linear-gradient(135deg, #2f8f68, #4caf88)",
-  hibrida: "linear-gradient(135deg, #002d62, #4caf88)",
-};
+export const PROJECT_CARD_TINT = "linear-gradient(135deg, #002d62, #4caf88)";
 
 export const INITIAL_PROJECTS = [
   {
@@ -19,7 +9,6 @@ export const INITIAL_PROJECTS = [
     daysLeft: 18,
     risks: 3,
     status: "atRisk",
-    methodology: "hibrida",
     sponsor: "Carlos Méndez",
     department: "Operaciones",
     contributesTo: ["okr-2026-2"],
@@ -34,7 +23,6 @@ export const INITIAL_PROJECTS = [
     daysLeft: 4,
     risks: 0,
     status: "onTrack",
-    methodology: "agil",
     sponsor: "Carlos Méndez",
     department: "Marketing",
     contributesTo: ["okr-2026-1"],
@@ -49,7 +37,6 @@ export const INITIAL_PROJECTS = [
     daysLeft: 45,
     risks: 5,
     status: "critical",
-    methodology: "cascada",
     sponsor: "Elena Ruiz",
     department: "Ventas",
     contributesTo: ["okr-2026-1", "okr-2026-2"],

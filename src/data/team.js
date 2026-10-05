@@ -16,7 +16,7 @@ export const INITIAL_STAKEHOLDERS = [
     email: "silvia.capra.90@gmail.com",
     rol: "Gestor de proyecto",
     ubicacion: "Barcelona, España",
-    planComunicacion: "Reporte de estado semanal por email + reunión diaria de seguimiento (daily).",
+    planComunicacion: "Reporte de estado semanal por correo electrónico + reunión diaria de seguimiento.",
   },
   {
     id: "marco",
@@ -24,7 +24,7 @@ export const INITIAL_STAKEHOLDERS = [
     email: "marco.rossi@adhocconsulting.com",
     rol: "Equipo",
     ubicacion: "Milán, Italia",
-    planComunicacion: "Seguimiento en el daily y actualizaciones en el tablero de tareas.",
+    planComunicacion: "Seguimiento en la reunión diaria y actualizaciones en el tablero de tareas.",
   },
   {
     id: "laura",
@@ -32,7 +32,7 @@ export const INITIAL_STAKEHOLDERS = [
     email: "laura.fernandez@adhocconsulting.com",
     rol: "Equipo",
     ubicacion: "Madrid, España",
-    planComunicacion: "Seguimiento en el daily y actualizaciones en el tablero de tareas.",
+    planComunicacion: "Seguimiento en la reunión diaria y actualizaciones en el tablero de tareas.",
   },
   {
     id: "carlos",
@@ -56,6 +56,6 @@ export const INITIAL_STAKEHOLDERS = [
     email: "ana.torres@adhocconsulting.com",
     rol: "Experto",
     ubicacion: "Remoto",
-    planComunicacion: "Consultas puntuales por email según necesidad del proyecto.",
+    planComunicacion: "Consultas puntuales por correo electrónico según necesidad del proyecto.",
   },
 ];

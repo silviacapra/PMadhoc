@@ -3,11 +3,6 @@ import { PHASE_FILTER_DEFS, TYPE_FILTER_DEFS } from "../../data/templates";
 import "../dashboard/NewProjectModal.css";
 
 const FORMAT_OPTIONS = ["DOCX", "XLSX", "PDF", "Enlace"];
-const METHODOLOGY_OPTIONS = [
-  { id: "cascada", label: "Cascada" },
-  { id: "agil", label: "Ágil" },
-  { id: "hibrida", label: "Híbrida" },
-];
 const PHASE_TO_CATEGORY = {
   fundamentos: "Fundamentos",
   preproyecto: "Fundamentos",
@@ -27,14 +22,9 @@ export default function AddTemplateModal({ open, onClose, onCreate }) {
   const [tipo, setTipo] = useState(SELECTABLE_TYPES[0].id);
   const [phase, setPhase] = useState(SELECTABLE_PHASES[0].id);
   const [format, setFormat] = useState(FORMAT_OPTIONS[0]);
-  const [methodologies, setMethodologies] = useState(["cascada", "agil", "hibrida"]);
   const [file, setFile] = useState("");
 
   if (!open) return null;
-
-  function toggleMethodology(id) {
-    setMethodologies((prev) => (prev.includes(id) ? prev.filter((m) => m !== id) : [...prev, id]));
-  }
 
   function reset() {
     setTitle("");
@@ -42,12 +32,11 @@ export default function AddTemplateModal({ open, onClose, onCreate }) {
     setTipo(SELECTABLE_TYPES[0].id);
     setPhase(SELECTABLE_PHASES[0].id);
     setFormat(FORMAT_OPTIONS[0]);
-    setMethodologies(["cascada", "agil", "hibrida"]);
     setFile("");
   }
 
   function handleCreate() {
-    if (!title.trim() || methodologies.length === 0) return;
+    if (!title.trim()) return;
     onCreate({
       title: title.trim(),
       desc: desc.trim(),
@@ -55,7 +44,6 @@ export default function AddTemplateModal({ open, onClose, onCreate }) {
       category: PHASE_TO_CATEGORY[phase] || "Fundamentos",
       format,
       phase,
-      methodologies,
       file: file.trim(),
     });
     reset();
@@ -118,18 +106,6 @@ export default function AddTemplateModal({ open, onClose, onCreate }) {
           <div className="modal-field">
             <label>Enlace al documento (opcional)</label>
             <input type="text" placeholder="https://..." value={file} onChange={(e) => setFile(e.target.value)} />
-          </div>
-        </div>
-
-        <div className="modal-field">
-          <label>Tipo de proyecto al que aplica</label>
-          <div className="okr-checklist">
-            {METHODOLOGY_OPTIONS.map((m) => (
-              <label key={m.id} className="okr-checklist-item">
-                <input type="checkbox" checked={methodologies.includes(m.id)} onChange={() => toggleMethodology(m.id)} />
-                <span>{m.label}</span>
-              </label>
-            ))}
           </div>
         </div>
 

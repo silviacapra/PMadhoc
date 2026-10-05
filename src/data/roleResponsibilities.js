@@ -16,7 +16,7 @@ export const ROLE_RESPONSIBILITIES = {
     "Ejecuta las tareas asignadas dentro del plazo y la calidad acordados.",
     "Informa al gestor de proyecto de avances, bloqueos y riesgos detectados en el día a día.",
     "Colabora con el resto del equipo y aporta su conocimiento técnico o funcional.",
-    "Participa en las ceremonias y revisiones del proyecto (dailies, retrospectivas, etc.).",
+    "Participa en las ceremonias y revisiones del proyecto (reuniones diarias, retrospectivas, etc.).",
   ],
   Experto: [
     "Aporta conocimiento técnico especializado cuando el equipo lo necesita.",

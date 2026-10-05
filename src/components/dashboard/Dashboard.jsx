@@ -4,7 +4,7 @@ import StatusBadge from "../shared/StatusBadge";
 import ProjectModal from "./ProjectModal";
 import ConfirmDeleteModal from "../shared/ConfirmDeleteModal";
 import Confetti from "../shared/Confetti";
-import { METHODOLOGY_LABELS, METHODOLOGY_TINT } from "../../data/projects";
+import { PROJECT_CARD_TINT } from "../../data/projects";
 import { TEAM_MEMBERS, DEPARTMENTS } from "../../data/team";
 import "./Dashboard.css";
 
@@ -69,7 +69,7 @@ export default function Dashboard({ dashboard, permissions, session, nav, status
       <div className="project-cards">
         {dashboard.projects.map((proj) => (
           <div key={proj.id} className="project-card">
-            <div className="project-card-banner" style={{ background: METHODOLOGY_TINT[proj.methodology] || METHODOLOGY_TINT.hibrida }}>
+            <div className="project-card-banner" style={{ background: PROJECT_CARD_TINT }}>
               <StatusBadge status={proj.status} style={{ position: "relative", zIndex: 1 }} />
               <TriDotIcon size={40} color="rgba(255,255,255,0.5)" style={{ position: "absolute", right: 18, bottom: 14 }} />
             </div>
@@ -96,7 +96,6 @@ export default function Dashboard({ dashboard, permissions, session, nav, status
 
               <div className="project-card-badges">
                 <span className="phase-pill">Fase: {proj.phase}</span>
-                <span className="phase-pill">{METHODOLOGY_LABELS[proj.methodology]}</span>
               </div>
 
               <p className="project-card-objective">{objectiveLabel(proj.contributesTo)}</p>

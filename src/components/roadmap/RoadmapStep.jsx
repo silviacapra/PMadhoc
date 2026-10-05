@@ -263,15 +263,21 @@ export default function RoadmapStep({ step, teamMembers, onToggle, onUpdate, onU
 
           <div className="editor-divider" />
 
-          <div className="editor-field editor-field--full">
-            <label>Título de la tarea</label>
-            <PencilEditField value={step.title} onSave={(v) => onUpdate(step.key, { title: v })} placeholder="Título" />
-            {onGoToKnowledge && (
-              <span className="roadmap-step-kb-link" onClick={onGoToKnowledge}>
-                ¿Necesitas más información sobre este concepto? Consulta la base de conocimiento
-              </span>
-            )}
+          <div className="editor-field editor-field--full roadmap-step-id-title-row">
+            <div className="roadmap-step-id-col">
+              <label>ID</label>
+              <div className="readonly-field">{step.workPackageId}</div>
+            </div>
+            <div className="roadmap-step-title-col">
+              <label>Título de la tarea</label>
+              <PencilEditField value={step.title} onSave={(v) => onUpdate(step.key, { title: v })} placeholder="Título" />
+            </div>
           </div>
+          {onGoToKnowledge && (
+            <span className="roadmap-step-kb-link editor-field--full" onClick={onGoToKnowledge}>
+              ¿Necesitas más información sobre este concepto? Consulta la base de conocimiento
+            </span>
+          )}
 
           <div className="editor-field editor-field--full">
             <label>Descripción</label>
@@ -281,11 +287,6 @@ export default function RoadmapStep({ step, teamMembers, onToggle, onUpdate, onU
               placeholder="Descripción breve de esta tarea"
               multiline
             />
-          </div>
-
-          <div className="editor-field editor-field--full">
-            <label>ID de la tarea</label>
-            <div className="readonly-field">{step.workPackageId}</div>
           </div>
 
           <div className="editor-divider" />

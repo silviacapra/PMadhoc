@@ -40,20 +40,16 @@ function TemplateCard({ tpl }) {
 export default function Templates({ templates }) {
   const {
     phaseFilters,
-    methodologyFilters,
     typeFilters,
     activePhaseFilter,
-    activeMethodologyFilter,
     activeTypeFilter,
     sostenibleOnly,
     disponibleOnly,
     searchQuery,
     filteredTemplates,
     togglePhaseFilter,
-    toggleMethodologyFilter,
     toggleTypeFilter,
     clearPhaseFilter,
-    clearMethodologyFilter,
     clearTypeFilter,
     setSostenibleOnly,
     setDisponibleOnly,
@@ -64,16 +60,10 @@ export default function Templates({ templates }) {
   } = templates;
 
   const hasActiveFilters =
-    activePhaseFilter.length > 0 ||
-    activeMethodologyFilter.length > 0 ||
-    activeTypeFilter.length > 0 ||
-    sostenibleOnly ||
-    disponibleOnly ||
-    searchQuery.trim().length > 0;
+    activePhaseFilter.length > 0 || activeTypeFilter.length > 0 || sostenibleOnly || disponibleOnly || searchQuery.trim().length > 0;
 
   function resetAllFilters() {
     clearPhaseFilter();
-    clearMethodologyFilter();
     clearTypeFilter();
     setSostenibleOnly(false);
     setDisponibleOnly(false);
@@ -109,13 +99,6 @@ export default function Templates({ templates }) {
           selected={activePhaseFilter}
           onToggle={togglePhaseFilter}
           onClear={clearPhaseFilter}
-        />
-        <FilterDropdown
-          label="Tipo de proyecto"
-          options={methodologyFilters.filter((mf) => mf.id !== "todas")}
-          selected={activeMethodologyFilter}
-          onToggle={toggleMethodologyFilter}
-          onClear={clearMethodologyFilter}
         />
         <FilterDropdown
           label="Tipo de plantilla"

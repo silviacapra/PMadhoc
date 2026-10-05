@@ -178,7 +178,7 @@
 .editor-divider {
   grid-column: 1 / -1;
   height: 1px;
-  background: var(--text-faint);
+  background: var(--border-light);
   margin: 2px 0;
 }
 
@@ -317,9 +317,24 @@
   width: auto;
 }
 
+.roadmap-step-id-title-row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+}
+
+.roadmap-step-id-col {
+  flex: 0 0 20%;
+}
+
+.roadmap-step-title-col {
+  flex: 1;
+  min-width: 0;
+}
+
 .roadmap-step-kb-link {
   display: inline-block;
-  margin-top: 8px;
+  margin-top: -8px;
   font-size: 12px;
   font-weight: 400;
   color: #4caf88;

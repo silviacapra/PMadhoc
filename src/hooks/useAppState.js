@@ -11,18 +11,15 @@ import {
 } from "firebase/auth";
 import { doc, setDoc, updateDoc, addDoc, deleteDoc, getDoc, collection, onSnapshot } from "firebase/firestore";
 import { auth, db } from "../firebase";
-import { askGemini, GEMINI_ENABLED } from "../gemini";
 import { ROLE_PERMISSIONS, ROLE_LABELS, defaultViewForRole } from "../data/roles";
 import { PHASE_ORDER, ROADMAP_CONTENT } from "../data/roadmapContent";
-import { ROADMAP_STEP_STATUS_DEFS } from "../data/statusStyles";
 import { GATE_REQUIREMENTS } from "../data/roadmapGates";
 import { TEAM_MEMBERS, INITIAL_STAKEHOLDERS } from "../data/team";
 import { RISK_CATEGORIES, PROBABILIDAD_OPTIONS, RIESGO_ESTADO_OPTIONS } from "../data/riesgos";
-import { PHASE_FILTER_DEFS, METHODOLOGY_FILTER_DEFS, TYPE_FILTER_DEFS, ALL_TEMPLATES } from "../data/templates";
+import { PHASE_FILTER_DEFS, TYPE_FILTER_DEFS, ALL_TEMPLATES } from "../data/templates";
 import { INITIAL_PROJECTS } from "../data/projects";
 import { STATUS_REPORTS } from "../data/statusReport";
 import { KB_CATEGORIES, ARTICLES, ARTICLES_VERSION } from "../data/knowledge";
-import { INITIAL_MESSAGES } from "../data/chatbot";
 import { INITIAL_COMPANY, INITIAL_OKR_CATALOG } from "../data/company";
 import { getInitials, getFirstName } from "../utils/text";
 import {
@@ -100,16 +97,11 @@ export function useAppState() {
   const [passwordBusy, setPasswordBusy] = useState(false);
 
   const [templateFilterPhase, setTemplateFilterPhase] = useState([]);
-  const [templateFilterMethodology, setTemplateFilterMethodology] = useState([]);
   const [templateFilterSostenible, setTemplateFilterSostenible] = useState(false);
   const [templateFilterDisponible, setTemplateFilterDisponible] = useState(false);
   const [templateFilterTipo, setTemplateFilterTipo] = useState([]);
   const [templateSearchQuery, setTemplateSearchQuery] = useState("");
   const [addTemplateOpen, setAddTemplateOpen] = useState(false);
-  const [chatInput, setChatInput] = useState("");
-  const [messages, setMessages] = useState(INITIAL_MESSAGES);
-  const [chatLoading, setChatLoading] = useState(false);
-  const [chatError, setChatError] = useState("");
 
   const [companyInfo, setCompanyInfo] = useState(INITIAL_COMPANY);
   const [okrCatalog, setOkrCatalog] = useState([]);
@@ -152,9 +144,6 @@ export function useAppState() {
   const [documentacionSelectedProjectId, setDocumentacionSelectedProjectId] = useState("");
   const [documentacionRoadmapData, setDocumentacionRoadmapData] = useState(null);
 
-  const [cambiosSelectedProjectId, setCambiosSelectedProjectId] = useState("");
-  const [cambiosItems, setCambiosItems] = useState([]);
-
 
   // Sesión: se queda escuchando si hay alguien conectado (y sigue conectado tras recargar la página).
   useEffect(() => {
@@ -187,6 +176,28 @@ export function useAppState() {
       await Promise.all(INITIAL_PROJECTS.map(({ id, ...rest }) => setDoc(doc(db, "projects", id), rest)));
       await Promise.all(ALL_TEMPLATES.map((t) => setDoc(doc(db, "templates", slugify(t.title)), t)));
       await Promise.all(INITIAL_STAKEHOLDERS.map(({ id, ...rest }) => setDoc(doc(db, "stakeholders", id), rest)));
+    })();
+  }, [user]);
+
+  // Borra las plantillas-semilla que quedaron huérfanas al traducir sus títulos (el id de
+  // Firestore se deriva del título, así que un cambio de título crea un documento nuevo y deja
+  // el viejo abandonado con el nombre en inglés).
+  useEffect(() => {
+    if (!user) return;
+    const OLD_TEMPLATE_TITLES = [
+      "Marco de project management",
+      "Product backlog inicial",
+      "Agenda de kickoff meeting",
+      "Sprint plan",
+      "Checklist de impacto ambiental y social",
+      "Burndown chart",
+    ];
+    (async () => {
+      for (const title of OLD_TEMPLATE_TITLES) {
+        const id = slugify(title);
+        const snap = await getDoc(doc(db, "templates", id));
+        if (snap.exists()) await deleteDoc(doc(db, "templates", id));
+      }
     })();
   }, [user]);
 
@@ -233,6 +244,20 @@ export function useAppState() {
     })();
   }, [user]);
 
+  // Borra los artículos-semilla huérfanos por cambios de título (mismo problema que con las
+  // plantillas: el id de Firestore depende del título del artículo).
+  useEffect(() => {
+    if (!user) return;
+    const OLD_ARTICLE_TITLES = ["Gate review", "WBS del proyecto", "Scrum vs. Waterfall"];
+    (async () => {
+      for (const title of OLD_ARTICLE_TITLES) {
+        const id = slugify(title);
+        const snap = await getDoc(doc(db, "knowledgeArticles", id));
+        if (snap.exists()) await deleteDoc(doc(db, "knowledgeArticles", id));
+      }
+    })();
+  }, [user]);
+
   // Traslada los artículos de la base de conocimiento a Firestore (y los re-sincroniza cuando
   // cambia el contenido en el código, subiendo ARTICLES_VERSION) para que se puedan editar.
   useEffect(() => {
@@ -264,9 +289,6 @@ export function useAppState() {
       onSnapshot(doc(db, "users", user.uid), (snap) => {
         if (snap.exists()) setProfile(snap.data());
       }),
-      onSnapshot(doc(db, "users", user.uid, "chat", "history"), (snap) => {
-        setMessages(snap.exists() ? snap.data().messages : INITIAL_MESSAGES);
-      }),
     ];
 
     return () => unsubs.forEach((unsub) => unsub());
@@ -289,15 +311,7 @@ export function useAppState() {
     if (!riesgosSelectedProjectId) setRiesgosSelectedProjectId(projects[0].id);
     if (!leccionesSelectedProjectId) setLeccionesSelectedProjectId(projects[0].id);
     if (!documentacionSelectedProjectId) setDocumentacionSelectedProjectId(projects[0].id);
-    if (!cambiosSelectedProjectId) setCambiosSelectedProjectId(projects[0].id);
-  }, [
-    projects,
-    statusSelectedProjectId,
-    riesgosSelectedProjectId,
-    leccionesSelectedProjectId,
-    documentacionSelectedProjectId,
-    cambiosSelectedProjectId,
-  ]);
+  }, [projects, statusSelectedProjectId, riesgosSelectedProjectId, leccionesSelectedProjectId, documentacionSelectedProjectId]);
 
   // Informe de estado y roadmap (para los datos automáticos) del proyecto elegido en Status Report.
   useEffect(() => {
@@ -333,15 +347,6 @@ export function useAppState() {
     );
     return unsub;
   }, [user, leccionesSelectedProjectId]);
-
-  // Registro de cambios del proyecto elegido.
-  useEffect(() => {
-    if (!user || !cambiosSelectedProjectId) return;
-    const unsub = onSnapshot(collection(db, "projects", cambiosSelectedProjectId, "cambios"), (snap) =>
-      setCambiosItems(snap.docs.map((d) => ({ id: d.id, ...d.data() })))
-    );
-    return unsub;
-  }, [user, cambiosSelectedProjectId]);
 
   // Roadmap del proyecto elegido en Documentación (para sacar los entregables enlazados).
   useEffect(() => {
@@ -463,62 +468,12 @@ export function useAppState() {
     setFichaExpandedStepKey((prev) => (prev === key ? null : key));
   }
 
-  function logChange(description) {
-    if (!fichaProjectId || !description) return;
-    addDoc(collection(db, "projects", fichaProjectId, "cambios"), {
-      descripcion: description,
-      fecha: new Date().toISOString(),
-      solicitadoPor: profile?.name || "Usuario",
-      solicitadoPorUid: user?.uid || "",
-      aprobado: false,
-      aprobadoPor: "",
-    });
-  }
-
-  function stepTitleForKey(key) {
-    const [phaseId, idxStr] = key.split("__");
-    const idx = Number(idxStr);
-    const meta = fichaTaskAssignments[key] || {};
-    return meta.title || ROADMAP_CONTENT[phaseId]?.steps?.[idx]?.title || "la tarea";
-  }
-
-  function describeTaskChange(key, patch) {
-    const title = stepTitleForKey(key);
-    const parts = [];
-    if ("status" in patch) parts.push(`cambió el estado a "${ROADMAP_STEP_STATUS_DEFS[patch.status]?.label || patch.status}"`);
-    if ("title" in patch) parts.push(`renombró la tarea a "${patch.title}"`);
-    if ("detail" in patch) parts.push("actualizó la descripción");
-    if ("assignee" in patch) parts.push(`asignó la tarea a ${patch.assignee || "sin asignar"}`);
-    if ("startDate" in patch) parts.push(`cambió la fecha de inicio a ${patch.startDate || "—"}`);
-    if ("endDate" in patch) parts.push(`cambió la fecha límite a ${patch.endDate || "—"}`);
-    if ("acceptanceCriteria" in patch) parts.push("actualizó los criterios de aceptación");
-    if ("technicalInfo" in patch) parts.push("actualizó la información técnica");
-    if (parts.length === 0) return null;
-    return `${parts.join(", ")} en "${title}"`;
-  }
-
-  function describeOutputChange(key, outputIndex, patch) {
-    const title = stepTitleForKey(key);
-    const [phaseId, idxStr] = key.split("__");
-    const idx = Number(idxStr);
-    const existingMeta = fichaTaskAssignments[key] || {};
-    const outputLabel =
-      existingMeta.outputs?.[outputIndex]?.label || ROADMAP_CONTENT[phaseId]?.steps?.[idx]?.outputs?.[outputIndex] || "un entregable";
-    const parts = [];
-    if ("done" in patch) parts.push(patch.done ? `marcó como hecho el entregable "${outputLabel}"` : `desmarcó el entregable "${outputLabel}"`);
-    if ("link" in patch) parts.push(`añadió un enlace al entregable "${outputLabel}"`);
-    if ("label" in patch) parts.push(`renombró el entregable a "${patch.label}"`);
-    if (parts.length === 0) return null;
-    return `${parts.join(", ")} en "${title}"`;
-  }
-
   function updateFichaTaskMeta(key, patch) {
     const updates = {};
     Object.entries(patch).forEach(([field, value]) => {
       updates[`taskAssignments.${key}.${field}`] = value;
     });
     updateDoc(doc(db, "projects", fichaProjectId, "roadmap", "main"), updates);
-    logChange(describeTaskChange(key, patch));
   }
 
   function updateStepOutput(key, outputIndex, patch) {
@@ -527,14 +482,6 @@ export function useAppState() {
       updates[`taskAssignments.${key}.outputs.${outputIndex}.${field}`] = value;
     });
     updateDoc(doc(db, "projects", fichaProjectId, "roadmap", "main"), updates);
-    logChange(describeOutputChange(key, outputIndex, patch));
-  }
-
-  function toggleCambioAprobado(id, aprobado) {
-    updateDoc(doc(db, "projects", cambiosSelectedProjectId, "cambios", id), {
-      aprobado,
-      aprobadoPor: aprobado ? profile?.name || "Usuario" : "",
-    });
   }
 
   async function saveProfile() {
@@ -587,33 +534,8 @@ export function useAppState() {
     toggleInArray(setTemplateFilterPhase, phaseId);
   }
 
-  function toggleTemplateMethodologyFilter(methodologyId) {
-    toggleInArray(setTemplateFilterMethodology, methodologyId);
-  }
-
   function toggleTemplateTipoFilter(tipoId) {
     toggleInArray(setTemplateFilterTipo, tipoId);
-  }
-
-  async function sendMessage() {
-    const text = chatInput.trim();
-    if (!text || chatLoading || !user) return;
-    const history = messages;
-    const withUserMsg = [...history, { from: "user", text }];
-    setChatInput("");
-    setChatError("");
-    setMessages(withUserMsg);
-    setChatLoading(true);
-    try {
-      const reply = await askGemini(history, text);
-      const finalHistory = [...withUserMsg, { from: "bot", text: reply }];
-      setMessages(finalHistory);
-      await setDoc(doc(db, "users", user.uid, "chat", "history"), { messages: finalHistory });
-    } catch (err) {
-      setChatError("No se pudo contactar con la IA. Inténtalo de nuevo en unos segundos.");
-    } finally {
-      setChatLoading(false);
-    }
   }
 
   function updateCompanyField(field, value) {
@@ -639,7 +561,7 @@ export function useAppState() {
     return Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
   }
 
-  async function addProject({ name, methodology, sponsor, pm, department, contributesTo, deadline, hitos, budget }) {
+  async function addProject({ name, sponsor, pm, department, contributesTo, deadline, hitos, budget }) {
     const id = `${slugify(name)}-${Date.now()}`;
     await setDoc(doc(db, "projects", id), {
       name,
@@ -648,7 +570,6 @@ export function useAppState() {
       daysLeft: daysLeftFromDeadline(deadline, 90),
       risks: 0,
       status: "onTrack",
-      methodology,
       sponsor,
       pm,
       department,
@@ -662,11 +583,10 @@ export function useAppState() {
     });
   }
 
-  async function updateProject(id, { name, methodology, sponsor, pm, department, contributesTo, deadline, hitos, budget }) {
+  async function updateProject(id, { name, sponsor, pm, department, contributesTo, deadline, hitos, budget }) {
     const existing = projects.find((p) => p.id === id);
     await updateDoc(doc(db, "projects", id), {
       name,
-      methodology,
       sponsor,
       pm,
       department,
@@ -764,7 +684,6 @@ export function useAppState() {
     if (!existing) return;
     updateProject(statusSelectedProjectId, {
       name: existing.name,
-      methodology: existing.methodology,
       sponsor: existing.sponsor,
       pm: existing.pm,
       department: existing.department,
@@ -839,7 +758,7 @@ export function useAppState() {
     if (fichaProjectId === id) closeFicha();
   }
 
-  async function addTemplate({ title, desc, tipo, category, format, phase, methodologies, file }) {
+  async function addTemplate({ title, desc, tipo, category, format, phase, file }) {
     await addDoc(collection(db, "templates"), {
       title,
       desc,
@@ -847,7 +766,6 @@ export function useAppState() {
       category,
       format,
       phase,
-      methodologies,
       sostenible: false,
       disponible: !!file,
       file: file || null,
@@ -858,7 +776,6 @@ export function useAppState() {
   const filteredTemplates = filterTemplates(
     templatesList,
     templateFilterPhase,
-    templateFilterMethodology,
     templateFilterSostenible,
     templateFilterDisponible,
     templateFilterTipo,
@@ -907,7 +824,6 @@ export function useAppState() {
     pm: statusSelectedProject?.pm || "",
     sponsor: statusSelectedProject?.sponsor || "",
     department: statusSelectedProject?.department || "",
-    methodology: statusSelectedProject?.methodology || "",
     deadline: statusSelectedProject?.deadline || "",
     createdAt: statusReportDoc?.createdAt || "",
     createdBy: statusReportDoc?.createdBy || "",
@@ -968,8 +884,6 @@ export function useAppState() {
       canRiesgos: can("riesgos"),
       canDocumentacion: can("documentacion"),
       canLecciones: can("lecciones"),
-      canCambios: can("cambios"),
-      canChatbot: can("chatbot") && GEMINI_ENABLED,
       canStatusReport: can("statusreport"),
       canStakeholders: can("stakeholders"),
       canCreateProject: role === "pm" || role === "sponsor",
@@ -1040,20 +954,16 @@ export function useAppState() {
     deleteStakeholder,
     templates: {
       phaseFilters: PHASE_FILTER_DEFS,
-      methodologyFilters: METHODOLOGY_FILTER_DEFS,
       typeFilters: TYPE_FILTER_DEFS,
       activePhaseFilter: templateFilterPhase,
-      activeMethodologyFilter: templateFilterMethodology,
       activeTypeFilter: templateFilterTipo,
       sostenibleOnly: templateFilterSostenible,
       disponibleOnly: templateFilterDisponible,
       searchQuery: templateSearchQuery,
       filteredTemplates,
       togglePhaseFilter: toggleTemplatePhaseFilter,
-      toggleMethodologyFilter: toggleTemplateMethodologyFilter,
       toggleTypeFilter: toggleTemplateTipoFilter,
       clearPhaseFilter: () => setTemplateFilterPhase([]),
-      clearMethodologyFilter: () => setTemplateFilterMethodology([]),
       clearTypeFilter: () => setTemplateFilterTipo([]),
       setSostenibleOnly: setTemplateFilterSostenible,
       setDisponibleOnly: setTemplateFilterDisponible,
@@ -1114,14 +1024,6 @@ export function useAppState() {
       currentUserUid: user?.uid,
       teamMembers: TEAM_MEMBERS,
     },
-    cambios: {
-      projects,
-      selectedProjectId: cambiosSelectedProjectId,
-      setSelectedProjectId: setCambiosSelectedProjectId,
-      items: [...cambiosItems].sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0)),
-      canApprove: role === "pm" || role === "sponsor",
-      toggleAprobado: toggleCambioAprobado,
-    },
     documentacionPage: {
       projects,
       selectedProjectId: documentacionSelectedProjectId,
@@ -1137,7 +1039,6 @@ export function useAppState() {
       updateArticle,
       deleteArticle,
     },
-    chatbot: { messages, chatInput, setChatInput, sendMessage, loading: chatLoading, error: chatError },
     profile: {
       current: profile || { name: "", email: "" },
       draft: profileDraft,

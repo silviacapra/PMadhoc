@@ -2,7 +2,7 @@ import Roadmap from "../roadmap/Roadmap";
 import Documentacion from "./Documentacion";
 import GanttChart from "../roadmap/GanttChart";
 import { TriDotIcon } from "../icons/Icons";
-import { METHODOLOGY_LABELS, METHODOLOGY_TINT } from "../../data/projects";
+import { PROJECT_CARD_TINT } from "../../data/projects";
 import { PHASE_ORDER, ROADMAP_CONTENT } from "../../data/roadmapContent";
 import "../registro/Registro.css";
 import "./FichaProyecto.css";
@@ -57,14 +57,11 @@ export default function FichaProyecto({ ficha, nav }) {
             <div className="ficha-picker-grid">
               {group.projects.map((p) => (
                 <div key={p.id} className="ficha-picker-card" onClick={() => setProjectId(p.id)}>
-                  <div className="ficha-picker-preview" style={{ background: METHODOLOGY_TINT[p.methodology] || METHODOLOGY_TINT.hibrida }}>
+                  <div className="ficha-picker-preview" style={{ background: PROJECT_CARD_TINT }}>
                     <TriDotIcon size={40} color="rgba(255,255,255,0.55)" />
                   </div>
                   <div className="ficha-picker-body">
                     <h4>{p.name}</h4>
-                    <div className="ficha-picker-tags">
-                      <span className="ficha-picker-tag">{METHODOLOGY_LABELS[p.methodology]}</span>
-                    </div>
                   </div>
                 </div>
               ))}

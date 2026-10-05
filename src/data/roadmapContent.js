@@ -9,7 +9,7 @@ export const ROADMAP_CONTENT = {
       {
         title: "Identificación del problema u oportunidad",
         detail: "Entender el estado actual de la organización y definir qué se quiere resolver o aprovechar.",
-        outputs: ["Business case (borrador)"],
+        outputs: ["Caso de negocio (borrador)"],
       },
       {
         title: "Análisis de factibilidad",
@@ -17,9 +17,9 @@ export const ROADMAP_CONTENT = {
         outputs: ["Informe de factibilidad"],
       },
       {
-        title: "Desarrollo del caso de negocio (Business Case)",
+        title: "Desarrollo del caso de negocio",
         detail: "Documentar la justificación financiera y estratégica para el proyecto.",
-        outputs: ["Business case", "Plan de gestión de beneficios"],
+        outputs: ["Caso de negocio", "Plan de gestión de beneficios"],
       },
       {
         title: "Definición de requisitos de alto nivel",
@@ -42,9 +42,9 @@ export const ROADMAP_CONTENT = {
         outputs: ["Registro de contactos clave", "Matriz de asignación de responsabilidades (RACI)"],
       },
       {
-        title: "Redactar el estatuto del proyecto (Charter)",
+        title: "Redactar el estatuto del proyecto",
         detail: "Formaliza alcance, entregables y KPI; requiere firma de aprobación.",
-        outputs: ["Acta de constitución del proyecto (Project Charter)", "Registro de supuestos (Assumption log)"],
+        outputs: ["Acta de constitución del proyecto", "Registro de supuestos"],
       },
     ],
   },
@@ -52,18 +52,18 @@ export const ROADMAP_CONTENT = {
     label: "Planificar",
     steps: [
       {
-        title: "Kickoff meeting",
+        title: "Reunión de arranque",
         detail: "Alinear a todo el equipo y contactos clave con una agenda clara.",
-        outputs: ["Agenda de kickoff meeting"],
+        outputs: ["Agenda de la reunión de arranque"],
       },
       {
-        title: "Desglosar tareas y milestones (WBS)",
-        detail: "Work Breakdown Structure para definir la jerarquía del trabajo.",
-        outputs: ["Work Breakdown Structure (WBS)", "Lista de hitos"],
+        title: "Desglosar tareas e hitos (EDT)",
+        detail: "Estructura de Desglose del Trabajo para definir la jerarquía del trabajo.",
+        outputs: ["Estructura de Desglose del Trabajo (EDT)", "Lista de hitos"],
       },
       {
         title: "Preparar el presupuesto",
-        detail: "Prever recursos, calcular una reserva del 5-10% y revisar tras cada milestone.",
+        detail: "Prever recursos, calcular una reserva del 5-10% y revisar tras cada hito.",
         outputs: ["Plan de gestión financiera", "Línea base de costos"],
       },
       {
@@ -73,7 +73,7 @@ export const ROADMAP_CONTENT = {
       },
       {
         title: "Cerrar el plan de proyecto definitivo",
-        detail: "Charter, Risk Management Plan, RACI y plan de comunicación.",
+        detail: "Acta de constitución, plan de gestión de riesgos, RACI y plan de comunicación.",
         outputs: ["Plan de gestión del proyecto (definitivo)", "Plan de comunicación", "Línea base del alcance"],
       },
     ],
@@ -83,7 +83,7 @@ export const ROADMAP_CONTENT = {
     steps: [
       {
         title: "Hacer seguimiento del avance",
-        detail: "Gantt, roadmap o burndown chart según el tipo de proyecto.",
+        detail: "Gantt, hoja de ruta o gráfico de avance según el tipo de proyecto.",
         outputs: ["Informe de desempeño del trabajo", "Cronograma actualizado"],
       },
       {
@@ -93,12 +93,12 @@ export const ROADMAP_CONTENT = {
       },
       {
         title: "Controlar la calidad",
-        detail: "Asegurar calidad (QA) antes del lanzamiento y controlarla (QC) después.",
+        detail: "Asegurar la calidad antes del lanzamiento y controlarla después.",
         outputs: ["Informe de calidad", "Métricas de calidad"],
       },
       {
         title: "Mantener el contacto con el cliente",
-        detail: "Encuestas de satisfacción y beta testing antes del lanzamiento.",
+        detail: "Encuestas de satisfacción y pruebas piloto antes del lanzamiento.",
         outputs: ["Resultados de encuesta de satisfacción"],
       },
     ],
@@ -108,17 +108,17 @@ export const ROADMAP_CONTENT = {
     steps: [
       {
         title: "Impulsar la mejora continua",
-        detail: "Retrospectivas tras cada milestone para no repetir errores.",
+        detail: "Retrospectivas tras cada hito para no repetir errores.",
         outputs: ["Acta de retrospectiva"],
       },
       {
         title: "Tomar decisiones basadas en datos",
         detail: "Métricas de productividad y de calidad del proyecto.",
-        outputs: ["Dashboard de métricas"],
+        outputs: ["Panel de métricas"],
       },
       {
         title: "Analizar y visualizar los datos",
-        detail: "Detectar sesgos y comunicar hallazgos con dashboards e infografías.",
+        detail: "Detectar sesgos y comunicar hallazgos con paneles e infografías.",
         outputs: ["Informe de análisis de datos"],
       },
     ],
@@ -127,13 +127,13 @@ export const ROADMAP_CONTENT = {
     label: "Cerrar",
     steps: [
       {
-        title: "Revisar la checklist de cierre",
-        detail: "Confirmar que todas las tareas están completadas y aprobadas por los SH.",
-        outputs: ["Checklist de cierre firmada"],
+        title: "Revisar la lista de verificación de cierre",
+        detail: "Confirmar que todas las tareas están completadas y aprobadas por los contactos clave.",
+        outputs: ["Lista de verificación de cierre firmada"],
       },
       {
         title: "Documentar el cierre",
-        detail: "Impact report, retrospectiva formal y project closeout report.",
+        detail: "Informe de impacto, retrospectiva formal e informe de cierre del proyecto.",
         outputs: ["Informe final del proyecto", "Registro de lecciones aprendidas"],
       },
       {

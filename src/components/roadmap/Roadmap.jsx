@@ -94,8 +94,8 @@ export default function Roadmap({ roadmap, onGoToKnowledge, onGoToTemplates, onG
 
       {isCurrentPhase && !isLastPhase && (
         <div className="section-card gate-card">
-          <h3 className="section-heading">Punto de control · requisitos para avanzar de fase</h3>
-          <p className="gate-subtitle">Marca cada requisito para poder avanzar a la siguiente fase.</p>
+          <h3 className="section-heading">Punto de control · requisitos para confirmar el cierre de la fase</h3>
+          <p className="gate-subtitle">Marca cada requisito para confirmar que esta fase está completada.</p>
           <div className="gate-checklist">
             {gateItems.map((item, i) => (
               <label key={item} className="gate-checklist-item">
@@ -105,7 +105,7 @@ export default function Roadmap({ roadmap, onGoToKnowledge, onGoToTemplates, onG
             ))}
           </div>
           <button className="gate-advance-btn" disabled={!canAdvance} onClick={advancePhase}>
-            Avanzar a la siguiente fase
+            Confirmar finalización de fase
           </button>
         </div>
       )}

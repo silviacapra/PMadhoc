@@ -147,7 +147,7 @@ export function ScrumWaterfallDiagram() {
   return (
     <svg viewBox="0 0 360 190" className="kb-diagram">
       <text x="10" y="18" fontSize="11" fontWeight="700" fill="var(--blue-primary)">
-        Waterfall
+        Cascada
       </text>
       {waterfall.map((label, i) => (
         <g key={label}>

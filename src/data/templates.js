@@ -9,13 +9,6 @@ export const PHASE_FILTER_DEFS = [
   { id: "cerrar", label: "Cerrar" },
 ];
 
-export const METHODOLOGY_FILTER_DEFS = [
-  { id: "todas", label: "Todas" },
-  { id: "cascada", label: "Cascada" },
-  { id: "agil", label: "Ágil" },
-  { id: "hibrida", label: "Híbrida" },
-];
-
 export const TYPE_FILTER_DEFS = [
   { id: "todos", label: "Todos" },
   { id: "documento", label: "Documento de proyecto" },
@@ -29,17 +22,14 @@ export const TYPE_LABELS = TYPE_FILTER_DEFS.reduce((acc, t) => {
   return acc;
 }, {});
 
-const ALL_METHODOLOGIES = ["cascada", "agil", "hibrida"];
-
 export const ALL_TEMPLATES = [
   {
     category: "Fundamentos",
     format: "DOCX",
-    title: "Marco de project management",
+    title: "Marco de gestión de proyectos",
     desc: "Las 5 fases del proyecto con sus elementos clave y documentos, en un único documento de referencia.",
     phase: "fundamentos",
     tipo: "tecnica",
-    methodologies: ALL_METHODOLOGIES,
     sostenible: false,
     disponible: false,
     file: null,
@@ -51,7 +41,6 @@ export const ALL_TEMPLATES = [
     desc: "Un caso de referencia para ver cómo se redactan objetivos y resultados clave medibles.",
     phase: "iniciar",
     tipo: "artefacto",
-    methodologies: ALL_METHODOLOGIES,
     sostenible: false,
     disponible: true,
     file: "/plantillas/plantilla_okr_ejemplo.docx",
@@ -63,7 +52,6 @@ export const ALL_TEMPLATES = [
     desc: "Formaliza el arranque del proyecto y su alcance inicial.",
     phase: "iniciar",
     tipo: "documento",
-    methodologies: ["cascada", "hibrida"],
     sostenible: false,
     disponible: false,
     file: null,
@@ -75,7 +63,6 @@ export const ALL_TEMPLATES = [
     desc: "Objetivo, entregables, caso de negocio, presupuesto, alcance y equipo, listos para rellenar.",
     phase: "iniciar",
     tipo: "documento",
-    methodologies: ALL_METHODOLOGIES,
     sostenible: false,
     disponible: true,
     file: "/plantillas/plantilla_estatuto_proyecto.docx",
@@ -83,11 +70,10 @@ export const ALL_TEMPLATES = [
   {
     category: "Inicio",
     format: "DOCX",
-    title: "Product backlog inicial",
+    title: "Backlog de producto inicial",
     desc: "Punto de partida para priorizar historias de usuario antes del primer sprint.",
     phase: "iniciar",
     tipo: "artefacto",
-    methodologies: ["agil", "hibrida"],
     sostenible: false,
     disponible: false,
     file: null,
@@ -99,7 +85,6 @@ export const ALL_TEMPLATES = [
     desc: "Identifica, valora y da seguimiento a los riesgos del proyecto.",
     phase: "planificar",
     tipo: "herramienta",
-    methodologies: ALL_METHODOLOGIES,
     sostenible: true,
     disponible: false,
     file: null,
@@ -111,7 +96,6 @@ export const ALL_TEMPLATES = [
     desc: "Define responsables, aprobadores, consultados e informados.",
     phase: "planificar",
     tipo: "tecnica",
-    methodologies: ALL_METHODOLOGIES,
     sostenible: false,
     disponible: false,
     file: null,
@@ -119,11 +103,10 @@ export const ALL_TEMPLATES = [
   {
     category: "Planificación",
     format: "DOCX",
-    title: "Agenda de kickoff meeting",
+    title: "Agenda de la reunión de arranque",
     desc: "Bloques, tiempos y contenidos para la reunión de arranque del proyecto (1 hora).",
     phase: "planificar",
     tipo: "documento",
-    methodologies: ALL_METHODOLOGIES,
     sostenible: false,
     disponible: true,
     file: "/plantillas/plantilla_agenda_kickoff.docx",
@@ -131,11 +114,10 @@ export const ALL_TEMPLATES = [
   {
     category: "Planificación",
     format: "XLSX",
-    title: "Sprint plan",
+    title: "Plan del sprint",
     desc: "Plantilla para planificar sprints: capacidad del equipo, historias comprometidas y objetivo del sprint.",
     phase: "planificar",
     tipo: "herramienta",
-    methodologies: ["agil", "hibrida"],
     sostenible: false,
     disponible: false,
     file: null,
@@ -147,7 +129,6 @@ export const ALL_TEMPLATES = [
     desc: "Qué se comunica, a quién, con qué frecuencia y por qué canal.",
     phase: "planificar",
     tipo: "documento",
-    methodologies: ALL_METHODOLOGIES,
     sostenible: false,
     disponible: false,
     file: null,
@@ -155,11 +136,10 @@ export const ALL_TEMPLATES = [
   {
     category: "Planificación",
     format: "DOCX",
-    title: "Checklist de impacto ambiental y social",
+    title: "Lista de verificación de impacto ambiental y social",
     desc: "Evalúa el impacto del proyecto y define medidas para reducirlo, para proyectos con criterios de sostenibilidad.",
     phase: "planificar",
     tipo: "herramienta",
-    methodologies: ALL_METHODOLOGIES,
     sostenible: true,
     disponible: false,
     file: null,
@@ -171,7 +151,6 @@ export const ALL_TEMPLATES = [
     desc: "Plantilla de seguimiento de avance, riesgos y bloqueos.",
     phase: "ejecutar",
     tipo: "herramienta",
-    methodologies: ALL_METHODOLOGIES,
     sostenible: false,
     disponible: false,
     file: null,
@@ -179,11 +158,10 @@ export const ALL_TEMPLATES = [
   {
     category: "Controlar",
     format: "XLSX",
-    title: "Burndown chart",
+    title: "Gráfico de avance del sprint",
     desc: "Seguimiento visual del trabajo pendiente frente al tiempo restante del sprint.",
     phase: "ejecutar",
     tipo: "herramienta",
-    methodologies: ["agil", "hibrida"],
     sostenible: false,
     disponible: false,
     file: null,
@@ -195,7 +173,6 @@ export const ALL_TEMPLATES = [
     desc: "Cierra formalmente el proyecto y documenta el aprendizaje.",
     phase: "cerrar",
     tipo: "documento",
-    methodologies: ALL_METHODOLOGIES,
     sostenible: false,
     disponible: false,
     file: null,

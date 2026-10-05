@@ -60,7 +60,6 @@ export default function ProjectModal({ open, onClose, sponsors, pms, departments
 
     const payload = {
       name: name.trim(),
-      methodology: isEdit ? project.methodology || "hibrida" : "hibrida",
       sponsor,
       pm,
       department,

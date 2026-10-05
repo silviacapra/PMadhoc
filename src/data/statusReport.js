@@ -10,7 +10,7 @@ export const STATUS_REPORTS = {
       { period: "1-8 sept 2026", status: "atRisk" },
     ],
     categories: [
-      { label: "Alcance", status: "onTrack", note: "Sin cambios de scope este periodo." },
+      { label: "Alcance", status: "onTrack", note: "Sin cambios de alcance este periodo." },
       { label: "Cronograma", status: "atRisk", note: "18 días para el cierre; margen ajustado." },
       { label: "Presupuesto", status: "onTrack", note: "Dentro de lo previsto, 58% ejecutado." },
       { label: "Equipo", status: "critical", note: "QA con disponibilidad limitada en sprint 6." },
@@ -18,7 +18,7 @@ export const STATUS_REPORTS = {
     achievements: [
       "Migración de los módulos de contactos y oportunidades completada.",
       "Pruebas de integración con el ERP superadas sin incidencias.",
-      "Kickoff del plan de comunicación de cambio con el equipo comercial.",
+      "Arranque del plan de comunicación de cambio con el equipo comercial.",
     ],
     nextSteps: [
       "Cerrar la migración de datos históricos antes del 15 de septiembre.",
@@ -84,11 +84,11 @@ export const STATUS_REPORTS = {
       { label: "Equipo", status: "atRisk", note: "Falta confirmar al arquitecto de integración." },
     ],
     achievements: [
-      "Business case y caso de negocio aprobados por el patrocinador.",
+      "Caso de negocio aprobado por el patrocinador.",
       "Selección del proveedor de integración completada.",
     ],
     nextSteps: [
-      "Cerrar el WBS y el cronograma definitivo.",
+      "Cerrar la EDT y el cronograma definitivo.",
       "Confirmar la incorporación del arquitecto de integración.",
       "Revisar con el patrocinador los 2 requisitos nuevos antes del punto de control.",
     ],

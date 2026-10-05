@@ -142,8 +142,7 @@ export default function AuthScreen({ auth }) {
         </div>
 
         <p className="auth-disclaimer">
-          Los proyectos, la empresa y las plantillas son compartidos entre todo el equipo. Tu perfil y tus
-          conversaciones con el PM virtual son solo tuyos.
+          Los proyectos, la empresa y las plantillas son compartidos entre todo el equipo. Tu perfil es solo tuyo.
         </p>
       </div>
     </div>

@@ -1,4 +1,4 @@
-export const ARTICLES_VERSION = 2;
+export const ARTICLES_VERSION = 5;
 
 export const KB_CATEGORIES = [
   { label: "Fundamentos", emoji: "📘" },
@@ -74,7 +74,7 @@ export const ARTICLES = [
       },
     ],
     closing:
-      "Revisa el registro en cada punto de control del roadmap, no solo cuando algo ya ha pasado. Un riesgo bien gestionado es aburrido: se ve venir, se mitiga, y no aparece en ningún informe de estado en rojo.",
+      "Revisa el registro en cada punto de control de la hoja de ruta, no solo cuando algo ya ha pasado. Un riesgo bien gestionado es aburrido: se ve venir, se mitiga, y no aparece en ningún informe de estado en rojo.",
   },
   {
     title: "Plan de comunicación",
@@ -96,7 +96,7 @@ export const ARTICLES = [
       },
       {
         term: "Por qué canal",
-        text: "Email, reunión, tablero compartido... el canal importa tanto como el contenido.",
+        text: "Correo electrónico, reunión, tablero compartido... el canal importa tanto como el contenido.",
       },
       {
         term: "Quién se lo cuenta",
@@ -107,22 +107,22 @@ export const ARTICLES = [
       "Un buen indicador de que el plan de comunicación funciona: nadie se sorprende en una reunión de comité. Si el patrocinador se entera en la reunión mensual de un riesgo que el equipo conocía desde hace tres semanas, el plan de comunicación ha fallado, no el proyecto.",
   },
   {
-    title: "Scrum vs. Waterfall",
+    title: "Scrum vs. Cascada",
     category: "Agile",
     readTime: "7 min",
     preview: "Cascada o sprints: cuándo usar cada uno.",
     reference: "PMI Agile Practice Guide · Sección 2 \"Ciclos de vida ágiles y ciclos de vida híbridos\"",
     intro:
-      "Waterfall (cascada) planifica todo el proyecto por adelantado y avanza fase a fase. Scrum (ágil) divide el trabajo en sprints cortos con entregas incrementales. Ninguno es \"mejor\" en abstracto.",
+      "La cascada planifica todo el proyecto por adelantado y avanza fase a fase. Scrum (ágil) divide el trabajo en sprints cortos con entregas incrementales. Ninguno es \"mejor\" en abstracto.",
     diagram: "scrum-waterfall",
     points: [
       {
-        term: "Cuándo conviene Waterfall",
+        term: "Cuándo conviene la cascada",
         text: "El resultado final está claro desde el principio y los cambios son costosos: obra civil, cumplimiento normativo, migraciones de sistemas críticos.",
       },
       {
         term: "Cuándo conviene Scrum",
-        text: "El resultado final no está del todo claro, el feedback del usuario es valioso pronto, y el coste de cambiar de dirección es bajo.",
+        text: "El resultado final no está del todo claro, la retroalimentación del usuario es valiosa pronto, y el coste de cambiar de dirección es bajo.",
       },
       {
         term: "La pregunta que de verdad importa",
@@ -134,7 +134,7 @@ export const ARTICLES = [
       },
     ],
     closing:
-      "Por eso en la app puedes marcar cada proyecto como Cascada, Ágil o Híbrida, y las plantillas se adaptan a esa elección.",
+      "Lo importante no es ponerle una etiqueta al proyecto, sino elegir conscientemente cuánto planificar por adelantado y cuánto dejar abierto a iterar según avance.",
   },
   {
     title: "Matriz RACI",
@@ -195,18 +195,18 @@ export const ARTICLES = [
       "Sea cual sea el método, la priorización tiene que revisarse cada sprint, no fijarse una vez y olvidarse. El backlog es un documento vivo, no un contrato.",
   },
   {
-    title: "WBS del proyecto",
+    title: "EDT del proyecto",
     category: "Cronograma",
     readTime: "6 min",
     preview: "El proyecto convertido en tareas asignables.",
     reference: "PMBOK® Guide – 6ª edición · Capítulo 5 \"Gestión del alcance del proyecto\", sección 5.4 \"Crear la EDT/WBS\"",
     intro:
-      "El WBS (Work Breakdown Structure, o desglose de tareas) es el mapa que convierte \"hay que hacer el proyecto\" en una lista de tareas concretas, asignables y medibles. Sin un buen WBS, el cronograma se construye sobre arena.",
+      "La EDT (Estructura de Desglose del Trabajo) es el mapa que convierte \"hay que hacer el proyecto\" en una lista de tareas concretas, asignables y medibles. Sin una buena EDT, el cronograma se construye sobre arena.",
     diagram: "wbs",
     points: [
       {
         term: "La regla del 8/80",
-        text: "Cada tarea del nivel más bajo del WBS debería tener entre 8 y 80 horas de trabajo. Más pequeña: estás micro-gestionando. Más grande: en realidad es una fase disfrazada de tarea.",
+        text: "Cada tarea del nivel más bajo de la EDT debería tener entre 8 y 80 horas de trabajo. Más pequeña: estás micro-gestionando. Más grande: en realidad es una fase disfrazada de tarea.",
       },
       {
         term: "De arriba a abajo",
@@ -214,7 +214,7 @@ export const ARTICLES = [
       },
       {
         term: "El trabajo invisible",
-        text: "Un buen WBS hace visible el trabajo que \"no se ve\" (documentación, pruebas, formación al cliente) y que, si no está en el WBS, casi nunca está en el cronograma ni en el presupuesto.",
+        text: "Una buena EDT hace visible el trabajo que \"no se ve\" (documentación, pruebas, formación al cliente) y que, si no está en la EDT, casi nunca está en el cronograma ni en el presupuesto.",
       },
     ],
   },
@@ -230,11 +230,11 @@ export const ARTICLES = [
     points: [
       {
         term: "Por qué el botón está bloqueado",
-        text: "En el roadmap de cada proyecto, \"Avanzar a la siguiente fase\" está desactivado hasta marcar todos los requisitos del checklist. No es burocracia: asegura que el acta de constitución está firmada antes de gastar presupuesto en Ejecutar, o que las pruebas de calidad están superadas antes de dar el proyecto por controlado.",
+        text: "En la hoja de ruta de cada proyecto, \"Confirmar finalización de fase\" está desactivado hasta marcar todos los requisitos de la lista de verificación. No es burocracia: asegura que el acta de constitución está firmada antes de gastar presupuesto en Ejecutar, o que las pruebas de calidad están superadas antes de dar el proyecto por controlado.",
       },
       {
         term: "Cómo diseñar un buen punto de control",
-        text: "Pocos requisitos, pero todos de verdad bloqueantes. Si el checklist tiene 20 casillas y nadie las lee de verdad, deja de proteger el proyecto y se convierte en un trámite que la gente marca sin pensar.",
+        text: "Pocos requisitos, pero todos de verdad bloqueantes. Si la lista de verificación tiene 20 casillas y nadie las lee de verdad, deja de proteger el proyecto y se convierte en un trámite que la gente marca sin pensar.",
       },
     ],
   },
@@ -254,7 +254,7 @@ export const ARTICLES = [
       },
       {
         term: "El patrocinador no es un contacto clave cualquiera",
-        text: "Es quien firma el caso de negocio y quien responde ante el resto de la organización si el proyecto no entrega valor. Por eso su plan de comunicación normalmente incluye una reunión de comité de dirección, no solo un informe por email.",
+        text: "Es quien firma el caso de negocio y quien responde ante el resto de la organización si el proyecto no entrega valor. Por eso su plan de comunicación normalmente incluye una reunión de comité de dirección, no solo un informe por correo electrónico.",
       },
     ],
     closing:

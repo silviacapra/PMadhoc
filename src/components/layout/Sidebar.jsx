@@ -14,11 +14,9 @@ export default function Sidebar({ nav, permissions }) {
     riesgos: permissions.canRiesgos,
     documentacion: permissions.canDocumentacion,
     lecciones: permissions.canLecciones,
-    cambios: permissions.canCambios,
     statusreport: permissions.canStatusReport,
     stakeholders: permissions.canStakeholders,
     knowledge: permissions.canKnowledge,
-    chatbot: permissions.canChatbot,
   };
 
   const mainItems = NAV_ITEMS.filter((item) => item.group === "main" && canFor[item.id]);
