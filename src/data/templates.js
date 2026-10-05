@@ -46,6 +46,17 @@ export const ALL_TEMPLATES = [
     file: "/plantillas/Plantilla_PMOadhoc_OKR.docx",
   },
   {
+    category: "Pre-proyecto",
+    format: "DOCX",
+    title: "Caso de negocio",
+    desc: "Justifica la necesidad y viabilidad del proyecto antes de arrancar: solución recomendada, beneficios, costos y riesgos.",
+    phase: "preproyecto",
+    tipo: "documento",
+    sostenible: false,
+    disponible: true,
+    file: "/plantillas/Plantilla_PMOadhoc_BusinessCase.docx",
+  },
+  {
     category: "Inicio",
     format: "DOCX",
     title: "Acta de constitución",

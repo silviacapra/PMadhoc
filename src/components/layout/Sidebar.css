@@ -116,3 +116,49 @@
 .nav-item--active .nav-item-label {
   font-weight: 700;
 }
+
+.nav-item-caret {
+  display: none;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.sidebar--expanded .nav-item-caret {
+  display: flex;
+}
+
+.nav-item-caret svg {
+  transition: transform 0.15s ease;
+}
+
+.nav-subitems {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 2px 12px 6px 46px;
+}
+
+.nav-subitem {
+  padding: 7px 10px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nav-subitem:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.nav-subitem--empty {
+  color: rgba(255, 255, 255, 0.4);
+  cursor: default;
+}
+
+.nav-subitem--empty:hover {
+  background: transparent;
+}

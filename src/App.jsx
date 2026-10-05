@@ -46,7 +46,7 @@ export default function App() {
     <div className="app-root">
       <Header session={session} nav={nav} dashboard={state.dashboard} permissions={permissions} />
       <div className="app-shell">
-        <Sidebar nav={nav} permissions={permissions} />
+        <Sidebar nav={nav} permissions={permissions} projects={state.ficha.projects} onOpenProject={state.ficha.setProjectId} />
         <main className="content-area">
           {view === "dashboard" && canShow.dashboard && (
             <Dashboard dashboard={state.dashboard} permissions={permissions} session={session} nav={nav} statusReport={state.statusReport} />
