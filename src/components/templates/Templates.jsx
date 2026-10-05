@@ -43,7 +43,6 @@ export default function Templates({ templates }) {
     typeFilters,
     activePhaseFilter,
     activeTypeFilter,
-    sostenibleOnly,
     disponibleOnly,
     searchQuery,
     filteredTemplates,
@@ -51,7 +50,6 @@ export default function Templates({ templates }) {
     toggleTypeFilter,
     clearPhaseFilter,
     clearTypeFilter,
-    setSostenibleOnly,
     setDisponibleOnly,
     setSearchQuery,
     addTemplateOpen,
@@ -60,12 +58,11 @@ export default function Templates({ templates }) {
   } = templates;
 
   const hasActiveFilters =
-    activePhaseFilter.length > 0 || activeTypeFilter.length > 0 || sostenibleOnly || disponibleOnly || searchQuery.trim().length > 0;
+    activePhaseFilter.length > 0 || activeTypeFilter.length > 0 || disponibleOnly || searchQuery.trim().length > 0;
 
   function resetAllFilters() {
     clearPhaseFilter();
     clearTypeFilter();
-    setSostenibleOnly(false);
     setDisponibleOnly(false);
     setSearchQuery("");
   }
@@ -107,12 +104,6 @@ export default function Templates({ templates }) {
           onToggle={toggleTypeFilter}
           onClear={clearTypeFilter}
         />
-        <span
-          className={`phase-filter-pill ${sostenibleOnly ? "phase-filter-pill--active" : ""}`}
-          onClick={() => setSostenibleOnly(!sostenibleOnly)}
-        >
-          🌱 Proyectos sostenibles
-        </span>
         <span
           className={`phase-filter-pill ${disponibleOnly ? "phase-filter-pill--active" : ""}`}
           onClick={() => setDisponibleOnly(!disponibleOnly)}

@@ -65,7 +65,7 @@ export function buildPhases(selectedPhase, currentPhase, taskAssignments = {}, p
       index: i,
       isSelected,
       isPastOrCurrent,
-      locked: i > currentIndex,
+      completed: i < currentIndex,
       showLine: i < PHASE_ORDER.length - 1,
       isLineFilled: i < currentIndex,
       health: isPastOrCurrent ? getPhaseHealth(id, taskAssignments, projectId) : null,

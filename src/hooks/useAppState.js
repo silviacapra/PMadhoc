@@ -97,7 +97,6 @@ export function useAppState() {
   const [passwordBusy, setPasswordBusy] = useState(false);
 
   const [templateFilterPhase, setTemplateFilterPhase] = useState([]);
-  const [templateFilterSostenible, setTemplateFilterSostenible] = useState(false);
   const [templateFilterDisponible, setTemplateFilterDisponible] = useState(false);
   const [templateFilterTipo, setTemplateFilterTipo] = useState([]);
   const [templateSearchQuery, setTemplateSearchQuery] = useState("");
@@ -715,7 +714,7 @@ export function useAppState() {
 
   function advanceFichaPhase() {
     const next = nextPhase(fichaCurrentPhase);
-    if (!fichaCanAdvance || !next) return;
+    if (!next) return;
     updateDoc(doc(db, "projects", fichaProjectId, "roadmap", "main"), { currentPhase: next });
     updateDoc(doc(db, "projects", fichaProjectId), { phase: ROADMAP_CONTENT[next].label });
     setFichaRoadmapPhase(next);
@@ -784,7 +783,6 @@ export function useAppState() {
   const filteredTemplates = filterTemplates(
     templatesList,
     templateFilterPhase,
-    templateFilterSostenible,
     templateFilterDisponible,
     templateFilterTipo,
     templateSearchQuery
@@ -965,7 +963,6 @@ export function useAppState() {
       typeFilters: TYPE_FILTER_DEFS,
       activePhaseFilter: templateFilterPhase,
       activeTypeFilter: templateFilterTipo,
-      sostenibleOnly: templateFilterSostenible,
       disponibleOnly: templateFilterDisponible,
       searchQuery: templateSearchQuery,
       filteredTemplates,
@@ -973,7 +970,6 @@ export function useAppState() {
       toggleTypeFilter: toggleTemplateTipoFilter,
       clearPhaseFilter: () => setTemplateFilterPhase([]),
       clearTypeFilter: () => setTemplateFilterTipo([]),
-      setSostenibleOnly: setTemplateFilterSostenible,
       setDisponibleOnly: setTemplateFilterDisponible,
       setSearchQuery: setTemplateSearchQuery,
       addTemplateOpen,

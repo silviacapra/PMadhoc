@@ -15,6 +15,7 @@ export const TYPE_FILTER_DEFS = [
   { id: "artefacto", label: "Artefacto" },
   { id: "tecnica", label: "Técnica" },
   { id: "herramienta", label: "Herramienta" },
+  { id: "importacion", label: "Plantilla de Importación" },
 ];
 
 export const TYPE_LABELS = TYPE_FILTER_DEFS.reduce((acc, t) => {
@@ -33,6 +34,17 @@ export const ALL_TEMPLATES = [
     sostenible: false,
     disponible: false,
     file: null,
+  },
+  {
+    category: "Fundamentos",
+    format: "XLSX",
+    title: "Importar proyectos ya empezados",
+    desc: "Plantilla para dar de alta en bloque proyectos en marcha, con campos obligatorios, fases y tareas.",
+    phase: "fundamentos",
+    tipo: "importacion",
+    sostenible: false,
+    disponible: true,
+    file: "/plantillas/Plantilla_PMOadhoc_ImportarProyectos.xlsx",
   },
   {
     category: "Fundamentos",

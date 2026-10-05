@@ -1,5 +1,7 @@
+import { useState } from "react";
 import RoadmapStep from "./RoadmapStep";
-import { LockIcon } from "../icons/Icons";
+import { CheckIcon } from "../icons/Icons";
+import Confetti from "../shared/Confetti";
 import "./Roadmap.css";
 
 export default function Roadmap({ roadmap, onGoToKnowledge, onGoToTemplates, onGoToRiesgos }) {
@@ -17,10 +19,15 @@ export default function Roadmap({ roadmap, onGoToKnowledge, onGoToTemplates, onG
     gateItems,
     gateChecked,
     toggleGateItem,
-    canAdvance,
     advancePhase,
   } = roadmap;
   const selectedPhaseData = phases.find((p) => p.id === selectedPhase);
+  const [confettiFire, setConfettiFire] = useState(0);
+
+  function handleAdvance() {
+    advancePhase();
+    setConfettiFire((n) => n + 1);
+  }
 
   return (
     <div>
@@ -34,20 +41,20 @@ export default function Roadmap({ roadmap, onGoToKnowledge, onGoToTemplates, onG
               : "var(--accent)";
           return (
           <div key={phase.id} className="phase-timeline-item">
-            <div
-              className={`phase-dot-wrap ${phase.locked ? "phase-dot-wrap--locked" : ""}`}
-              onClick={() => !phase.locked && selectPhase(phase.id)}
-              title={phase.locked ? "Completa las fases anteriores para desbloquear esta" : undefined}
-            >
+            <div className="phase-dot-wrap" onClick={() => selectPhase(phase.id)}>
               <div
                 className="phase-dot"
-                style={{
-                  background: phase.isSelected ? healthColor : "var(--white)",
-                  color: phase.isSelected ? "#FFFFFF" : phase.isPastOrCurrent ? healthColor : "#B7B7B7",
-                  borderColor: phase.isSelected ? healthColor : phase.isPastOrCurrent ? healthColor : "#DADADA",
-                }}
+                style={
+                  phase.completed
+                    ? { background: "var(--accent)", borderColor: "var(--accent)" }
+                    : {
+                        background: phase.isSelected ? healthColor : "var(--white)",
+                        color: phase.isSelected ? "#FFFFFF" : phase.isPastOrCurrent ? healthColor : "#B7B7B7",
+                        borderColor: phase.isSelected ? healthColor : phase.isPastOrCurrent ? healthColor : "#DADADA",
+                      }
+                }
               >
-                {phase.locked ? <LockIcon size={13} color="#B7B7B7" /> : phase.index}
+                {phase.completed ? <CheckIcon size={16} color="#FFFFFF" /> : phase.index}
               </div>
               <span
                 className="phase-label"
@@ -104,11 +111,12 @@ export default function Roadmap({ roadmap, onGoToKnowledge, onGoToTemplates, onG
               </label>
             ))}
           </div>
-          <button className="gate-advance-btn" disabled={!canAdvance} onClick={advancePhase}>
+          <button className="gate-advance-btn" onClick={handleAdvance}>
             Confirmar finalización de fase
           </button>
         </div>
       )}
+      <Confetti fire={confettiFire} />
     </div>
   );
 }
