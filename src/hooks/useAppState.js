@@ -191,6 +191,14 @@ export function useAppState() {
       "Sprint plan",
       "Checklist de impacto ambiental y social",
       "Burndown chart",
+      "OKR de ejemplo: proyecto Muévete",
+      "KPIs de ejemplo: proyecto Muévete",
+      "Backlog de producto inicial",
+      "Plan del sprint",
+      "Gráfico de avance del sprint",
+      "Estatuto del proyecto (plantilla en blanco)",
+      "Lista de verificación de impacto ambiental y social",
+      "Informe de estado semanal",
     ];
     (async () => {
       for (const title of OLD_TEMPLATE_TITLES) {
