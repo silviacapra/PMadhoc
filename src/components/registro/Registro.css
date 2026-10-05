@@ -172,3 +172,23 @@
 .registry-form-row--two {
   grid-template-columns: 1fr 1fr;
 }
+
+.cambios-approve {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.cambios-approve input[type="checkbox"] {
+  width: auto;
+  accent-color: var(--accent);
+}
+
+.cambios-approve input[type="checkbox"]:disabled {
+  cursor: not-allowed;
+}

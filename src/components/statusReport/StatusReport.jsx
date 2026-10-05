@@ -139,7 +139,7 @@ function InlinePencilField({ label, value, onSave, placeholder }) {
 
 function LastMonthGantt({ steps }) {
   if (steps.length === 0) {
-    return <p className="registry-empty">No hay work packages con fechas en el último mes.</p>;
+    return <p className="registry-empty">No hay tareas con fechas en el último mes.</p>;
   }
 
   const dates = steps.flatMap((s) => [s.startDate, s.endDate].filter(Boolean)).map((d) => new Date(`${d}T00:00:00`).getTime());
@@ -223,7 +223,7 @@ export default function StatusReport({ statusReport }) {
             Exportar PDF
           </button>
         </div>
-        <h1 className="page-title">Informe de estado del proyecto</h1>
+        <h1 className="page-title">Informes de proyecto</h1>
 
         <div className="registro-project-picker">
           <label>Proyecto</label>
@@ -492,7 +492,7 @@ export default function StatusReport({ statusReport }) {
 
   return (
     <div>
-      <h1 className="page-title">Informe de estado del proyecto</h1>
+      <h1 className="page-title">Informes de proyecto</h1>
 
       <div className="status-report-toolbar">
         <h3 className="section-heading" style={{ margin: 0 }}>

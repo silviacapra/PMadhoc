@@ -9,7 +9,7 @@ export default function Documentacion({ documentacion }) {
     <div className="section-card">
       <h3 className="section-heading">Documentación</h3>
       <div className="doc-disclaimer">
-        ℹ️ Esta sección se rellena automáticamente desde el apartado <strong>Roadmap Proyecto</strong>: en cuanto marcas un
+        ℹ️ Esta sección se rellena automáticamente desde el apartado <strong>Fases del proyecto</strong>: en cuanto marcas un
         entregable como hecho y le añades un enlace en Fases del proyecto, aparece aquí agrupado por fase.
       </div>
 

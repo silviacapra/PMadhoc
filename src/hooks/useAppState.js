@@ -11,16 +11,17 @@ import {
 } from "firebase/auth";
 import { doc, setDoc, updateDoc, addDoc, deleteDoc, getDoc, collection, onSnapshot } from "firebase/firestore";
 import { auth, db } from "../firebase";
-import { askGemini } from "../gemini";
+import { askGemini, GEMINI_ENABLED } from "../gemini";
 import { ROLE_PERMISSIONS, ROLE_LABELS, defaultViewForRole } from "../data/roles";
 import { PHASE_ORDER, ROADMAP_CONTENT } from "../data/roadmapContent";
+import { ROADMAP_STEP_STATUS_DEFS } from "../data/statusStyles";
 import { GATE_REQUIREMENTS } from "../data/roadmapGates";
 import { TEAM_MEMBERS, INITIAL_STAKEHOLDERS } from "../data/team";
 import { RISK_CATEGORIES, PROBABILIDAD_OPTIONS, RIESGO_ESTADO_OPTIONS } from "../data/riesgos";
 import { PHASE_FILTER_DEFS, METHODOLOGY_FILTER_DEFS, TYPE_FILTER_DEFS, ALL_TEMPLATES } from "../data/templates";
 import { INITIAL_PROJECTS } from "../data/projects";
 import { STATUS_REPORTS } from "../data/statusReport";
-import { KB_CATEGORIES, ARTICLES } from "../data/knowledge";
+import { KB_CATEGORIES, ARTICLES, ARTICLES_VERSION } from "../data/knowledge";
 import { INITIAL_MESSAGES } from "../data/chatbot";
 import { INITIAL_COMPANY, INITIAL_OKR_CATALOG } from "../data/company";
 import { getInitials, getFirstName } from "../utils/text";
@@ -31,7 +32,6 @@ import {
   buildGanttRows,
   buildInitialTaskAssignments,
   getCurrentTaskStatus,
-  arePhaseWorkPackagesReady,
   nextPhase,
   phaseLabelToKey,
 } from "../utils/roadmap";
@@ -152,6 +152,9 @@ export function useAppState() {
   const [documentacionSelectedProjectId, setDocumentacionSelectedProjectId] = useState("");
   const [documentacionRoadmapData, setDocumentacionRoadmapData] = useState(null);
 
+  const [cambiosSelectedProjectId, setCambiosSelectedProjectId] = useState("");
+  const [cambiosItems, setCambiosItems] = useState([]);
+
 
   // Sesión: se queda escuchando si hay alguien conectado (y sigue conectado tras recargar la página).
   useEffect(() => {
@@ -230,20 +233,16 @@ export function useAppState() {
     })();
   }, [user]);
 
-  // Traslada los artículos de la base de conocimiento a Firestore (solo si faltan) para que se puedan editar.
+  // Traslada los artículos de la base de conocimiento a Firestore (y los re-sincroniza cuando
+  // cambia el contenido en el código, subiendo ARTICLES_VERSION) para que se puedan editar.
   useEffect(() => {
     if (!user) return;
     (async () => {
       for (const a of ARTICLES) {
         const id = slugify(a.title);
         const snap = await getDoc(doc(db, "knowledgeArticles", id));
-        if (!snap.exists()) {
-          await setDoc(doc(db, "knowledgeArticles", id), a);
-        } else {
-          const data = snap.data();
-          if (data.points && (data.diagram !== a.diagram || data.preview !== a.preview)) {
-            await updateDoc(doc(db, "knowledgeArticles", id), { diagram: a.diagram, preview: a.preview });
-          }
+        if (!snap.exists() || snap.data()._kbVersion !== ARTICLES_VERSION) {
+          await setDoc(doc(db, "knowledgeArticles", id), { ...a, _kbVersion: ARTICLES_VERSION });
         }
       }
     })();
@@ -290,7 +289,15 @@ export function useAppState() {
     if (!riesgosSelectedProjectId) setRiesgosSelectedProjectId(projects[0].id);
     if (!leccionesSelectedProjectId) setLeccionesSelectedProjectId(projects[0].id);
     if (!documentacionSelectedProjectId) setDocumentacionSelectedProjectId(projects[0].id);
-  }, [projects, statusSelectedProjectId, riesgosSelectedProjectId, leccionesSelectedProjectId, documentacionSelectedProjectId]);
+    if (!cambiosSelectedProjectId) setCambiosSelectedProjectId(projects[0].id);
+  }, [
+    projects,
+    statusSelectedProjectId,
+    riesgosSelectedProjectId,
+    leccionesSelectedProjectId,
+    documentacionSelectedProjectId,
+    cambiosSelectedProjectId,
+  ]);
 
   // Informe de estado y roadmap (para los datos automáticos) del proyecto elegido en Status Report.
   useEffect(() => {
@@ -326,6 +333,15 @@ export function useAppState() {
     );
     return unsub;
   }, [user, leccionesSelectedProjectId]);
+
+  // Registro de cambios del proyecto elegido.
+  useEffect(() => {
+    if (!user || !cambiosSelectedProjectId) return;
+    const unsub = onSnapshot(collection(db, "projects", cambiosSelectedProjectId, "cambios"), (snap) =>
+      setCambiosItems(snap.docs.map((d) => ({ id: d.id, ...d.data() })))
+    );
+    return unsub;
+  }, [user, cambiosSelectedProjectId]);
 
   // Roadmap del proyecto elegido en Documentación (para sacar los entregables enlazados).
   useEffect(() => {
@@ -447,12 +463,62 @@ export function useAppState() {
     setFichaExpandedStepKey((prev) => (prev === key ? null : key));
   }
 
+  function logChange(description) {
+    if (!fichaProjectId || !description) return;
+    addDoc(collection(db, "projects", fichaProjectId, "cambios"), {
+      descripcion: description,
+      fecha: new Date().toISOString(),
+      solicitadoPor: profile?.name || "Usuario",
+      solicitadoPorUid: user?.uid || "",
+      aprobado: false,
+      aprobadoPor: "",
+    });
+  }
+
+  function stepTitleForKey(key) {
+    const [phaseId, idxStr] = key.split("__");
+    const idx = Number(idxStr);
+    const meta = fichaTaskAssignments[key] || {};
+    return meta.title || ROADMAP_CONTENT[phaseId]?.steps?.[idx]?.title || "la tarea";
+  }
+
+  function describeTaskChange(key, patch) {
+    const title = stepTitleForKey(key);
+    const parts = [];
+    if ("status" in patch) parts.push(`cambió el estado a "${ROADMAP_STEP_STATUS_DEFS[patch.status]?.label || patch.status}"`);
+    if ("title" in patch) parts.push(`renombró la tarea a "${patch.title}"`);
+    if ("detail" in patch) parts.push("actualizó la descripción");
+    if ("assignee" in patch) parts.push(`asignó la tarea a ${patch.assignee || "sin asignar"}`);
+    if ("startDate" in patch) parts.push(`cambió la fecha de inicio a ${patch.startDate || "—"}`);
+    if ("endDate" in patch) parts.push(`cambió la fecha límite a ${patch.endDate || "—"}`);
+    if ("acceptanceCriteria" in patch) parts.push("actualizó los criterios de aceptación");
+    if ("technicalInfo" in patch) parts.push("actualizó la información técnica");
+    if (parts.length === 0) return null;
+    return `${parts.join(", ")} en "${title}"`;
+  }
+
+  function describeOutputChange(key, outputIndex, patch) {
+    const title = stepTitleForKey(key);
+    const [phaseId, idxStr] = key.split("__");
+    const idx = Number(idxStr);
+    const existingMeta = fichaTaskAssignments[key] || {};
+    const outputLabel =
+      existingMeta.outputs?.[outputIndex]?.label || ROADMAP_CONTENT[phaseId]?.steps?.[idx]?.outputs?.[outputIndex] || "un entregable";
+    const parts = [];
+    if ("done" in patch) parts.push(patch.done ? `marcó como hecho el entregable "${outputLabel}"` : `desmarcó el entregable "${outputLabel}"`);
+    if ("link" in patch) parts.push(`añadió un enlace al entregable "${outputLabel}"`);
+    if ("label" in patch) parts.push(`renombró el entregable a "${patch.label}"`);
+    if (parts.length === 0) return null;
+    return `${parts.join(", ")} en "${title}"`;
+  }
+
   function updateFichaTaskMeta(key, patch) {
     const updates = {};
     Object.entries(patch).forEach(([field, value]) => {
       updates[`taskAssignments.${key}.${field}`] = value;
     });
     updateDoc(doc(db, "projects", fichaProjectId, "roadmap", "main"), updates);
+    logChange(describeTaskChange(key, patch));
   }
 
   function updateStepOutput(key, outputIndex, patch) {
@@ -461,6 +527,14 @@ export function useAppState() {
       updates[`taskAssignments.${key}.outputs.${outputIndex}.${field}`] = value;
     });
     updateDoc(doc(db, "projects", fichaProjectId, "roadmap", "main"), updates);
+    logChange(describeOutputChange(key, outputIndex, patch));
+  }
+
+  function toggleCambioAprobado(id, aprobado) {
+    updateDoc(doc(db, "projects", cambiosSelectedProjectId, "cambios", id), {
+      aprobado,
+      aprobadoPor: aprobado ? profile?.name || "Usuario" : "",
+    });
   }
 
   async function saveProfile() {
@@ -710,9 +784,7 @@ export function useAppState() {
   const fichaGateItemsForCurrentPhase = GATE_REQUIREMENTS[fichaCurrentPhase] || [];
   const fichaGateCheckedForCurrentPhase = fichaGateChecks[fichaCurrentPhase] || {};
   const fichaCanAdvance =
-    fichaGateItemsForCurrentPhase.length > 0 &&
-    fichaGateItemsForCurrentPhase.every((_, i) => fichaGateCheckedForCurrentPhase[i]) &&
-    arePhaseWorkPackagesReady(fichaCurrentPhase, fichaTaskAssignments, fichaProjectId);
+    fichaGateItemsForCurrentPhase.length > 0 && fichaGateItemsForCurrentPhase.every((_, i) => fichaGateCheckedForCurrentPhase[i]);
 
   function advanceFichaPhase() {
     const next = nextPhase(fichaCurrentPhase);
@@ -896,7 +968,8 @@ export function useAppState() {
       canRiesgos: can("riesgos"),
       canDocumentacion: can("documentacion"),
       canLecciones: can("lecciones"),
-      canChatbot: can("chatbot"),
+      canCambios: can("cambios"),
+      canChatbot: can("chatbot") && GEMINI_ENABLED,
       canStatusReport: can("statusreport"),
       canStakeholders: can("stakeholders"),
       canCreateProject: role === "pm" || role === "sponsor",
@@ -942,7 +1015,8 @@ export function useAppState() {
           fichaRoadmapPhase || fichaCurrentPhase || "preproyecto",
           fichaTaskAssignments,
           fichaExpandedStepKey,
-          fichaProjectId
+          fichaProjectId,
+          projects.find((p) => p.id === fichaProjectId)?.name
         ),
         selectedPhase: fichaRoadmapPhase || fichaCurrentPhase || "preproyecto",
         isCurrentPhase: (fichaRoadmapPhase || fichaCurrentPhase) === fichaCurrentPhase,
@@ -1039,6 +1113,14 @@ export function useAppState() {
       delete: deleteLeccion,
       currentUserUid: user?.uid,
       teamMembers: TEAM_MEMBERS,
+    },
+    cambios: {
+      projects,
+      selectedProjectId: cambiosSelectedProjectId,
+      setSelectedProjectId: setCambiosSelectedProjectId,
+      items: [...cambiosItems].sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0)),
+      canApprove: role === "pm" || role === "sponsor",
+      toggleAprobado: toggleCambioAprobado,
     },
     documentacionPage: {
       projects,

@@ -32,7 +32,7 @@ export const ROADMAP_CONTENT = {
     label: "Iniciar",
     steps: [
       {
-        title: "Definir el goal del proyecto",
+        title: "Definir el objetivo del proyecto",
         detail: "Objetivos SMART a largo plazo, o KPIs a corto plazo.",
         outputs: ["Objetivos SMART / KPIs del proyecto"],
       },
@@ -88,7 +88,7 @@ export const ROADMAP_CONTENT = {
       },
       {
         title: "Gestionar cambios y riesgos",
-        detail: "Categorizar con ROAM y actualizar el informe de estado del proyecto.",
+        detail: "Categorizar con ROAM y actualizar los informes de proyecto.",
         outputs: ["Registro de cambios", "Solicitudes de cambio aprobadas"],
       },
       {

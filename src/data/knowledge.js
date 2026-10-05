@@ -1,3 +1,5 @@
+export const ARTICLES_VERSION = 2;
+
 export const KB_CATEGORIES = [
   { label: "Fundamentos", emoji: "📘" },
   { label: "Riesgos", emoji: "⚠️" },
@@ -35,7 +37,7 @@ export const ARTICLES = [
         text: "Muchos frameworks modernos la añaden en el centro del triángulo, como resultado de cómo se gestionan las otras tres — no como una cuarta variable independiente.",
         subitems: [
           "Si se recorta tiempo o coste sin tocar el alcance, la calidad suele ser la que paga la diferencia.",
-          "Por eso el Informe de estado del proyecto de esta app usa siempre estas cuatro categorías en semáforo: alcance, cronograma, presupuesto y calidad.",
+          "Por eso los Informes de proyecto de esta app usan siempre estas cuatro categorías en semáforo: alcance, cronograma, presupuesto y calidad.",
         ],
       },
     ],
@@ -72,7 +74,7 @@ export const ARTICLES = [
       },
     ],
     closing:
-      "Revisa el registro en cada punto de control del roadmap (los \"gate review\"), no solo cuando algo ya ha pasado. Un riesgo bien gestionado es aburrido: se ve venir, se mitiga, y no aparece en ningún informe de estado en rojo.",
+      "Revisa el registro en cada punto de control del roadmap, no solo cuando algo ya ha pasado. Un riesgo bien gestionado es aburrido: se ve venir, se mitiga, y no aparece en ningún informe de estado en rojo.",
   },
   {
     title: "Plan de comunicación",
@@ -217,13 +219,13 @@ export const ARTICLES = [
     ],
   },
   {
-    title: "Gate review",
+    title: "Punto de control",
     category: "Calidad",
     readTime: "4 min",
     preview: "El punto de control antes de avanzar de fase.",
     reference: "PMBOK® Guide – 6ª edición · Sección 1.2.4.3 \"Fases del proyecto\" (phase gates)",
     intro:
-      "Un gate review (revisión de puerta) es un punto de control obligatorio antes de pasar de una fase del proyecto a la siguiente: no avances a Ejecutar si el plan de Planificar todavía tiene huecos, porque cada fallo que se cuela se vuelve más caro de arreglar cuanto más tarde se detecta.",
+      "Un punto de control (lo que en inglés se conoce como \"gate review\") es un momento obligatorio para revisar que todo está listo antes de pasar de una fase del proyecto a la siguiente: no avances a Ejecutar si el plan de Planificar todavía tiene huecos, porque cada fallo que se cuela se vuelve más caro de arreglar cuanto más tarde se detecta.",
     diagram: "gate-review",
     points: [
       {
@@ -231,7 +233,7 @@ export const ARTICLES = [
         text: "En el roadmap de cada proyecto, \"Avanzar a la siguiente fase\" está desactivado hasta marcar todos los requisitos del checklist. No es burocracia: asegura que el acta de constitución está firmada antes de gastar presupuesto en Ejecutar, o que las pruebas de calidad están superadas antes de dar el proyecto por controlado.",
       },
       {
-        term: "Cómo diseñar un buen gate",
+        term: "Cómo diseñar un buen punto de control",
         text: "Pocos requisitos, pero todos de verdad bloqueantes. Si el checklist tiene 20 casillas y nadie las lee de verdad, deja de proteger el proyecto y se convierte en un trámite que la gente marca sin pensar.",
       },
     ],

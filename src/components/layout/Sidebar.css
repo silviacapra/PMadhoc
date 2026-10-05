@@ -29,18 +29,19 @@
 .sidebar-toggle {
   position: absolute;
   top: 50%;
-  right: -13px;
+  right: -15px;
   transform: translateY(-50%);
-  width: 22px;
-  height: 44px;
-  border-radius: 0 8px 8px 0;
-  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid var(--white);
   background: var(--black);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   z-index: 16;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
 }
 
 .sidebar-toggle svg {

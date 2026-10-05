@@ -16,6 +16,7 @@ import {
 import ArticleModal from "./ArticleModal";
 import ConfirmDeleteModal from "../shared/ConfirmDeleteModal";
 import KnowledgeAssistant from "./KnowledgeAssistant";
+import { GEMINI_ENABLED } from "../../gemini";
 import "./Knowledge.css";
 
 const DIAGRAMS = {
@@ -152,7 +153,7 @@ export default function Knowledge({ knowledge }) {
         </button>
       </div>
 
-      <KnowledgeAssistant articles={articles} />
+      {GEMINI_ENABLED && <KnowledgeAssistant articles={articles} />}
 
       <div className="kb-categories">
         {categories.map((cat) => {

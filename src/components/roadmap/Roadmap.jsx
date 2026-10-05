@@ -2,7 +2,7 @@ import RoadmapStep from "./RoadmapStep";
 import { LockIcon } from "../icons/Icons";
 import "./Roadmap.css";
 
-export default function Roadmap({ roadmap }) {
+export default function Roadmap({ roadmap, onGoToKnowledge, onGoToTemplates, onGoToRiesgos }) {
   const {
     phases,
     steps,
@@ -84,6 +84,9 @@ export default function Roadmap({ roadmap }) {
               onToggle={toggleStep}
               onUpdate={updateTaskMeta}
               onUpdateOutput={updateStepOutput}
+              onGoToKnowledge={onGoToKnowledge}
+              onGoToTemplates={onGoToTemplates}
+              onGoToRiesgos={onGoToRiesgos}
             />
           ))}
         </div>
@@ -91,11 +94,8 @@ export default function Roadmap({ roadmap }) {
 
       {isCurrentPhase && !isLastPhase && (
         <div className="section-card gate-card">
-          <h3 className="section-heading">Gate review · requisitos para avanzar de fase</h3>
-          <p className="gate-subtitle">
-            Marca cada requisito y deja todos los work packages de esta fase en "Completado", "Atención" o "Crítico"
-            (ninguno en "Sin empezar" o "En curso") para poder avanzar a la siguiente fase.
-          </p>
+          <h3 className="section-heading">Punto de control · requisitos para avanzar de fase</h3>
+          <p className="gate-subtitle">Marca cada requisito para poder avanzar a la siguiente fase.</p>
           <div className="gate-checklist">
             {gateItems.map((item, i) => (
               <label key={item} className="gate-checklist-item">

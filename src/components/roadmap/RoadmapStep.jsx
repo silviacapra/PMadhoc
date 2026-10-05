@@ -2,20 +2,28 @@ import { useState, useEffect } from "react";
 import { CheckIcon, ChevronDownIcon, PencilIcon, ExternalLinkIcon } from "../icons/Icons";
 import { ROADMAP_STEP_STATUS_DEFS } from "../../data/statusStyles";
 
-function EditableField({ value, onSave, placeholder, multiline, rows }) {
+function EditableField({ value, onSave, placeholder, rows }) {
+  const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(value);
 
   useEffect(() => {
     setDraft(value);
   }, [value]);
 
-  function commit() {
-    if (draft !== value) onSave(draft);
+  function startEdit() {
+    setDraft(value);
+    setEditing(true);
   }
 
-  if (multiline) {
+  function commit() {
+    if (draft !== value) onSave(draft);
+    setEditing(false);
+  }
+
+  if (editing) {
     return (
       <textarea
+        autoFocus
         rows={rows || 3}
         value={draft}
         placeholder={placeholder}
@@ -25,14 +33,23 @@ function EditableField({ value, onSave, placeholder, multiline, rows }) {
     );
   }
 
+  const lines = (value || "")
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
+
   return (
-    <input
-      type="text"
-      value={draft}
-      placeholder={placeholder}
-      onChange={(e) => setDraft(e.target.value)}
-      onBlur={commit}
-    />
+    <div className="bullet-field-display" onClick={startEdit}>
+      {lines.length > 0 ? (
+        <ul className="bullet-field-list">
+          {lines.map((line, i) => (
+            <li key={i}>{line}</li>
+          ))}
+        </ul>
+      ) : (
+        <span className="pencil-field-text pencil-field-text--empty">{placeholder}</span>
+      )}
+    </div>
   );
 }
 
@@ -80,18 +97,31 @@ function PencilEditField({ value, onSave, placeholder, multiline }) {
   );
 }
 
-function OutputRow({ output, stepKey, onUpdate }) {
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(output.link);
+function OutputRow({ output, stepKey, onUpdate, onGoToTemplates }) {
+  const [editingLink, setEditingLink] = useState(false);
+  const [draftLink, setDraftLink] = useState(output.link);
+  const [editingLabel, setEditingLabel] = useState(false);
+  const [draftLabel, setDraftLabel] = useState(output.label);
 
-  function startEdit() {
-    setDraft(output.link);
-    setEditing(true);
+  function startEditLink() {
+    setDraftLink(output.link);
+    setEditingLink(true);
   }
 
   function saveLink() {
-    onUpdate(stepKey, output.index, { link: draft.trim() });
-    setEditing(false);
+    onUpdate(stepKey, output.index, { link: draftLink.trim() });
+    setEditingLink(false);
+  }
+
+  function startEditLabel() {
+    setDraftLabel(output.label);
+    setEditingLabel(true);
+  }
+
+  function saveLabel() {
+    const trimmed = draftLabel.trim();
+    if (trimmed && trimmed !== output.label) onUpdate(stepKey, output.index, { label: trimmed });
+    setEditingLabel(false);
   }
 
   return (
@@ -101,16 +131,35 @@ function OutputRow({ output, stepKey, onUpdate }) {
         checked={output.done}
         onChange={(e) => onUpdate(stepKey, output.index, { done: e.target.checked })}
       />
-      <span className="output-label">{output.label}</span>
 
-      {editing ? (
+      {editingLabel ? (
+        <input
+          type="text"
+          autoFocus
+          className="output-label-input"
+          value={draftLabel}
+          onChange={(e) => setDraftLabel(e.target.value)}
+          onBlur={saveLabel}
+          onKeyDown={(e) => e.key === "Enter" && saveLabel()}
+          onClick={(e) => e.stopPropagation()}
+        />
+      ) : (
+        <span className="output-label" onClick={(e) => { e.stopPropagation(); startEditLabel(); }}>
+          {output.label}
+        </span>
+      )}
+      <button className="output-edit-btn" onClick={(e) => { e.stopPropagation(); startEditLabel(); }} title="Editar nombre del entregable">
+        <PencilIcon size={12} color="currentColor" />
+      </button>
+
+      {editingLink ? (
         <div className="output-edit" onClick={(e) => e.stopPropagation()}>
           <input
             type="text"
             autoFocus
-            value={draft}
+            value={draftLink}
             placeholder="Pega aquí el enlace externo (Drive, Notion, Confluence...)"
-            onChange={(e) => setDraft(e.target.value)}
+            onChange={(e) => setDraftLink(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && saveLink()}
           />
           <button className="output-save-btn" onClick={saveLink}>
@@ -125,23 +174,38 @@ function OutputRow({ output, stepKey, onUpdate }) {
               Abrir
             </a>
           ) : (
-            <button className="output-upload-btn output-upload-btn--empty" onClick={startEdit}>
+            <button className="output-upload-btn output-upload-btn--empty" onClick={startEditLink}>
               Añadir enlace
             </button>
           )}
-          <button className="output-edit-btn" onClick={startEdit} title="Editar enlace">
+          <button className="output-edit-btn" onClick={startEditLink} title="Editar enlace">
             <PencilIcon size={12} color="currentColor" />
           </button>
+          {onGoToTemplates && (
+            <button
+              className="output-upload-btn output-upload-btn--template"
+              onClick={onGoToTemplates}
+              title="¿Necesitas plantilla para este entregable?"
+            >
+              Plantillas
+            </button>
+          )}
         </div>
       )}
     </div>
   );
 }
 
-export default function RoadmapStep({ step, teamMembers, onToggle, onUpdate, onUpdateOutput }) {
+export default function RoadmapStep({ step, teamMembers, onToggle, onUpdate, onUpdateOutput, onGoToKnowledge, onGoToTemplates, onGoToRiesgos }) {
   const activeDef = step.status ? ROADMAP_STEP_STATUS_DEFS[step.status] : null;
   const dotBorder = step.isDone ? "var(--status-done-dot)" : activeDef ? activeDef.dot : "#DADADA";
   const dotFill = step.isDone ? "var(--status-done-dot)" : activeDef ? activeDef.dot : "var(--white)";
+  const [showRiskPrompt, setShowRiskPrompt] = useState(false);
+
+  function handleStatusClick(id) {
+    onUpdate(step.key, { status: id });
+    setShowRiskPrompt(id === "yellow" || id === "red");
+  }
 
   return (
     <div className="roadmap-step">
@@ -179,18 +243,34 @@ export default function RoadmapStep({ step, teamMembers, onToggle, onUpdate, onU
             {activeDef.label.toUpperCase()}
           </span>
         )}
-        <ChevronDownIcon
-          size={16}
-          color="#B7B7B7"
-          style={{ flexShrink: 0, marginTop: 2, transform: step.expanded ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.15s ease" }}
-        />
+        <span className="roadmap-step-expand-btn" title={step.expanded ? "Contraer" : "Expandir"}>
+          <ChevronDownIcon size={13} color="#FFFFFF" style={{ transform: step.expanded ? "rotate(180deg)" : "rotate(0deg)" }} />
+        </span>
       </div>
 
       {step.expanded && (
         <div className="roadmap-step-editor">
+          {step.outputs.length > 0 && (
+            <div className="editor-field editor-field--full">
+              <label>Entregables recomendados</label>
+              <div className="output-list">
+                {step.outputs.map((output) => (
+                  <OutputRow key={output.index} output={output} stepKey={step.key} onUpdate={onUpdateOutput} onGoToTemplates={onGoToTemplates} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="editor-divider" />
+
           <div className="editor-field editor-field--full">
-            <label>Título del work package</label>
+            <label>Título de la tarea</label>
             <PencilEditField value={step.title} onSave={(v) => onUpdate(step.key, { title: v })} placeholder="Título" />
+            {onGoToKnowledge && (
+              <span className="roadmap-step-kb-link" onClick={onGoToKnowledge}>
+                ¿Necesitas más información sobre este concepto? Consulta la base de conocimiento
+              </span>
+            )}
           </div>
 
           <div className="editor-field editor-field--full">
@@ -198,15 +278,17 @@ export default function RoadmapStep({ step, teamMembers, onToggle, onUpdate, onU
             <PencilEditField
               value={step.detail}
               onSave={(v) => onUpdate(step.key, { detail: v })}
-              placeholder="Descripción breve de este work package"
+              placeholder="Descripción breve de esta tarea"
               multiline
             />
           </div>
 
           <div className="editor-field editor-field--full">
-            <label>ID del work package</label>
+            <label>ID de la tarea</label>
             <div className="readonly-field">{step.workPackageId}</div>
           </div>
+
+          <div className="editor-divider" />
 
           <div className="editor-field editor-field--full">
             <label>Estado *</label>
@@ -221,7 +303,7 @@ export default function RoadmapStep({ step, teamMembers, onToggle, onUpdate, onU
                       background: active ? def.bg : "#FFFFFF",
                       borderColor: active ? def.dot : "var(--border-light)",
                     }}
-                    onClick={() => onUpdate(step.key, { status: id })}
+                    onClick={() => handleStatusClick(id)}
                   >
                     <span className="status-option-dot" style={{ background: def.dot }} />
                     {def.label}
@@ -229,6 +311,19 @@ export default function RoadmapStep({ step, teamMembers, onToggle, onUpdate, onU
                 );
               })}
             </div>
+            {showRiskPrompt && onGoToRiesgos && (
+              <div className="roadmap-step-risk-prompt">
+                <span>¿Quieres actualizar el registro de riesgos?</span>
+                <div className="roadmap-step-risk-prompt-actions">
+                  <button className="roadmap-step-risk-prompt-btn" onClick={onGoToRiesgos}>
+                    Sí, ir al registro
+                  </button>
+                  <span className="cancel-link" onClick={() => setShowRiskPrompt(false)}>
+                    Ahora no
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="editor-field">
@@ -268,8 +363,7 @@ export default function RoadmapStep({ step, teamMembers, onToggle, onUpdate, onU
             <EditableField
               value={step.acceptanceCriteria}
               onSave={(v) => onUpdate(step.key, { acceptanceCriteria: v })}
-              placeholder="Criterios que se usarán para aceptar este work package"
-              multiline
+              placeholder="Criterios que se usarán para aceptar esta tarea"
             />
           </div>
 
@@ -279,20 +373,8 @@ export default function RoadmapStep({ step, teamMembers, onToggle, onUpdate, onU
               value={step.technicalInfo}
               onSave={(v) => onUpdate(step.key, { technicalInfo: v })}
               placeholder="Información técnica o referencia a documentación técnica"
-              multiline
             />
           </div>
-
-          {step.outputs.length > 0 && (
-            <div className="editor-field editor-field--full">
-              <label>Entregables recomendados</label>
-              <div className="output-list">
-                {step.outputs.map((output) => (
-                  <OutputRow key={output.index} output={output} stepKey={step.key} onUpdate={onUpdateOutput} />
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       )}
     </div>

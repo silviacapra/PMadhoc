@@ -9,11 +9,20 @@ import "./FichaProyecto.css";
 
 const TABS = [
   { id: "roadmap", label: "Fases del proyecto" },
-  { id: "gantt", label: "Roadmap" },
+  { id: "gantt", label: "Hoja de ruta" },
   { id: "documentacion", label: "Documentación" },
 ];
 
-export default function FichaProyecto({ ficha }) {
+const PHASE_GROUP_LABELS = {
+  preproyecto: "Pre-proyecto",
+  iniciar: "Iniciados",
+  planificar: "Planificados",
+  ejecutar: "Ejecutados",
+  controlar: "Controlados",
+  cerrar: "Cerrados",
+};
+
+export default function FichaProyecto({ ficha, nav }) {
   const { projects, projectId, setProjectId, closeFicha, tab, setTab, roadmap, documentacion, gantt, openRiesgos, openLecciones } = ficha;
 
   if (!projectId) {
@@ -44,7 +53,7 @@ export default function FichaProyecto({ ficha }) {
 
         {phaseGroups.map((group) => (
           <div key={group.phaseId} className="ficha-phase-group">
-            <h3 className="ficha-phase-group-label">{group.label}</h3>
+            <h3 className="ficha-phase-group-label">{PHASE_GROUP_LABELS[group.phaseId] || group.label}</h3>
             <div className="ficha-picker-grid">
               {group.projects.map((p) => (
                 <div key={p.id} className="ficha-picker-card" onClick={() => setProjectId(p.id)}>
@@ -89,7 +98,14 @@ export default function FichaProyecto({ ficha }) {
         </span>
       </div>
 
-      {tab === "roadmap" && <Roadmap roadmap={roadmap} />}
+      {tab === "roadmap" && (
+        <Roadmap
+          roadmap={roadmap}
+          onGoToKnowledge={() => nav?.setView("knowledge")}
+          onGoToTemplates={() => nav?.setView("templates")}
+          onGoToRiesgos={() => openRiesgos(projectId)}
+        />
+      )}
       {tab === "gantt" && <GanttChart phases={gantt.phases} />}
       {tab === "documentacion" && <Documentacion documentacion={documentacion} />}
     </div>

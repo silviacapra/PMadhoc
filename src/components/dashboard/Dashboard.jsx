@@ -81,7 +81,7 @@ export default function Dashboard({ dashboard, permissions, session, nav, status
                   <button className="project-card-icon-btn" title="Editar proyecto" onClick={() => setEditingProject(proj)}>
                     <PencilIcon size={14} color="currentColor" />
                   </button>
-                  <button className="project-card-icon-btn" title="Ir al informe de estado del proyecto" onClick={() => goToStatusReport(proj)}>
+                  <button className="project-card-icon-btn" title="Ir a los informes de proyecto" onClick={() => goToStatusReport(proj)}>
                     <StatusReportIcon size={15} color="currentColor" />
                   </button>
                   <button

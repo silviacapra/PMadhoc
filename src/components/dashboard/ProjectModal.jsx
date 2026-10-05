@@ -1,19 +1,11 @@
 import { useState, useEffect } from "react";
 import "./NewProjectModal.css";
 
-const METHODOLOGY_OPTIONS = ["cascada", "agil", "hibrida"];
-const ENFOQUE_LABELS = {
-  cascada: "Enfoque tradicional",
-  agil: "Enfoque adaptativo (ágil/scrum)",
-  hibrida: "Enfoque híbrido",
-};
-
-const BLANK = { name: "", methodology: "", sponsor: "", pm: "", department: "", contributesTo: [], deadline: "", budget: "" };
+const BLANK = { name: "", sponsor: "", pm: "", department: "", contributesTo: [], deadline: "", budget: "" };
 
 export default function ProjectModal({ open, onClose, sponsors, pms, departments, okrCatalog, onCreate, onSave, project }) {
   const isEdit = !!project;
   const [name, setName] = useState(BLANK.name);
-  const [methodology, setMethodology] = useState(BLANK.methodology);
   const [sponsor, setSponsor] = useState("");
   const [pm, setPm] = useState("");
   const [department, setDepartment] = useState(departments[0] || "");
@@ -27,7 +19,6 @@ export default function ProjectModal({ open, onClose, sponsors, pms, departments
     setError("");
     if (project) {
       setName(project.name || "");
-      setMethodology(project.methodology || "");
       setSponsor(project.sponsor || "");
       setPm(project.pm || "");
       setDepartment(project.department || departments[0] || "");
@@ -36,7 +27,6 @@ export default function ProjectModal({ open, onClose, sponsors, pms, departments
       setBudget(project.budgetTotal ? String(project.budgetTotal) : "");
     } else {
       setName(BLANK.name);
-      setMethodology(BLANK.methodology);
       setSponsor("");
       setPm("");
       setDepartment(departments[0] || "");
@@ -56,7 +46,6 @@ export default function ProjectModal({ open, onClose, sponsors, pms, departments
   function handleSubmit() {
     const missing = [];
     if (!name.trim()) missing.push("nombre del proyecto");
-    if (!methodology) missing.push("enfoque inicial");
     if (!pm) missing.push("gestor del proyecto");
     if (!sponsor) missing.push("patrocinador");
     if (!deadline) missing.push("fecha límite prevista");
@@ -71,7 +60,7 @@ export default function ProjectModal({ open, onClose, sponsors, pms, departments
 
     const payload = {
       name: name.trim(),
-      methodology,
+      methodology: isEdit ? project.methodology || "hibrida" : "hibrida",
       sponsor,
       pm,
       department,
@@ -94,21 +83,6 @@ export default function ProjectModal({ open, onClose, sponsors, pms, departments
         <div className="modal-field">
           <label>Nombre del proyecto *</label>
           <input type="text" placeholder="Ej: Implementación de ERP" value={name} onChange={(e) => setName(e.target.value)} />
-        </div>
-
-        <div className="modal-field">
-          <label>Enfoque inicial *</label>
-          <div className="methodology-options">
-            {METHODOLOGY_OPTIONS.map((m) => (
-              <span
-                key={m}
-                className={`methodology-option ${methodology === m ? "methodology-option--active" : ""}`}
-                onClick={() => setMethodology(m)}
-              >
-                {ENFOQUE_LABELS[m]}
-              </span>
-            ))}
-          </div>
         </div>
 
         <div className="modal-field-row">

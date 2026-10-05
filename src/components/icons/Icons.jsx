@@ -259,6 +259,16 @@ export function DownloadIcon(props) {
   );
 }
 
+export function HistoryIcon(props) {
+  return (
+    <Svg {...props}>
+      <path d="M3 12a9 9 0 1 0 3-6.7" />
+      <path d="M3 4v4h4" />
+      <path d="M12 8v4l3 2" />
+    </Svg>
+  );
+}
+
 export function SendIcon(props) {
   return (
     <Svg {...props}>
@@ -277,6 +287,7 @@ export const NAV_ICON_MAP = {
   riesgos: WarningIcon,
   documentacion: DocumentIcon,
   lecciones: LightbulbIcon,
+  cambios: HistoryIcon,
   statusreport: StatusReportIcon,
   stakeholders: StakeholdersIcon,
   knowledge: GraduationCapIcon,

@@ -106,6 +106,24 @@
   justify-content: center;
 }
 
+.roadmap-step-expand-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: var(--black);
+  flex-shrink: 0;
+  margin-top: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.roadmap-step-expand-btn svg {
+  transition: transform 0.15s ease;
+}
+
 .roadmap-step-body {
   flex: 1;
 }
@@ -155,6 +173,13 @@
 
 .editor-field--full {
   grid-column: 1 / -1;
+}
+
+.editor-divider {
+  grid-column: 1 / -1;
+  height: 1px;
+  background: var(--text-faint);
+  margin: 2px 0;
 }
 
 .roadmap-step-editor label {
@@ -219,6 +244,38 @@
   border-radius: 4px;
 }
 
+.roadmap-step-risk-prompt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: var(--status-critical-bg);
+  color: var(--status-critical-color);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.roadmap-step-risk-prompt-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.roadmap-step-risk-prompt-btn {
+  background: var(--status-critical-color);
+  color: var(--white);
+  border: none;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 .roadmap-step-dates {
   display: flex;
   gap: 12px;
@@ -251,6 +308,26 @@
   font-size: 13px;
   font-weight: 400;
   color: #000000;
+  cursor: pointer;
+}
+
+.output-label-input {
+  min-width: 160px;
+  flex: 1;
+  width: auto;
+}
+
+.roadmap-step-kb-link {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #4caf88;
+  cursor: pointer;
+}
+
+.roadmap-step-kb-link:hover {
+  text-decoration: underline;
 }
 
 .readonly-field {
@@ -287,6 +364,31 @@
   color: var(--text-faint);
 }
 
+.bullet-field-display {
+  cursor: pointer;
+  min-height: 36px;
+  padding: 8px 10px;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  background: var(--white);
+}
+
+.bullet-field-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+  color: #000000;
+  line-height: 1.6;
+}
+
+.bullet-field-list li {
+  margin-bottom: 2px;
+}
+
+.bullet-field-list li:last-child {
+  margin-bottom: 0;
+}
+
 .output-actions {
   display: flex;
   align-items: center;
@@ -320,6 +422,15 @@
 .output-upload-btn--set {
   background: var(--black);
   color: var(--white);
+}
+
+.output-upload-btn--template {
+  background: #4caf88;
+  color: var(--white);
+}
+
+.output-upload-btn--template:hover {
+  background: #3d9c74;
 }
 
 .output-edit-btn {

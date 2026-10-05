@@ -90,7 +90,7 @@ export const STATUS_REPORTS = {
     nextSteps: [
       "Cerrar el WBS y el cronograma definitivo.",
       "Confirmar la incorporación del arquitecto de integración.",
-      "Revisar con el patrocinador los 2 requisitos nuevos antes del gate review.",
+      "Revisar con el patrocinador los 2 requisitos nuevos antes del punto de control.",
     ],
     risks: [
       { desc: "Ampliación de alcance no presupuestada", impact: "alto", owner: "Elena Ruiz", status: "Escalado" },

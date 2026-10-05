@@ -44,7 +44,7 @@ export default function Chatbot({ chatbot }) {
             value={chatInput}
             onChange={(e) => setChatInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Escribe tu pregunta, por ejemplo: ¿qué tool uso para un análisis de riesgo?"
+            placeholder="Escribe tu pregunta, por ejemplo: ¿qué herramienta uso para un análisis de riesgo?"
             disabled={loading}
           />
           <button onClick={sendMessage} className="chatbot-send-btn" disabled={loading}>

@@ -32,7 +32,7 @@ export const INITIAL_OKR_CATALOG = [
     keyResults: [
       "Reducir el tiempo medio de cierre de proyectos en un 15%",
       "Implementar un repositorio único de plantillas para todo el equipo",
-      "Estandarizar el proceso de gate review en el 100% de los proyectos",
+      "Estandarizar el proceso de punto de control en el 100% de los proyectos",
     ],
   },
 ];

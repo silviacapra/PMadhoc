@@ -15,12 +15,29 @@ const PHASE_ID_CODE = {
   cerrar: "CI",
 };
 
-function buildWorkPackageId(phaseId, idx) {
-  const code = PHASE_ID_CODE[phaseId] || phaseId.slice(0, 2).toUpperCase();
-  return `WP-${code}-${String(idx + 1).padStart(2, "0")}`;
+const SIGLA_STOPWORDS = new Set(["de", "del", "la", "el", "los", "las", "y", "en", "para", "con", "a", "al", "un", "una"]);
+
+function projectSigla(projectName) {
+  if (!projectName) return "PRY";
+  const words = projectName
+    .trim()
+    .split(/\s+/)
+    .filter((w) => w.length > 0 && !SIGLA_STOPWORDS.has(w.toLowerCase()));
+  if (words.length === 0) return "PRY";
+  if (words.length === 1) return words[0].slice(0, 3).toUpperCase();
+  return words
+    .slice(0, 3)
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase();
 }
 
-// Peor estado entre los work packages de una fase: "red" > "yellow" > null (todo sano).
+function buildWorkPackageId(phaseId, idx, projectName) {
+  const code = PHASE_ID_CODE[phaseId] || phaseId.slice(0, 2).toUpperCase();
+  return `${projectSigla(projectName)}-${code}-${String(idx + 1).padStart(2, "0")}`;
+}
+
+// Peor estado entre las tareas de una fase: "red" > "yellow" > null (todo sano).
 // Se usa para pintar el circulito de la fase en el timeline con el color real de cómo se cerró.
 export function getPhaseHealth(phaseId, taskAssignments, projectId) {
   const useDemoDefaults = DEMO_SEED_PROJECT_IDS.has(projectId);
@@ -35,20 +52,6 @@ export function getPhaseHealth(phaseId, taskAssignments, projectId) {
     else if (status === "yellow" && worst !== "red") worst = "yellow";
   });
   return worst;
-}
-
-// Todos los work packages de la fase deben estar en un estado "cerrado" (Completado, Atención o
-// Crítico) para poder avanzar. "Sin empezar" o "En curso" bloquean el avance.
-export function arePhaseWorkPackagesReady(phaseId, taskAssignments, projectId) {
-  const useDemoDefaults = DEMO_SEED_PROJECT_IDS.has(projectId);
-  const steps = ROADMAP_CONTENT[phaseId]?.steps || [];
-  return steps.every((step, idx) => {
-    const key = `${phaseId}__${idx}`;
-    const defaults = (useDemoDefaults && DEFAULT_TASK_STATUS[key]) || {};
-    const meta = { ...defaults, ...(taskAssignments[key] || {}) };
-    const status = meta.status || (useDemoDefaults ? null : "notStarted");
-    return status === "done" || status === "yellow" || status === "red";
-  });
 }
 
 export function buildPhases(selectedPhase, currentPhase, taskAssignments = {}, projectId) {
@@ -70,7 +73,7 @@ export function buildPhases(selectedPhase, currentPhase, taskAssignments = {}, p
   });
 }
 
-export function buildRoadmapSteps(selectedPhase, taskAssignments, expandedStepKey, projectId) {
+export function buildRoadmapSteps(selectedPhase, taskAssignments, expandedStepKey, projectId, projectName) {
   const useDemoDefaults = DEMO_SEED_PROJECT_IDS.has(projectId);
   return ROADMAP_CONTENT[selectedPhase].steps.map((step, idx) => {
     const key = `${selectedPhase}__${idx}`;
@@ -81,7 +84,7 @@ export function buildRoadmapSteps(selectedPhase, taskAssignments, expandedStepKe
     const outputsMeta = meta.outputs || {};
     const outputs = (step.outputs || []).map((label, outIdx) => ({
       index: outIdx,
-      label,
+      label: outputsMeta[outIdx]?.label || label,
       done: !!outputsMeta[outIdx]?.done,
       link: outputsMeta[outIdx]?.link || "",
     }));
@@ -89,7 +92,7 @@ export function buildRoadmapSteps(selectedPhase, taskAssignments, expandedStepKe
     const dateLineParts = [];
     if (meta.assignee) dateLineParts.push(meta.assignee);
     if (meta.startDate || meta.endDate) dateLineParts.push(`${meta.startDate || "¿?"} → ${meta.endDate || "¿?"}`);
-    const doneOutputs = outputs.filter((o) => o.done).length;
+    const doneOutputs = outputs.filter((o) => o.done && o.link).length;
     const entregablesLine = outputs.length > 0 ? `${doneOutputs}/${outputs.length} entregables` : "";
 
     return {
@@ -108,7 +111,7 @@ export function buildRoadmapSteps(selectedPhase, taskAssignments, expandedStepKe
       startDate: meta.startDate || "",
       endDate: meta.endDate || "",
       outputs,
-      workPackageId: buildWorkPackageId(selectedPhase, idx),
+      workPackageId: buildWorkPackageId(selectedPhase, idx, projectName),
       acceptanceCriteria: meta.acceptanceCriteria || "",
       technicalInfo: meta.technicalInfo || "",
     };
