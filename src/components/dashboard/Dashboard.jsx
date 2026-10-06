@@ -2,8 +2,9 @@ import { useState } from "react";
 import { PlusIcon, StatusReportIcon, TrashIcon, PencilIcon, ArrowRightIcon, TriDotIcon } from "../icons/Icons";
 import StatusBadge from "../shared/StatusBadge";
 import ProjectModal from "./ProjectModal";
+import NewProjectOnboarding from "./NewProjectOnboarding";
 import ConfirmDeleteModal from "../shared/ConfirmDeleteModal";
-import Confetti from "../shared/Confetti";
+import ConfirmModifyModal from "../shared/ConfirmModifyModal";
 import { PROJECT_CARD_TINT } from "../../data/projects";
 import { TEAM_MEMBERS, DEPARTMENTS } from "../../data/team";
 import "./Dashboard.css";
@@ -14,7 +15,7 @@ const PMS = TEAM_MEMBERS.filter((t) => t.roleLabel === "Gestor de proyecto");
 export default function Dashboard({ dashboard, permissions, session, nav, statusReport }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
-  const [confettiFire, setConfettiFire] = useState(0);
+  const [modifyTarget, setModifyTarget] = useState(null);
 
   function formatDate(dateStr) {
     if (!dateStr) return "";
@@ -78,7 +79,7 @@ export default function Dashboard({ dashboard, permissions, session, nav, status
               <div className="project-card-top">
                 <h2 className="project-card-name">{proj.name}</h2>
                 <div className="project-card-icons">
-                  <button className="project-card-icon-btn" title="Editar proyecto" onClick={() => setEditingProject(proj)}>
+                  <button className="project-card-icon-btn" title="Editar proyecto" onClick={() => setModifyTarget(proj)}>
                     <PencilIcon size={14} color="currentColor" />
                   </button>
                   <button className="project-card-icon-btn" title="Ir a los informes de proyecto" onClick={() => goToStatusReport(proj)}>
@@ -143,20 +144,26 @@ export default function Dashboard({ dashboard, permissions, session, nav, status
         ))}
       </div>
 
-      <ProjectModal
+      <NewProjectOnboarding
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         sponsors={SPONSORS}
         pms={PMS}
         departments={DEPARTMENTS}
         okrCatalog={dashboard.okrCatalog}
-        onCreate={(project) => {
-          dashboard.addProject(project);
-          setModalOpen(false);
-          setConfettiFire((n) => n + 1);
+        onCreate={(project) => dashboard.addProject(project)}
+      />
+
+      <ConfirmModifyModal
+        item={modifyTarget}
+        itemLabel="proyecto"
+        itemName={modifyTarget?.name}
+        onClose={() => setModifyTarget(null)}
+        onConfirm={(proj) => {
+          setEditingProject(proj);
+          setModifyTarget(null);
         }}
       />
-      <Confetti fire={confettiFire} />
 
       <ProjectModal
         open={!!editingProject}

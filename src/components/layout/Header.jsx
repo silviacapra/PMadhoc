@@ -1,8 +1,7 @@
 import { useState } from "react";
 import Logo from "../shared/Logo";
-import Confetti from "../shared/Confetti";
 import { LogoutIcon, PlusIcon } from "../icons/Icons";
-import ProjectModal from "../dashboard/ProjectModal";
+import NewProjectOnboarding from "../dashboard/NewProjectOnboarding";
 import { TEAM_MEMBERS, DEPARTMENTS } from "../../data/team";
 import "./Header.css";
 
@@ -11,7 +10,6 @@ const PMS = TEAM_MEMBERS.filter((t) => t.roleLabel === "Gestor de proyecto");
 
 export default function Header({ session, nav, dashboard, permissions }) {
   const [modalOpen, setModalOpen] = useState(false);
-  const [confettiFire, setConfettiFire] = useState(0);
 
   return (
     <header className="app-header">
@@ -38,22 +36,19 @@ export default function Header({ session, nav, dashboard, permissions }) {
       </div>
 
       {dashboard && (
-        <ProjectModal
+        <NewProjectOnboarding
           open={modalOpen}
-          onClose={() => setModalOpen(false)}
+          onClose={() => {
+            setModalOpen(false);
+            nav.setView("dashboard");
+          }}
           sponsors={SPONSORS}
           pms={PMS}
           departments={DEPARTMENTS}
           okrCatalog={dashboard.okrCatalog}
-          onCreate={(project) => {
-            dashboard.addProject(project);
-            setModalOpen(false);
-            nav.setView("dashboard");
-            setConfettiFire((n) => n + 1);
-          }}
+          onCreate={(project) => dashboard.addProject(project)}
         />
       )}
-      <Confetti fire={confettiFire} />
     </header>
   );
 }

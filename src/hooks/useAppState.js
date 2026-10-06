@@ -568,11 +568,11 @@ export function useAppState() {
     return Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
   }
 
-  async function addProject({ name, sponsor, pm, department, contributesTo, deadline, hitos, budget }) {
+  async function addProject({ name, sponsor, pm, department, contributesTo, deadline, hitos, budget, phase }) {
     const id = `${slugify(name)}-${Date.now()}`;
     await setDoc(doc(db, "projects", id), {
       name,
-      phase: "Pre-proyecto",
+      phase: phase || "Pre-proyecto",
       progress: 0,
       daysLeft: daysLeftFromDeadline(deadline, 90),
       risks: 0,
@@ -580,7 +580,7 @@ export function useAppState() {
       sponsor,
       pm,
       department,
-      contributesTo,
+      contributesTo: contributesTo || [],
       deadline: deadline || "",
       hitos: hitos || "",
       budgetTotal: Number(budget) || 0,
