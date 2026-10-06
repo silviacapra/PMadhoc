@@ -174,6 +174,7 @@ export default function NewProjectOnboarding({ open, onClose, sponsors, pms, dep
       budget: projectInfo.presupuesto,
       contributesTo: selectedOkrIds,
       phase: activeConfig.faseInicio,
+      projectType: RESULTS[activeConfig.tipo]?.title || "",
     };
     onCreate(payload);
     setCreatedProject(payload);

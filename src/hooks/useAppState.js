@@ -105,6 +105,7 @@ export function useAppState() {
   const [companyInfo, setCompanyInfo] = useState(INITIAL_COMPANY);
   const [okrCatalog, setOkrCatalog] = useState([]);
   const [projects, setProjects] = useState([]);
+  const [globalReportsList, setGlobalReportsList] = useState([]);
   const [templatesList, setTemplatesList] = useState([]);
 
   // Ficha de proyecto: qué proyecto y qué pestaña se está viendo ahora mismo.
@@ -293,6 +294,7 @@ export function useAppState() {
       onSnapshot(collection(db, "templates"), (snap) => setTemplatesList(snap.docs.map((d) => ({ id: d.id, ...d.data() })))),
       onSnapshot(collection(db, "stakeholders"), (snap) => setStakeholders(snap.docs.map((d) => ({ id: d.id, ...d.data() })))),
       onSnapshot(collection(db, "knowledgeArticles"), (snap) => setCustomArticles(snap.docs.map((d) => ({ id: d.id, ...d.data() })))),
+      onSnapshot(collection(db, "globalReports"), (snap) => setGlobalReportsList(snap.docs.map((d) => ({ id: d.id, ...d.data() })))),
       onSnapshot(doc(db, "users", user.uid), (snap) => {
         if (snap.exists()) setProfile(snap.data());
       }),
@@ -568,11 +570,12 @@ export function useAppState() {
     return Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
   }
 
-  async function addProject({ name, sponsor, pm, department, contributesTo, deadline, hitos, budget, phase }) {
+  async function addProject({ name, sponsor, pm, department, contributesTo, deadline, hitos, budget, phase, projectType }) {
     const id = `${slugify(name)}-${Date.now()}`;
     await setDoc(doc(db, "projects", id), {
       name,
       phase: phase || "Pre-proyecto",
+      projectType: projectType || "",
       progress: 0,
       daysLeft: daysLeftFromDeadline(deadline, 90),
       risks: 0,
@@ -605,6 +608,48 @@ export function useAppState() {
       lastModifiedBy: profile?.name || "Usuario",
       lastModifiedAt: new Date().toISOString(),
     });
+  }
+
+  // Para el informe global: lee de golpe el roadmap y el informe de estado de cada
+  // proyecto seleccionado (no se mantienen en memoria salvo para el proyecto activo
+  // en Informes de proyecto), para contar actividades críticas/en riesgo y sacar los
+  // semáforos de cronograma y presupuesto reales de cada uno.
+  async function fetchGlobalReportData(ids) {
+    const entries = await Promise.all(
+      ids.map(async (id) => {
+        const [roadmapSnap, reportSnap] = await Promise.all([
+          getDoc(doc(db, "projects", id, "roadmap", "main")),
+          getDoc(doc(db, "projects", id, "statusReport", "main")),
+        ]);
+        const taskAssignments = roadmapSnap.exists() ? roadmapSnap.data().taskAssignments || {} : {};
+        const statuses = Object.values(taskAssignments).map((t) => t.status);
+        const categories = reportSnap.exists()
+          ? reportSnap.data().categories || DEFAULT_REPORT_CATEGORIES
+          : STATUS_REPORTS[id]?.categories || DEFAULT_REPORT_CATEGORIES;
+        return [
+          id,
+          {
+            criticalCount: statuses.filter((s) => s === "red").length,
+            atRiskCount: statuses.filter((s) => s === "yellow").length,
+            categories,
+          },
+        ];
+      })
+    );
+    return Object.fromEntries(entries);
+  }
+
+  async function addGlobalReport(title, projectIds) {
+    await addDoc(collection(db, "globalReports"), {
+      title,
+      projectIds,
+      createdAt: new Date().toISOString(),
+      createdBy: profile?.name || "Usuario",
+    });
+  }
+
+  async function deleteGlobalReport(id) {
+    await deleteDoc(doc(db, "globalReports", id));
   }
 
   function todayStr() {
@@ -1001,6 +1046,10 @@ export function useAppState() {
       updateProjectField: updateStatusProjectField,
       goToRiesgos: () => openRiesgos(statusSelectedProject?.id),
       goToLecciones: () => openLecciones(statusSelectedProject?.id),
+      fetchGlobalReportData,
+      savedGlobalReports: globalReportsList,
+      addGlobalReport,
+      deleteGlobalReport,
     },
     riesgos: {
       projects,

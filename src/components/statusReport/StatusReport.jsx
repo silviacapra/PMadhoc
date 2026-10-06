@@ -1,9 +1,155 @@
-import { useState } from "react";
-import { CheckIcon, ArrowRightIcon, WarningIcon, DownloadIcon, PencilIcon } from "../icons/Icons";
+import { useEffect, useState } from "react";
+import { CheckIcon, ArrowRightIcon, WarningIcon, DownloadIcon, PencilIcon, StatusReportIcon, TrashIcon } from "../icons/Icons";
 import StatusBadge from "../shared/StatusBadge";
+import ConfirmDeleteModal from "../shared/ConfirmDeleteModal";
 import { PROJECT_STATUS_STYLES, ROADMAP_STEP_STATUS_DEFS } from "../../data/statusStyles";
 import "../registro/Registro.css";
+import "../dashboard/NewProjectModal.css";
 import "./StatusReport.css";
+
+const PHASE_LABELS_ORDERED = ["Pre-proyecto", "Iniciar", "Planificar", "Ejecutar", "Controlar", "Cerrar"];
+// Degradado de un solo tono (el verde-teal de marca, --accent) de claro a oscuro: como las fases
+// van en orden, cada paso siguiente es un poco más oscuro. Validado (claro→oscuro, contraste y
+// separación entre pasos) con el validador de paletas del equipo de diseño.
+const PHASE_DONUT_COLORS = ["#70c49c", "#4caf88", "#2e9a70", "#1f8259", "#176a48", "#0f5238"];
+const SEMAPHORE_LABELS = { onTrack: "OK", atRisk: "Riesgo", critical: "Crítico" };
+
+// El cronograma y el presupuesto usan, si existe, la valoración manual del informe de
+// cada proyecto (categorías Cronograma/Presupuesto); si ese proyecto aún no tiene
+// informe, se calcula un semáforo razonable a partir de sus propios datos.
+function scheduleFallback(proj) {
+  if ((proj.daysLeft ?? 0) < 0) return "critical";
+  if ((proj.daysLeft ?? 0) <= 14) return "atRisk";
+  return "onTrack";
+}
+
+function budgetFallback(pct) {
+  if (pct > 100) return "critical";
+  if (pct > 90) return "atRisk";
+  return "onTrack";
+}
+
+// El coste se calcula siempre así, comparando cuánto presupuesto se ha gastado frente
+// a cuánto ha avanzado el proyecto: gastar mucho más deprisa de lo que se avanza es la
+// señal de alerta, independientemente de lo que diga el informe manual.
+function costStatus(budgetPct, progress) {
+  const diff = budgetPct - (progress || 0);
+  if (diff > 20) return "critical";
+  if (diff > 10) return "atRisk";
+  return "onTrack";
+}
+
+function Semaphore({ status }) {
+  if (!status) {
+    return <span className="semaphore-cell semaphore-loading">…</span>;
+  }
+  const def = PROJECT_STATUS_STYLES[status] || PROJECT_STATUS_STYLES.onTrack;
+  return (
+    <span className="semaphore-cell">
+      <span className="semaphore-dot" style={{ background: def.dot }} />
+      <span className="semaphore-text" style={{ color: def.color }}>
+        {SEMAPHORE_LABELS[status] || status}
+      </span>
+    </span>
+  );
+}
+
+function GlanceStat({ icon, value, label }) {
+  return (
+    <div className="glance-stat-card">
+      <div className="glance-stat-top">
+        <span className="glance-stat-label">{label}</span>
+        <span className="glance-stat-icon">{icon}</span>
+      </div>
+      <span className="glance-stat-value">{value}</span>
+    </div>
+  );
+}
+
+function PhaseDonut({ segments, centerValue, centerLabel }) {
+  const r = 42;
+  const circumference = 2 * Math.PI * r;
+  const gap = segments.length > 1 ? 1.5 : 0;
+  let cumulativePct = 0;
+  return (
+    <svg viewBox="0 0 100 100" width="140" height="140">
+      <circle cx="50" cy="50" r={r} fill="none" stroke="var(--gray-light)" strokeWidth="14" />
+      {segments.map((seg) => {
+        const segLen = Math.max((seg.pct / 100) * circumference - gap, 0);
+        const offset = circumference - (cumulativePct / 100) * circumference;
+        cumulativePct += seg.pct;
+        return (
+          <circle
+            key={seg.label}
+            cx="50"
+            cy="50"
+            r={r}
+            fill="none"
+            stroke={seg.color}
+            strokeWidth="14"
+            strokeDasharray={`${segLen} ${circumference}`}
+            strokeDashoffset={offset}
+            strokeLinecap="round"
+            transform="rotate(-90 50 50)"
+          />
+        );
+      })}
+      <text x="50" y="47" textAnchor="middle" fontSize="20" fontWeight="700" fill="var(--gray-dark)">
+        {centerValue}
+      </text>
+      <text x="50" y="62" textAnchor="middle" fontSize="7" fill="var(--text-faint)">
+        {centerLabel}
+      </text>
+    </svg>
+  );
+}
+
+function NameGlobalReportModal({ open, projectCount, onCancel, onConfirm }) {
+  const [title, setTitle] = useState("");
+
+  if (!open) return null;
+
+  function handleConfirm() {
+    if (!title.trim()) return;
+    onConfirm(title.trim());
+    setTitle("");
+  }
+
+  function handleCancel() {
+    setTitle("");
+    onCancel();
+  }
+
+  return (
+    <div className="modal-overlay" onClick={handleCancel}>
+      <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+        <h2 className="modal-title">Nombra este informe global</h2>
+        <p className="delete-modal-text">
+          Se guardará con {projectCount} proyecto{projectCount === 1 ? "" : "s"} para poder volver a abrirlo más
+          adelante desde "Informes de proyecto".
+        </p>
+        <div className="modal-field">
+          <input
+            autoFocus
+            type="text"
+            placeholder="Ej: Programa de transformación digital"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleConfirm()}
+          />
+        </div>
+        <div className="modal-actions">
+          <button className="modal-btn modal-btn--ghost" onClick={handleCancel}>
+            Cancelar
+          </button>
+          <button className="modal-btn modal-btn--primary" disabled={!title.trim()} onClick={handleConfirm}>
+            Crear informe
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function formatFecha(iso) {
   if (!iso) return "";
@@ -197,16 +343,58 @@ export default function StatusReport({ statusReport }) {
     updatePeriod,
     updatePreparedBy,
     updateProjectField,
+    fetchGlobalReportData,
+    savedGlobalReports,
+    addGlobalReport,
+    deleteGlobalReport,
   } = statusReport;
 
   const [view, setView] = useState("portfolio");
   const [globalSelectedIds, setGlobalSelectedIds] = useState([]);
+  const [globalData, setGlobalData] = useState({});
+  const [globalDataLoading, setGlobalDataLoading] = useState(false);
+  const [currentGlobalTitle, setCurrentGlobalTitle] = useState("");
+  const [nameModalOpen, setNameModalOpen] = useState(false);
+  const [deleteReportTarget, setDeleteReportTarget] = useState(null);
 
   function toggleGlobalSelected(id) {
     setGlobalSelectedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   }
 
+  function handleConfirmReportTitle(title) {
+    addGlobalReport(title, globalSelectedIds);
+    setCurrentGlobalTitle(title);
+    setNameModalOpen(false);
+    setView("global");
+  }
+
+  function openSavedGlobalReport(savedReport) {
+    setGlobalSelectedIds(savedReport.projectIds || []);
+    setCurrentGlobalTitle(savedReport.title);
+    setView("global");
+  }
+
+  function backToPortfolio() {
+    setCurrentGlobalTitle("");
+    setView("portfolio");
+  }
+
   const globalProjects = portfolio.filter((p) => globalSelectedIds.includes(p.id));
+
+  useEffect(() => {
+    if (view !== "global" || globalSelectedIds.length === 0) return;
+    let cancelled = false;
+    setGlobalDataLoading(true);
+    fetchGlobalReportData(globalSelectedIds).then((data) => {
+      if (cancelled) return;
+      setGlobalData(data);
+      setGlobalDataLoading(false);
+    });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [view, globalSelectedIds]);
 
   const overallDef = PROJECT_STATUS_STYLES[report.overallStatus];
   const currentTaskDef = report.currentTask ? ROADMAP_STEP_STATUS_DEFS[report.currentTask.status] : null;
@@ -398,22 +586,32 @@ export default function StatusReport({ statusReport }) {
   }
 
   if (view === "global") {
-    const totalProgress = globalProjects.length
-      ? Math.round(globalProjects.reduce((sum, p) => sum + (p.progress || 0), 0) / globalProjects.length)
-      : 0;
-    const totalRisks = globalProjects.reduce((sum, p) => sum + (p.risks || 0), 0);
-    const totalBudgetSpent = globalProjects.reduce((sum, p) => sum + (p.budgetSpent || 0), 0);
+    const totalProjects = globalProjects.length;
     const totalBudgetTotal = globalProjects.reduce((sum, p) => sum + (p.budgetTotal || 0), 0);
-    const budgetPct = totalBudgetTotal > 0 ? Math.round((totalBudgetSpent / totalBudgetTotal) * 100) : 0;
-    const statusCounts = { onTrack: 0, atRisk: 0, critical: 0 };
+    const totalRisks = globalProjects.reduce((sum, p) => sum + (p.risks || 0), 0);
+    const totalCritical = globalProjects.reduce((sum, p) => sum + (globalData[p.id]?.criticalCount || 0), 0);
+    const totalAtRisk = globalProjects.reduce((sum, p) => sum + (globalData[p.id]?.atRiskCount || 0), 0);
+
+    const phaseCounts = {};
     globalProjects.forEach((p) => {
-      if (statusCounts[p.status] !== undefined) statusCounts[p.status] += 1;
+      const label = p.phase || "Sin fase";
+      phaseCounts[label] = (phaseCounts[label] || 0) + 1;
     });
+    const orderedPhaseLabels = PHASE_LABELS_ORDERED.filter((l) => phaseCounts[l]);
+    Object.keys(phaseCounts).forEach((l) => {
+      if (!orderedPhaseLabels.includes(l)) orderedPhaseLabels.push(l);
+    });
+    const phaseSegments = orderedPhaseLabels.map((label, i) => ({
+      label,
+      count: phaseCounts[label],
+      pct: totalProjects ? Math.round((phaseCounts[label] / totalProjects) * 100) : 0,
+      color: PHASE_DONUT_COLORS[i % PHASE_DONUT_COLORS.length],
+    }));
 
     return (
       <div>
         <div className="status-report-toolbar">
-          <span className="ficha-back" onClick={() => setView("portfolio")}>
+          <span className="ficha-back" onClick={backToPortfolio}>
             ← Volver al portafolio
           </span>
           <button className="report-export-btn" onClick={() => window.print()}>
@@ -422,69 +620,90 @@ export default function StatusReport({ statusReport }) {
           </button>
         </div>
 
-        <h1 className="page-title">Informe global de programa</h1>
+        <h1 className="page-title">{currentGlobalTitle || "Informe global de programa"}</h1>
         <p className="page-subtitle">
-          Resumen consolidado de {globalProjects.length} proyecto{globalProjects.length === 1 ? "" : "s"}: {globalProjects.map((p) => p.name).join(", ")}
+          Resumen consolidado de {totalProjects} proyecto{totalProjects === 1 ? "" : "s"}: {globalProjects.map((p) => p.name).join(", ")}
         </p>
 
         <div className="status-report-print-area status-report-a4">
-        <div className="report-top-grid">
-          <div className="section-card report-score-card">
-            <CircularStat value={totalProgress} sublabel="avance medio" color="var(--accent)" />
-            <div className="report-score-meta">
-              <span className="report-score-period">Periodo: Este mes</span>
-              <span className="report-score-period">Preparado por {report.preparedBy || "—"}</span>
-            </div>
+          <div className="glance-stat-row">
+            <GlanceStat
+              icon={<span style={{ fontSize: 13, fontWeight: 700 }}>€</span>}
+              value={`${totalBudgetTotal.toLocaleString("es-ES")} €`}
+              label="Coste total estimado"
+            />
+            <GlanceStat
+              icon={<WarningIcon size={14} color="currentColor" />}
+              value={totalRisks}
+              label="Total riesgos abiertos"
+            />
+            <GlanceStat
+              icon={<StatusReportIcon size={14} color="currentColor" />}
+              value={globalDataLoading ? "…" : totalCritical}
+              label="Actividades en estado crítico"
+            />
+            <GlanceStat
+              icon={<StatusReportIcon size={14} color="currentColor" />}
+              value={globalDataLoading ? "…" : totalAtRisk}
+              label="Actividades en atención / riesgo"
+            />
           </div>
 
-          <div className="section-card report-glance-card">
-            <h4>De un vistazo</h4>
-            <div className="report-glance-grid">
-              <div className="report-glance-item">
-                <span className="report-glance-value">{totalRisks}</span>
-                <span className="report-glance-label">riesgos abiertos (total)</span>
-              </div>
-              <div className="report-glance-item">
-                <span className="report-glance-value">{budgetPct}%</span>
-                <span className="report-glance-label">presupuesto usado (total)</span>
-              </div>
-              <div className="report-glance-item">
-                <span className="report-glance-value">{statusCounts.onTrack}</span>
-                <span className="report-glance-label">proyectos en marcha</span>
-              </div>
-              <div className="report-glance-item">
-                <span className="report-glance-value">{statusCounts.atRisk + statusCounts.critical}</span>
-                <span className="report-glance-label">en riesgo o crítico</span>
+          <div className="global-two-col">
+            <div className="section-card global-donut-card">
+              <h4>Proyectos por fase actual</h4>
+              <div className="global-donut-row">
+                <PhaseDonut segments={phaseSegments} centerValue={totalProjects} centerLabel="proyectos" />
+                <div className="global-donut-legend">
+                  {phaseSegments.map((seg) => (
+                    <div key={seg.label} className="global-legend-item">
+                      <span className="global-legend-dot" style={{ background: seg.color }} />
+                      <span className="global-legend-label">{seg.label}</span>
+                      <span className="global-legend-pct">{seg.pct}%</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        <h3 className="section-heading">Proyectos incluidos</h3>
-        <div className="portfolio-table">
-          <div className="portfolio-row portfolio-row--head portfolio-row--global">
-            <span>PROYECTO</span>
-            <span>FASE</span>
-            <span>AVANCE</span>
-            <span>RIESGOS</span>
-            <span>PRESUPUESTO</span>
-            <span>ESTADO</span>
-          </div>
-          {globalProjects.map((proj) => (
-            <div key={proj.id} className="portfolio-row portfolio-row--global">
-              <span className="portfolio-name">{proj.name}</span>
-              <span className="portfolio-cell">{proj.phase}</span>
-              <span className="portfolio-cell">{proj.progress}%</span>
-              <span className="portfolio-cell">
-                {proj.risks} · {riskLevel(proj.risks)}
-              </span>
-              <span className="portfolio-cell">
-                {(proj.budgetSpent || 0).toLocaleString("es-ES")} € / {(proj.budgetTotal || 0).toLocaleString("es-ES")} €
-              </span>
-              <StatusBadge status={proj.status} style={{ width: "fit-content" }} />
+            <div className="global-table-col">
+              <h3 className="section-heading" style={{ marginTop: 0 }}>
+                Proyectos incluidos
+              </h3>
+              <div className="global-table-scroll">
+                <div className="portfolio-table">
+                  <div className="portfolio-row portfolio-row--head portfolio-row--globaltable">
+                    <span>PROYECTO</span>
+                    <span>SPONSOR</span>
+                    <span>PM</span>
+                    <span>TIPO DE PROYECTO</span>
+                    <span>SCHEDULE</span>
+                    <span>COSTE</span>
+                    <span>PRESUPUESTO</span>
+                  </div>
+                  {globalProjects.map((proj) => {
+                    const data = globalData[proj.id];
+                    const budgetPct = proj.budgetTotal > 0 ? Math.round(((proj.budgetSpent || 0) / proj.budgetTotal) * 100) : 0;
+                    const scheduleStatus =
+                      data?.categories?.find((c) => c.label === "Cronograma")?.status || scheduleFallback(proj);
+                    const budgetStatus =
+                      data?.categories?.find((c) => c.label === "Presupuesto")?.status || budgetFallback(budgetPct);
+                    return (
+                      <div key={proj.id} className="portfolio-row portfolio-row--globaltable">
+                        <span className="portfolio-name">{proj.name}</span>
+                        <span className="portfolio-cell">{proj.sponsor || "—"}</span>
+                        <span className="portfolio-cell">{proj.pm || "—"}</span>
+                        <span className="portfolio-cell">{proj.projectType || "—"}</span>
+                        <Semaphore status={globalDataLoading ? null : scheduleStatus} />
+                        <Semaphore status={costStatus(budgetPct, proj.progress)} />
+                        <Semaphore status={globalDataLoading ? null : budgetStatus} />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
-          ))}
-        </div>
+          </div>
         </div>
       </div>
     );
@@ -501,7 +720,7 @@ export default function StatusReport({ statusReport }) {
         <button
           className="report-export-btn"
           disabled={globalSelectedIds.length === 0}
-          onClick={() => setView("global")}
+          onClick={() => setNameModalOpen(true)}
         >
           Crear informe global{globalSelectedIds.length > 0 ? ` (${globalSelectedIds.length})` : ""}
         </button>
@@ -571,11 +790,69 @@ export default function StatusReport({ statusReport }) {
           </div>
         ))}
         {filteredPortfolio.length === 0 && (
-          <div className="portfolio-row">
+          <div className="portfolio-row portfolio-empty-row">
             <span className="portfolio-cell">No hay proyectos que coincidan con estos filtros.</span>
           </div>
         )}
       </div>
+
+      <h3 className="section-heading">Informes globales guardados</h3>
+      <div className="portfolio-table saved-reports-table">
+        {savedGlobalReports.length > 0 && (
+          <div className="portfolio-row portfolio-row--head saved-report-row">
+            <span>TÍTULO</span>
+            <span>PROYECTOS</span>
+            <span>CREADO</span>
+            <span></span>
+          </div>
+        )}
+        {savedGlobalReports.length === 0 && (
+          <div className="portfolio-row portfolio-empty-row">
+            <span className="portfolio-cell">
+              Todavía no has guardado ningún informe global. Selecciona proyectos arriba y crea uno.
+            </span>
+          </div>
+        )}
+        {savedGlobalReports.map((rep) => (
+          <div key={rep.id} className="portfolio-row saved-report-row" onClick={() => openSavedGlobalReport(rep)}>
+            <span className="portfolio-name">{rep.title}</span>
+            <span className="portfolio-cell">
+              {(rep.projectIds || []).length} proyecto{(rep.projectIds || []).length === 1 ? "" : "s"}
+            </span>
+            <span className="portfolio-cell">
+              {rep.createdBy ? `Creado por ${rep.createdBy}` : ""} {rep.createdAt ? `· ${formatFecha(rep.createdAt)}` : ""}
+            </span>
+            <button
+              className="saved-report-delete"
+              title="Eliminar informe guardado"
+              onClick={(e) => {
+                e.stopPropagation();
+                setDeleteReportTarget(rep);
+              }}
+            >
+              <TrashIcon size={14} color="currentColor" />
+            </button>
+          </div>
+        ))}
+      </div>
+
+      <NameGlobalReportModal
+        open={nameModalOpen}
+        projectCount={globalSelectedIds.length}
+        onCancel={() => setNameModalOpen(false)}
+        onConfirm={handleConfirmReportTitle}
+      />
+
+      <ConfirmDeleteModal
+        item={deleteReportTarget}
+        itemLabel="informe global"
+        itemName={deleteReportTarget?.title}
+        onClose={() => setDeleteReportTarget(null)}
+        onConfirm={(id) => {
+          deleteGlobalReport(id);
+          setDeleteReportTarget(null);
+        }}
+      />
     </div>
   );
 }
