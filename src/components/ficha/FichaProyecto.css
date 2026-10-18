@@ -11,17 +11,24 @@
   text-decoration: underline;
 }
 
-.ficha-phase-group {
+.ficha-group {
   margin-bottom: 28px;
 }
 
-.ficha-phase-group-label {
+.ficha-group-label {
   font-size: 13px;
   font-weight: 700;
   color: var(--blue-primary);
   text-transform: uppercase;
   letter-spacing: 0.3px;
   margin: 0 0 12px 0;
+}
+
+.ficha-group-okr {
+  font-weight: 500;
+  text-transform: none;
+  color: var(--text-muted);
+  letter-spacing: normal;
 }
 
 .ficha-picker-grid {
@@ -79,6 +86,103 @@
   background: var(--gray-light);
   padding: 4px 10px;
   border-radius: 20px;
+}
+
+.ficha-info-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+  margin-bottom: 22px;
+}
+
+.ficha-info-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ficha-info-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.ficha-info-value {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--gray-dark);
+}
+
+.ficha-info-value--overdue {
+  color: var(--status-critical-color);
+}
+
+.ficha-info-edit-link {
+  appearance: none;
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.ficha-portfolio-edit-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ficha-portfolio-edit-row select {
+  font-family: inherit;
+  font-size: 13px;
+  padding: 6px 8px;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  color: var(--gray-dark);
+}
+
+.ficha-info-save-btn {
+  appearance: none;
+  border: none;
+  background: var(--black);
+  color: var(--white);
+  border-radius: 14px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.ficha-portfolio-create {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 280px;
+}
+
+.ficha-portfolio-create input,
+.ficha-portfolio-create select {
+  font-family: inherit;
+  font-size: 13px;
+  padding: 7px 9px;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  color: var(--gray-dark);
+}
+
+.ficha-portfolio-create-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .ficha-tabs {

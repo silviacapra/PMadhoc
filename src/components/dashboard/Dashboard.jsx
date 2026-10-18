@@ -179,6 +179,7 @@ export default function Dashboard({ dashboard, permissions, session, nav, status
         pms={PMS}
         departments={DEPARTMENTS}
         okrCatalog={dashboard.okrCatalog}
+        portfolioCatalog={dashboard.portfolioCatalog}
         onSave={(id, patch) => {
           dashboard.updateProject(id, patch);
           setEditingProject(null);

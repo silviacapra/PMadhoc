@@ -1,9 +1,9 @@
+import { useState } from "react";
 import Roadmap from "../roadmap/Roadmap";
 import Documentacion from "./Documentacion";
 import GanttChart from "../roadmap/GanttChart";
 import { TriDotIcon } from "../icons/Icons";
 import { PROJECT_CARD_TINT } from "../../data/projects";
-import { PHASE_ORDER, ROADMAP_CONTENT } from "../../data/roadmapContent";
 import "../registro/Registro.css";
 import "./FichaProyecto.css";
 
@@ -13,32 +13,165 @@ const TABS = [
   { id: "documentacion", label: "Documentación" },
 ];
 
-const PHASE_GROUP_LABELS = {
-  preproyecto: "Pre-proyecto",
-  iniciar: "Iniciados",
-  planificar: "Planificados",
-  ejecutar: "Ejecutados",
-  controlar: "Controlados",
-  cerrar: "Cerrados",
-};
+const SIN_PORTFOLIO = "Sin portfolio asignado";
+
+function formatFechaCorta(dateStr) {
+  if (!dateStr) return "";
+  return new Date(`${dateStr}T00:00:00`).toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" });
+}
+
+function daysUntil(dateStr) {
+  if (!dateStr) return null;
+  const target = new Date(`${dateStr}T00:00:00`);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return Math.round((target - today) / (1000 * 60 * 60 * 24));
+}
+
+function PortfolioAssignField({ project, portfolioCatalog, okrCatalog, onAssign, onCreatePortfolio }) {
+  const [open, setOpen] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [selected, setSelected] = useState(project.portfolioId || "");
+  const [newName, setNewName] = useState("");
+  const [newOkrId, setNewOkrId] = useState("");
+
+  const current = portfolioCatalog.find((pf) => pf.id === project.portfolioId);
+
+  function startOpen() {
+    setSelected(project.portfolioId || "");
+    setCreating(false);
+    setNewName("");
+    setNewOkrId("");
+    setOpen(true);
+  }
+
+  function handleSelectChange(value) {
+    if (value === "__new__") {
+      setCreating(true);
+      return;
+    }
+    setSelected(value);
+  }
+
+  async function handleSave() {
+    if (creating) {
+      if (!newName.trim()) return;
+      const id = await onCreatePortfolio({ name: newName.trim(), okrId: newOkrId });
+      onAssign(id);
+    } else {
+      onAssign(selected);
+    }
+    setOpen(false);
+  }
+
+  if (!open) {
+    return (
+      <div className="ficha-info-field">
+        <span className="ficha-info-label">Portfolio</span>
+        <span className="ficha-info-value">
+          {current ? current.name : SIN_PORTFOLIO}
+          <button className="ficha-info-edit-link" onClick={startOpen}>
+            {current ? "Cambiar" : "Asignar"}
+          </button>
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="ficha-info-field">
+      <span className="ficha-info-label">Portfolio</span>
+      {!creating ? (
+        <div className="ficha-portfolio-edit-row">
+          <select value={selected} onChange={(e) => handleSelectChange(e.target.value)}>
+            <option value="">Sin portfolio asignado</option>
+            {portfolioCatalog.map((pf) => (
+              <option key={pf.id} value={pf.id}>
+                {pf.name}
+              </option>
+            ))}
+            <option value="__new__">+ Crear nuevo portfolio</option>
+          </select>
+          <button className="ficha-info-save-btn" onClick={handleSave}>
+            Guardar
+          </button>
+          <span className="cancel-link" onClick={() => setOpen(false)}>
+            Cancelar
+          </span>
+        </div>
+      ) : (
+        <div className="ficha-portfolio-create">
+          <input
+            type="text"
+            autoFocus
+            placeholder="Nombre del nuevo portfolio"
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+          />
+          <select value={newOkrId} onChange={(e) => setNewOkrId(e.target.value)}>
+            <option value="">Sin vincular a un objetivo</option>
+            {okrCatalog.map((o) => (
+              <option key={o.id} value={o.id}>
+                {o.objective} · {o.year}
+              </option>
+            ))}
+          </select>
+          <div className="ficha-portfolio-create-actions">
+            <button className="ficha-info-save-btn" onClick={handleSave}>
+              Crear y asignar
+            </button>
+            <span className="cancel-link" onClick={() => setCreating(false)}>
+              Volver
+            </span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function FichaProyecto({ ficha, nav }) {
-  const { projects, projectId, setProjectId, closeFicha, tab, setTab, roadmap, documentacion, gantt, openRiesgos, openLecciones, openStatusReport } =
-    ficha;
+  const {
+    projects,
+    okrCatalog,
+    portfolioCatalog,
+    projectId,
+    setProjectId,
+    closeFicha,
+    tab,
+    setTab,
+    roadmap,
+    documentacion,
+    gantt,
+    openRiesgos,
+    openLecciones,
+    openStatusReport,
+    updateProjectPortfolio,
+    addPortfolio,
+  } = ficha;
 
   if (!projectId) {
     const currentProject = [...projects].sort(
       (a, b) => new Date(b.lastModifiedAt || b.createdAt || 0) - new Date(a.lastModifiedAt || a.createdAt || 0)
     )[0];
-    const phaseGroups = PHASE_ORDER.map((phaseId) => ({
-      phaseId,
-      label: ROADMAP_CONTENT[phaseId].label,
-      projects: projects.filter((p) => p.phase === ROADMAP_CONTENT[phaseId].label),
-    })).filter((g) => g.projects.length > 0);
+
+    const portfolioGroups = portfolioCatalog
+      .map((pf) => ({
+        key: pf.id,
+        label: pf.name,
+        okrLabel: okrCatalog.find((o) => o.id === pf.okrId)?.objective || "",
+        projects: projects.filter((p) => p.portfolioId === pf.id),
+      }))
+      .filter((g) => g.projects.length > 0);
+
+    const unassignedProjects = projects.filter((p) => !p.portfolioId || !portfolioCatalog.some((pf) => pf.id === p.portfolioId));
+    if (unassignedProjects.length > 0) {
+      portfolioGroups.push({ key: "sin-portfolio", label: SIN_PORTFOLIO, okrLabel: "", projects: unassignedProjects });
+    }
 
     return (
       <div>
-        <h1 className="page-title">Proyectos por fases</h1>
+        <h1 className="page-title">Proyectos por portfolio</h1>
         {currentProject && (
           <div className="registro-project-picker">
             <label>Proyecto</label>
@@ -52,9 +185,12 @@ export default function FichaProyecto({ ficha, nav }) {
           </div>
         )}
 
-        {phaseGroups.map((group) => (
-          <div key={group.phaseId} className="ficha-phase-group">
-            <h3 className="ficha-phase-group-label">{PHASE_GROUP_LABELS[group.phaseId] || group.label}</h3>
+        {portfolioGroups.map((group) => (
+          <div key={group.key} className="ficha-group">
+            <h3 className="ficha-group-label">
+              {group.label}
+              {group.okrLabel && <span className="ficha-group-okr"> · {group.okrLabel}</span>}
+            </h3>
             <div className="ficha-picker-grid">
               {group.projects.map((p) => (
                 <div key={p.id} className="ficha-picker-card" onClick={() => setProjectId(p.id)}>
@@ -74,6 +210,7 @@ export default function FichaProyecto({ ficha, nav }) {
   }
 
   const project = projects.find((p) => p.id === projectId);
+  const daysLeft = daysUntil(project?.deadline);
 
   return (
     <div>
@@ -81,6 +218,44 @@ export default function FichaProyecto({ ficha, nav }) {
         ← Todos los proyectos
       </span>
       <h1 className="page-title">{project?.name}</h1>
+
+      {project && (
+        <div className="ficha-info-row">
+          <div className="ficha-info-field">
+            <span className="ficha-info-label">Gestor de proyecto</span>
+            <span className="ficha-info-value">{project.pm || "Sin asignar"}</span>
+          </div>
+          <div className="ficha-info-field">
+            <span className="ficha-info-label">Patrocinador</span>
+            <span className="ficha-info-value">{project.sponsor || "Sin asignar"}</span>
+          </div>
+          <div className="ficha-info-field">
+            <span className="ficha-info-label">Fecha de inicio</span>
+            <span className="ficha-info-value">{project.startDate ? formatFechaCorta(project.startDate) : "Sin definir"}</span>
+          </div>
+          <div className="ficha-info-field">
+            <span className="ficha-info-label">Fecha fin prevista</span>
+            <span className="ficha-info-value">{project.deadline ? formatFechaCorta(project.deadline) : "Sin definir"}</span>
+          </div>
+          <div className="ficha-info-field">
+            <span className="ficha-info-label">Cuenta atrás</span>
+            <span className={`ficha-info-value ${daysLeft !== null && daysLeft < 0 ? "ficha-info-value--overdue" : ""}`}>
+              {daysLeft === null
+                ? "Sin fecha fin"
+                : daysLeft >= 0
+                ? `${daysLeft} día${daysLeft === 1 ? "" : "s"} restante${daysLeft === 1 ? "" : "s"}`
+                : `Vencido hace ${Math.abs(daysLeft)} día${Math.abs(daysLeft) === 1 ? "" : "s"}`}
+            </span>
+          </div>
+          <PortfolioAssignField
+            project={project}
+            portfolioCatalog={portfolioCatalog}
+            okrCatalog={okrCatalog}
+            onAssign={(id) => updateProjectPortfolio(projectId, id)}
+            onCreatePortfolio={addPortfolio}
+          />
+        </div>
+      )}
 
       <div className="ficha-tabs">
         {TABS.map((t) => (

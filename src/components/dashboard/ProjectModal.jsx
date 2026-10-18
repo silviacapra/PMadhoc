@@ -1,17 +1,19 @@
 import { useState, useEffect } from "react";
 import "./NewProjectModal.css";
 
-const BLANK = { name: "", sponsor: "", pm: "", department: "", contributesTo: [], deadline: "", budget: "" };
+const BLANK = { name: "", sponsor: "", pm: "", department: "", contributesTo: [], startDate: "", deadline: "", budget: "", portfolioId: "" };
 
-export default function ProjectModal({ open, onClose, sponsors, pms, departments, okrCatalog, onCreate, onSave, project }) {
+export default function ProjectModal({ open, onClose, sponsors, pms, departments, okrCatalog, portfolioCatalog = [], onCreate, onSave, project }) {
   const isEdit = !!project;
   const [name, setName] = useState(BLANK.name);
   const [sponsor, setSponsor] = useState("");
   const [pm, setPm] = useState("");
   const [department, setDepartment] = useState(departments[0] || "");
   const [selectedOkrIds, setSelectedOkrIds] = useState(BLANK.contributesTo);
+  const [startDate, setStartDate] = useState(BLANK.startDate);
   const [deadline, setDeadline] = useState(BLANK.deadline);
   const [budget, setBudget] = useState(BLANK.budget);
+  const [portfolioId, setPortfolioId] = useState(BLANK.portfolioId);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -23,16 +25,20 @@ export default function ProjectModal({ open, onClose, sponsors, pms, departments
       setPm(project.pm || "");
       setDepartment(project.department || departments[0] || "");
       setSelectedOkrIds(project.contributesTo || []);
+      setStartDate(project.startDate || "");
       setDeadline(project.deadline || "");
       setBudget(project.budgetTotal ? String(project.budgetTotal) : "");
+      setPortfolioId(project.portfolioId || "");
     } else {
       setName(BLANK.name);
       setSponsor("");
       setPm("");
       setDepartment(departments[0] || "");
       setSelectedOkrIds(BLANK.contributesTo);
+      setStartDate(BLANK.startDate);
       setDeadline(BLANK.deadline);
       setBudget(BLANK.budget);
+      setPortfolioId(BLANK.portfolioId);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, project]);
@@ -64,8 +70,10 @@ export default function ProjectModal({ open, onClose, sponsors, pms, departments
       pm,
       department,
       contributesTo: selectedOkrIds,
+      startDate,
       deadline,
       budget,
+      portfolioId,
     };
     if (isEdit) {
       onSave(project.id, payload);
@@ -121,14 +129,32 @@ export default function ProjectModal({ open, onClose, sponsors, pms, departments
             </select>
           </div>
           <div className="modal-field">
+            <label>Fecha de inicio</label>
+            <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+          </div>
+        </div>
+
+        <div className="modal-field-row">
+          <div className="modal-field">
             <label>Fecha límite prevista *</label>
             <input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} />
+          </div>
+          <div className="modal-field">
+            <label>Presupuesto (€) *</label>
+            <input type="number" min="0" placeholder="Ej: 50000" value={budget} onChange={(e) => setBudget(e.target.value)} />
           </div>
         </div>
 
         <div className="modal-field">
-          <label>Presupuesto (€) *</label>
-          <input type="number" min="0" placeholder="Ej: 50000" value={budget} onChange={(e) => setBudget(e.target.value)} />
+          <label>Portfolio</label>
+          <select value={portfolioId} onChange={(e) => setPortfolioId(e.target.value)}>
+            <option value="">Sin portfolio asignado</option>
+            {portfolioCatalog.map((pf) => (
+              <option key={pf.id} value={pf.id}>
+                {pf.name}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="modal-field">

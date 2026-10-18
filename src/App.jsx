@@ -51,7 +51,7 @@ export default function App() {
           {view === "dashboard" && canShow.dashboard && (
             <Dashboard dashboard={state.dashboard} permissions={permissions} session={session} nav={nav} statusReport={state.statusReport} />
           )}
-          {view === "empresa" && canShow.empresa && <EmpresaOkr company={state.company} okr={state.okr} />}
+          {view === "empresa" && canShow.empresa && <EmpresaOkr company={state.company} okr={state.okr} portfolio={state.portfolio} />}
           {view === "roadmap" && canShow.roadmap && <FichaProyecto ficha={state.ficha} nav={nav} />}
           {view === "templates" && canShow.templates && <Templates templates={state.templates} />}
           {view === "riesgos" && canShow.riesgos && <Riesgos riesgos={state.riesgos} />}

@@ -107,6 +107,7 @@ export function useAppState() {
   const [okrCatalog, setOkrCatalog] = useState([]);
   const [projects, setProjects] = useState([]);
   const [globalReportsList, setGlobalReportsList] = useState([]);
+  const [portfolioCatalog, setPortfolioCatalog] = useState([]);
   const [templatesList, setTemplatesList] = useState([]);
 
   // Ficha de proyecto: qué proyecto y qué pestaña se está viendo ahora mismo.
@@ -358,6 +359,7 @@ export function useAppState() {
       onSnapshot(collection(db, "stakeholders"), (snap) => setStakeholders(snap.docs.map((d) => ({ id: d.id, ...d.data() })))),
       onSnapshot(collection(db, "knowledgeArticles"), (snap) => setCustomArticles(snap.docs.map((d) => ({ id: d.id, ...d.data() })))),
       onSnapshot(collection(db, "globalReports"), (snap) => setGlobalReportsList(snap.docs.map((d) => ({ id: d.id, ...d.data() })))),
+      onSnapshot(collection(db, "portfolios"), (snap) => setPortfolioCatalog(snap.docs.map((d) => ({ id: d.id, ...d.data() })))),
       onSnapshot(doc(db, "users", user.uid), (snap) => {
         if (snap.exists()) setProfile(snap.data());
       }),
@@ -627,18 +629,46 @@ export function useAppState() {
     await deleteDoc(doc(db, "okrs", id));
   }
 
+  async function addPortfolio({ name, okrId }) {
+    const id = `portfolio-${Date.now()}`;
+    await setDoc(doc(db, "portfolios", id), { name, okrId: okrId || "" });
+    return id;
+  }
+
+  async function updatePortfolio(id, { name, okrId }) {
+    await updateDoc(doc(db, "portfolios", id), { name, okrId: okrId || "" });
+  }
+
+  async function deletePortfolio(id) {
+    await deleteDoc(doc(db, "portfolios", id));
+  }
+
   function daysLeftFromDeadline(deadline, fallback) {
     if (!deadline) return fallback;
     const diffMs = new Date(deadline).getTime() - Date.now();
     return Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
   }
 
-  async function addProject({ name, sponsor, pm, department, contributesTo, deadline, hitos, budget, phase, projectType }) {
+  async function addProject({
+    name,
+    sponsor,
+    pm,
+    department,
+    contributesTo,
+    startDate,
+    deadline,
+    hitos,
+    budget,
+    phase,
+    projectType,
+    portfolioId,
+  }) {
     const id = `${slugify(name)}-${Date.now()}`;
     await setDoc(doc(db, "projects", id), {
       name,
       phase: phase || "Pre-proyecto",
       projectType: projectType || "",
+      portfolioId: portfolioId || "",
       progress: 0,
       daysLeft: daysLeftFromDeadline(deadline, 90),
       risks: 0,
@@ -647,6 +677,7 @@ export function useAppState() {
       pm,
       department,
       contributesTo: contributesTo || [],
+      startDate: startDate || "",
       deadline: deadline || "",
       hitos: hitos || "",
       budgetTotal: Number(budget) || 0,
@@ -656,7 +687,7 @@ export function useAppState() {
     });
   }
 
-  async function updateProject(id, { name, sponsor, pm, department, contributesTo, deadline, hitos, budget }) {
+  async function updateProject(id, { name, sponsor, pm, department, contributesTo, startDate, deadline, hitos, budget, portfolioId }) {
     const existing = projects.find((p) => p.id === id);
     await updateDoc(doc(db, "projects", id), {
       name,
@@ -664,13 +695,19 @@ export function useAppState() {
       pm,
       department,
       contributesTo,
+      startDate: startDate || "",
       deadline: deadline || "",
       hitos: hitos || "",
       budgetTotal: Number(budget) || 0,
+      portfolioId: portfolioId || "",
       daysLeft: daysLeftFromDeadline(deadline, existing?.daysLeft ?? 90),
       lastModifiedBy: profile?.name || "Usuario",
       lastModifiedAt: new Date().toISOString(),
     });
+  }
+
+  async function updateProjectPortfolio(id, portfolioId) {
+    await updateDoc(doc(db, "projects", id), { portfolioId: portfolioId || "" });
   }
 
   // Para el informe global: lee de golpe el roadmap y el informe de estado de cada
@@ -1013,6 +1050,7 @@ export function useAppState() {
       addProject,
       updateProject,
       okrCatalog,
+      portfolioCatalog,
       openFicha,
       deleteProjectId,
       setDeleteProjectId,
@@ -1028,8 +1066,16 @@ export function useAppState() {
       updateOkr,
       deleteOkr,
     },
+    portfolio: {
+      catalog: portfolioCatalog,
+      addPortfolio,
+      updatePortfolio,
+      deletePortfolio,
+    },
     ficha: {
       projects,
+      okrCatalog,
+      portfolioCatalog,
       projectId: fichaProjectId,
       setProjectId: openFicha,
       closeFicha,
@@ -1038,6 +1084,8 @@ export function useAppState() {
       openRiesgos,
       openLecciones,
       openStatusReport,
+      updateProjectPortfolio,
+      addPortfolio,
       roadmap: {
         phases: buildPhases(
           fichaRoadmapPhase || fichaCurrentPhase || "preproyecto",

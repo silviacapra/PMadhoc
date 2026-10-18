@@ -149,15 +149,113 @@ function OkrCard({ okr, onUpdate, onDelete }) {
   );
 }
 
-export default function EmpresaOkr({ company, okr }) {
+function PortfolioCard({ portfolio, okrCatalog, onUpdate, onDelete }) {
+  const [editing, setEditing] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [name, setName] = useState(portfolio.name);
+  const [okrId, setOkrId] = useState(portfolio.okrId || "");
+
+  function handleSave() {
+    if (!name.trim()) return;
+    onUpdate(portfolio.id, { name: name.trim(), okrId });
+    setEditing(false);
+  }
+
+  function handleCancel() {
+    setName(portfolio.name);
+    setOkrId(portfolio.okrId || "");
+    setEditing(false);
+  }
+
+  const linkedOkr = okrCatalog.find((o) => o.id === portfolio.okrId);
+
+  return (
+    <div className="section-card okr-card">
+      <div className="okr-card-head">
+        {editing ? (
+          <input className="okr-card-edit-title" type="text" value={name} onChange={(e) => setName(e.target.value)} />
+        ) : (
+          <h4>{portfolio.name}</h4>
+        )}
+        <div className="okr-card-actions">
+          <button className="okr-icon-btn" onClick={() => setEditing((v) => !v)}>
+            <PencilIcon size={14} color="currentColor" />
+          </button>
+          <button className="okr-icon-btn" onClick={() => setConfirmingDelete((v) => !v)}>
+            <TrashIcon size={14} color="currentColor" />
+          </button>
+        </div>
+      </div>
+
+      {editing ? (
+        <div className="okr-field" style={{ marginTop: 10 }}>
+          <label>Objetivo estratégico al que sirve</label>
+          <select value={okrId} onChange={(e) => setOkrId(e.target.value)}>
+            <option value="">Sin vincular</option>
+            {okrCatalog.map((o) => (
+              <option key={o.id} value={o.id}>
+                {o.objective} · {o.year}
+              </option>
+            ))}
+          </select>
+        </div>
+      ) : (
+        <p className="portfolio-okr-link">{linkedOkr ? `Objetivo: ${linkedOkr.objective}` : "Sin objetivo estratégico vinculado"}</p>
+      )}
+
+      {editing && (
+        <div className="okr-card-edit-actions">
+          <button className="okr-add-btn" onClick={handleSave}>
+            Guardar
+          </button>
+          <span className="cancel-link" onClick={handleCancel}>
+            Cancelar
+          </span>
+        </div>
+      )}
+
+      {confirmingDelete && (
+        <div className="okr-confirm-delete">
+          <span>¿Eliminar este portfolio?</span>
+          <button
+            className="okr-confirm-yes"
+            onClick={() => {
+              onDelete(portfolio.id);
+              setConfirmingDelete(false);
+            }}
+          >
+            Sí, eliminar
+          </button>
+          <span className="cancel-link" onClick={() => setConfirmingDelete(false)}>
+            Cancelar
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function EmpresaOkr({ company, okr, portfolio }) {
   const { info, updateField } = company;
   const { catalog, addOkr, updateOkr, deleteOkr } = okr;
+  const { catalog: portfolioCatalog, addPortfolio, updatePortfolio, deletePortfolio } = portfolio;
 
   const [editingCompany, setEditingCompany] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [year, setYear] = useState(String(new Date().getFullYear()));
   const [objParts, setObjParts] = useState(BLANK_SMART_PARTS);
   const [krPartsList, setKrPartsList] = useState([BLANK_SMART_PARTS]);
+  const [addPortfolioOpen, setAddPortfolioOpen] = useState(false);
+  const [newPortfolioName, setNewPortfolioName] = useState("");
+  const [newPortfolioOkrId, setNewPortfolioOkrId] = useState("");
+
+  function handleAddPortfolio() {
+    if (!newPortfolioName.trim()) return;
+    addPortfolio({ name: newPortfolioName.trim(), okrId: newPortfolioOkrId });
+    setNewPortfolioName("");
+    setNewPortfolioOkrId("");
+    setAddPortfolioOpen(false);
+  }
 
   const years = [...new Set(catalog.map((o) => o.year))].sort((a, b) => b - a);
 
@@ -298,6 +396,61 @@ export default function EmpresaOkr({ company, okr }) {
         <button className="new-project-btn" onClick={() => setAddOpen(true)}>
           <PlusIcon size={16} color="currentColor" />
           Añadir objetivo
+        </button>
+      )}
+
+      <h3 className="section-heading okr-catalog-heading">Portfolios de proyectos</h3>
+      <div className="okr-list">
+        {portfolioCatalog.map((pf) => (
+          <PortfolioCard key={pf.id} portfolio={pf} okrCatalog={catalog} onUpdate={updatePortfolio} onDelete={deletePortfolio} />
+        ))}
+        {portfolioCatalog.length === 0 && !addPortfolioOpen && (
+          <p className="registry-empty">Todavía no has creado ningún portfolio.</p>
+        )}
+      </div>
+
+      {addPortfolioOpen ? (
+        <div className="section-card okr-add-card">
+          <div className="section-head-row">
+            <h3 className="section-heading" style={{ margin: 0 }}>
+              Añadir nuevo portfolio
+            </h3>
+            <span className="cancel-link" onClick={() => setAddPortfolioOpen(false)}>
+              Cancelar
+            </span>
+          </div>
+
+          <div className="okr-field">
+            <label>Nombre del portfolio</label>
+            <input
+              type="text"
+              placeholder="Ej: Transformación Digital 2026"
+              value={newPortfolioName}
+              onChange={(e) => setNewPortfolioName(e.target.value)}
+            />
+          </div>
+          <div className="okr-field">
+            <label>Objetivo estratégico al que sirve</label>
+            <select value={newPortfolioOkrId} onChange={(e) => setNewPortfolioOkrId(e.target.value)}>
+              <option value="">Sin vincular</option>
+              {catalog.map((o) => (
+                <option key={o.id} value={o.id}>
+                  {o.objective} · {o.year}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="okr-add-actions">
+            <button className="okr-add-btn" onClick={handleAddPortfolio}>
+              Añadir portfolio
+            </button>
+          </div>
+        </div>
+      ) : (
+        <button className="new-project-btn" onClick={() => setAddPortfolioOpen(true)}>
+          <PlusIcon size={16} color="currentColor" />
+          Añadir portfolio
         </button>
       )}
     </div>
