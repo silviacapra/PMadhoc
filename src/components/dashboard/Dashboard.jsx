@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PlusIcon, StatusReportIcon, TrashIcon, PencilIcon, ArrowRightIcon, TriDotIcon } from "../icons/Icons";
+import { PlusIcon, UploadIcon, StatusReportIcon, TrashIcon, PencilIcon, ArrowRightIcon, TriDotIcon } from "../icons/Icons";
 import StatusBadge from "../shared/StatusBadge";
 import ProjectModal from "./ProjectModal";
 import NewProjectOnboarding from "./NewProjectOnboarding";
@@ -7,10 +7,12 @@ import ConfirmDeleteModal from "../shared/ConfirmDeleteModal";
 import ConfirmModifyModal from "../shared/ConfirmModifyModal";
 import { PROJECT_CARD_TINT } from "../../data/projects";
 import { TEAM_MEMBERS, DEPARTMENTS } from "../../data/team";
+import { ALL_TEMPLATES } from "../../data/templates";
 import "./Dashboard.css";
 
 const SPONSORS = TEAM_MEMBERS.filter((t) => t.roleLabel === "Patrocinador");
 const PMS = TEAM_MEMBERS.filter((t) => t.roleLabel === "Gestor de proyecto");
+const IMPORT_TEMPLATE = ALL_TEMPLATES.find((t) => t.title === "Importar proyectos ya empezados");
 
 export default function Dashboard({ dashboard, permissions, session, nav, statusReport }) {
   const [modalOpen, setModalOpen] = useState(false);
@@ -51,19 +53,23 @@ export default function Dashboard({ dashboard, permissions, session, nav, status
 
   return (
     <div>
-      <p className="dashboard-greeting">
-        Hola {session.profile.firstName}, bienvenido a tu espacio de gestión de proyectos.
-      </p>
-
       <div className="dashboard-header">
-        <div>
-          <h1 className="page-title">Panel</h1>
-        </div>
+        <h1 className="page-title" style={{ marginBottom: 0 }}>
+          Hola {session.profile.firstName}, bienvenido/a a tu PMO
+        </h1>
         {permissions?.canCreateProject && (
-          <button className="new-project-btn" onClick={() => setModalOpen(true)}>
-            <PlusIcon size={16} color="currentColor" />
-            Nuevo proyecto
-          </button>
+          <div className="dashboard-header-actions">
+            {IMPORT_TEMPLATE?.file && (
+              <a className="new-project-btn new-project-btn--secondary" href={IMPORT_TEMPLATE.file} download>
+                <UploadIcon size={16} color="currentColor" />
+                Sube un proyecto existente
+              </a>
+            )}
+            <button className="new-project-btn" onClick={() => setModalOpen(true)}>
+              <PlusIcon size={16} color="currentColor" />
+              Nuevo proyecto
+            </button>
+          </div>
         )}
       </div>
 

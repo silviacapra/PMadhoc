@@ -23,7 +23,8 @@ const PHASE_GROUP_LABELS = {
 };
 
 export default function FichaProyecto({ ficha, nav }) {
-  const { projects, projectId, setProjectId, closeFicha, tab, setTab, roadmap, documentacion, gantt, openRiesgos, openLecciones } = ficha;
+  const { projects, projectId, setProjectId, closeFicha, tab, setTab, roadmap, documentacion, gantt, openRiesgos, openLecciones, openStatusReport } =
+    ficha;
 
   if (!projectId) {
     const currentProject = [...projects].sort(
@@ -101,6 +102,8 @@ export default function FichaProyecto({ ficha, nav }) {
           onGoToKnowledge={() => nav?.setView("knowledge")}
           onGoToTemplates={() => nav?.setView("templates")}
           onGoToRiesgos={() => openRiesgos(projectId)}
+          onGoToStatusReport={() => openStatusReport(projectId)}
+          onGoToLecciones={() => openLecciones(projectId)}
         />
       )}
       {tab === "gantt" && <GanttChart phases={gantt.phases} />}

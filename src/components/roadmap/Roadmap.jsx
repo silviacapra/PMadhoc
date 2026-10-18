@@ -4,7 +4,7 @@ import { CheckIcon } from "../icons/Icons";
 import Confetti from "../shared/Confetti";
 import "./Roadmap.css";
 
-export default function Roadmap({ roadmap, onGoToKnowledge, onGoToTemplates, onGoToRiesgos }) {
+export default function Roadmap({ roadmap, onGoToKnowledge, onGoToTemplates, onGoToRiesgos, onGoToStatusReport, onGoToLecciones }) {
   const {
     phases,
     steps,
@@ -94,6 +94,8 @@ export default function Roadmap({ roadmap, onGoToKnowledge, onGoToTemplates, onG
               onGoToKnowledge={onGoToKnowledge}
               onGoToTemplates={onGoToTemplates}
               onGoToRiesgos={onGoToRiesgos}
+              onGoToStatusReport={onGoToStatusReport}
+              onGoToLecciones={onGoToLecciones}
             />
           ))}
         </div>

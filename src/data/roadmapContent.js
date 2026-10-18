@@ -42,7 +42,7 @@ export const ROADMAP_CONTENT = {
         outputs: ["Registro de contactos clave", "Matriz de asignación de responsabilidades (RACI)"],
       },
       {
-        title: "Redactar el estatuto del proyecto",
+        title: "Aprobación del proyecto",
         detail: "Formaliza alcance, entregables y KPI; requiere firma de aprobación.",
         outputs: ["Acta de constitución del proyecto", "Registro de supuestos"],
       },
@@ -52,14 +52,14 @@ export const ROADMAP_CONTENT = {
     label: "Planificar",
     steps: [
       {
-        title: "Reunión de arranque",
+        title: "Reunión kickoff",
         detail: "Alinear a todo el equipo y contactos clave con una agenda clara.",
-        outputs: ["Agenda de la reunión de arranque"],
+        outputs: ["Agenda de kickoff"],
       },
       {
-        title: "Desglosar tareas e hitos (EDT)",
-        detail: "Estructura de Desglose del Trabajo para definir la jerarquía del trabajo.",
-        outputs: ["Estructura de Desglose del Trabajo (EDT)", "Lista de hitos"],
+        title: "Desglosar tareas e hitos",
+        detail: "Estructura de Desglose del Trabajo (EDT) para definir la jerarquía del trabajo.",
+        outputs: ["EDT", "Lista de hitos"],
       },
       {
         title: "Preparar el presupuesto",
@@ -82,14 +82,14 @@ export const ROADMAP_CONTENT = {
     label: "Ejecutar",
     steps: [
       {
-        title: "Hacer seguimiento del avance",
+        title: "Seguimiento del avance",
         detail: "Gantt, hoja de ruta o gráfico de avance según el tipo de proyecto.",
-        outputs: ["Informe de desempeño del trabajo", "Cronograma actualizado"],
+        outputs: ["Cronograma"],
       },
       {
         title: "Gestionar cambios y riesgos",
-        detail: "Categorizar con ROAM y actualizar los informes de proyecto.",
-        outputs: ["Registro de cambios", "Solicitudes de cambio aprobadas"],
+        detail: "Categorizar riesgos y actualizar los informes de proyecto.",
+        outputs: ["Registro de cambios"],
       },
       {
         title: "Controlar la calidad",
@@ -99,7 +99,7 @@ export const ROADMAP_CONTENT = {
       {
         title: "Mantener el contacto con el cliente",
         detail: "Encuestas de satisfacción y pruebas piloto antes del lanzamiento.",
-        outputs: ["Resultados de encuesta de satisfacción"],
+        outputs: ["Resultados de encuestas"],
       },
     ],
   },
@@ -109,17 +109,17 @@ export const ROADMAP_CONTENT = {
       {
         title: "Impulsar la mejora continua",
         detail: "Retrospectivas tras cada hito para no repetir errores.",
-        outputs: ["Acta de retrospectiva"],
+        outputs: ["Acta de reuniones de retrospectiva"],
       },
       {
         title: "Tomar decisiones basadas en datos",
         detail: "Métricas de productividad y de calidad del proyecto.",
-        outputs: ["Panel de métricas"],
+        outputs: ["Informes de proyecto (enlace a pestaña)"],
       },
       {
         title: "Analizar y visualizar los datos",
         detail: "Detectar sesgos y comunicar hallazgos con paneles e infografías.",
-        outputs: ["Informe de análisis de datos"],
+        outputs: ["Informes de proyecto (enlace a pestaña)"],
       },
     ],
   },
@@ -127,19 +127,19 @@ export const ROADMAP_CONTENT = {
     label: "Cerrar",
     steps: [
       {
-        title: "Revisar la lista de verificación de cierre",
+        title: "Revisar tareas pendientes",
         detail: "Confirmar que todas las tareas están completadas y aprobadas por los contactos clave.",
-        outputs: ["Lista de verificación de cierre firmada"],
+        outputs: ["Documento de cierre firmado (v1)"],
       },
       {
         title: "Documentar el cierre",
         detail: "Informe de impacto, retrospectiva formal e informe de cierre del proyecto.",
-        outputs: ["Informe final del proyecto", "Registro de lecciones aprendidas"],
+        outputs: ["Documento de cierre firmado (v2)", "Actualizar lecciones aprendidas (enlace a pestaña)"],
       },
       {
-        title: "Entregar y agradecer",
-        detail: "Poner a disposición herramientas, formación y documentación al cliente.",
-        outputs: ["Acta de transición del producto/servicio final"],
+        title: "Entrega del proyecto",
+        detail: "Poner a disposición herramientas, formación y documentación al cliente / usuario final.",
+        outputs: ["Documento de transición del producto/servicio"],
       },
     ],
   },

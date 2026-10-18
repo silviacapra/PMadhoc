@@ -22,6 +22,7 @@ function StakeholderCard({ stakeholder, onUpdate, onDeleteRequest }) {
   const [rol, setRol] = useState(stakeholder.rol);
   const [ubicacion, setUbicacion] = useState(stakeholder.ubicacion);
   const [planComunicacion, setPlanComunicacion] = useState(stakeholder.planComunicacion);
+  const [showAllResponsibilities, setShowAllResponsibilities] = useState(false);
 
   function handleSave() {
     onUpdate(stakeholder.id, { rol: rol.trim(), ubicacion: ubicacion.trim(), planComunicacion: planComunicacion.trim() });
@@ -102,10 +103,18 @@ function StakeholderCard({ stakeholder, onUpdate, onDeleteRequest }) {
             <div className="stakeholder-field">
               <span className="stakeholder-label">Responsabilidad del rol</span>
               <ul className="stakeholder-responsibilities">
-                {ROLE_RESPONSIBILITIES[stakeholder.rol].map((r, i) => (
+                {(showAllResponsibilities
+                  ? ROLE_RESPONSIBILITIES[stakeholder.rol]
+                  : ROLE_RESPONSIBILITIES[stakeholder.rol].slice(0, 1)
+                ).map((r, i) => (
                   <li key={i}>{r}</li>
                 ))}
               </ul>
+              {ROLE_RESPONSIBILITIES[stakeholder.rol].length > 1 && (
+                <span className="cancel-link stakeholder-responsibilities-toggle" onClick={() => setShowAllResponsibilities((v) => !v)}>
+                  {showAllResponsibilities ? "Ver menos" : `Ver ${ROLE_RESPONSIBILITIES[stakeholder.rol].length - 1} más`}
+                </span>
+              )}
             </div>
           )}
         </>

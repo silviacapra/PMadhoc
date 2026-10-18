@@ -97,11 +97,16 @@ function PencilEditField({ value, onSave, placeholder, multiline }) {
   );
 }
 
-function OutputRow({ output, stepKey, onUpdate, onGoToTemplates }) {
+const TAB_LINK_MARKER = "(enlace a pestaña)";
+
+function OutputRow({ output, stepKey, onUpdate, onGoToTemplates, onGoToStatusReport, onGoToLecciones }) {
   const [editingLink, setEditingLink] = useState(false);
   const [draftLink, setDraftLink] = useState(output.link);
   const [editingLabel, setEditingLabel] = useState(false);
   const [draftLabel, setDraftLabel] = useState(output.label);
+
+  const isTabLink = output.label.includes(TAB_LINK_MARKER);
+  const tabTarget = isTabLink ? (/lecciones aprendidas/i.test(output.label) ? onGoToLecciones : onGoToStatusReport) : null;
 
   function startEditLink() {
     setDraftLink(output.link);
@@ -152,7 +157,16 @@ function OutputRow({ output, stepKey, onUpdate, onGoToTemplates }) {
         <PencilIcon size={12} color="currentColor" />
       </button>
 
-      {editingLink ? (
+      {isTabLink ? (
+        <div className="output-actions" onClick={(e) => e.stopPropagation()}>
+          {tabTarget && (
+            <button className="output-upload-btn output-upload-btn--set" onClick={tabTarget}>
+              <ExternalLinkIcon size={12} color="currentColor" />
+              Ir a la pestaña
+            </button>
+          )}
+        </div>
+      ) : editingLink ? (
         <div className="output-edit" onClick={(e) => e.stopPropagation()}>
           <input
             type="text"
@@ -196,7 +210,18 @@ function OutputRow({ output, stepKey, onUpdate, onGoToTemplates }) {
   );
 }
 
-export default function RoadmapStep({ step, teamMembers, onToggle, onUpdate, onUpdateOutput, onGoToKnowledge, onGoToTemplates, onGoToRiesgos }) {
+export default function RoadmapStep({
+  step,
+  teamMembers,
+  onToggle,
+  onUpdate,
+  onUpdateOutput,
+  onGoToKnowledge,
+  onGoToTemplates,
+  onGoToRiesgos,
+  onGoToStatusReport,
+  onGoToLecciones,
+}) {
   const activeDef = step.status ? ROADMAP_STEP_STATUS_DEFS[step.status] : null;
   const dotBorder = step.isDone ? "var(--status-done-dot)" : activeDef ? activeDef.dot : "#DADADA";
   const dotFill = step.isDone ? "var(--status-done-dot)" : activeDef ? activeDef.dot : "var(--white)";
@@ -255,7 +280,15 @@ export default function RoadmapStep({ step, teamMembers, onToggle, onUpdate, onU
               <label>Entregables recomendados</label>
               <div className="output-list">
                 {step.outputs.map((output) => (
-                  <OutputRow key={output.index} output={output} stepKey={step.key} onUpdate={onUpdateOutput} onGoToTemplates={onGoToTemplates} />
+                  <OutputRow
+                    key={output.index}
+                    output={output}
+                    stepKey={step.key}
+                    onUpdate={onUpdateOutput}
+                    onGoToTemplates={onGoToTemplates}
+                    onGoToStatusReport={onGoToStatusReport}
+                    onGoToLecciones={onGoToLecciones}
+                  />
                 ))}
               </div>
             </div>

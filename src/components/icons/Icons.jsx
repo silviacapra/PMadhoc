@@ -251,6 +251,14 @@ export function DownloadIcon(props) {
   );
 }
 
+export function UploadIcon(props) {
+  return (
+    <Svg {...props}>
+      <path d="M12 21V9m0 0l-4 4m4-4l4 4M4 3h16" />
+    </Svg>
+  );
+}
+
 export function SendIcon(props) {
   return (
     <Svg {...props}>

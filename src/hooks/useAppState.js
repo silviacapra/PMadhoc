@@ -91,6 +91,7 @@ export function useAppState() {
   const [profileDraft, setProfileDraft] = useState({ name: "", email: "" });
   const [profileSaved, setProfileSaved] = useState(false);
   const profileLoadedRef = useRef(false);
+  const roadmapTextMigrationRanRef = useRef(false);
   const [passwordForm, setPasswordForm] = useState(INITIAL_PASSWORD_FORM);
   const [passwordError, setPasswordError] = useState("");
   const [passwordSuccess, setPasswordSuccess] = useState(false);
@@ -254,6 +255,68 @@ export function useAppState() {
 
   // Borra los artículos-semilla huérfanos por cambios de título (mismo problema que con las
   // plantillas: el id de Firestore depende del título del artículo).
+  // El título/detalle/entregable de un paso del roadmap se graba por proyecto la primera vez
+  // que se toca ese paso (taskAssignments en Firestore), así que cambiar el texto por defecto en
+  // el código no actualiza los proyectos que ya tenían ese paso guardado con el texto antiguo.
+  // Esta limpieza de una sola vez sustituye el texto antiguo conocido por el nuevo, proyecto a
+  // proyecto, sin tocar nada que el usuario haya personalizado de verdad (solo actúa si el valor
+  // guardado coincide exactamente con el texto antiguo).
+  useEffect(() => {
+    if (!user || projects.length === 0 || roadmapTextMigrationRanRef.current) return;
+    roadmapTextMigrationRanRef.current = true;
+    const OLD_ROADMAP_STEP_TEXT = {
+      iniciar__2: { title: "Redactar el estatuto del proyecto" },
+      planificar__0: { title: "Reunión de arranque", outputs: { 0: "Agenda de la reunión de arranque" } },
+      planificar__1: {
+        title: "Desglosar tareas e hitos (EDT)",
+        detail: "Estructura de Desglose del Trabajo para definir la jerarquía del trabajo.",
+        outputs: { 0: "Estructura de Desglose del Trabajo (EDT)" },
+      },
+      ejecutar__0: { title: "Hacer seguimiento del avance", outputs: { 0: "Informe de desempeño del trabajo" } },
+      ejecutar__1: { detail: "Categorizar con ROAM y actualizar los informes de proyecto." },
+      ejecutar__3: { outputs: { 0: "Resultados de encuesta de satisfacción" } },
+      controlar__0: { outputs: { 0: "Acta de retrospectiva" } },
+      controlar__1: { outputs: { 0: "Panel de métricas" } },
+      controlar__2: { outputs: { 0: "Informe de análisis de datos" } },
+      cerrar__0: {
+        title: "Revisar la lista de verificación de cierre",
+        outputs: { 0: "Lista de verificación de cierre firmada" },
+      },
+      cerrar__1: { outputs: { 0: "Informe final del proyecto", 1: "Registro de lecciones aprendidas" } },
+      cerrar__2: {
+        title: "Entregar y agradecer",
+        detail: "Poner a disposición herramientas, formación y documentación al cliente.",
+        outputs: { 0: "Acta de transición del producto/servicio final" },
+      },
+    };
+    (async () => {
+      for (const project of projects) {
+        const ref = doc(db, "projects", project.id, "roadmap", "main");
+        const snap = await getDoc(ref);
+        if (!snap.exists()) continue;
+        const taskAssignments = snap.data().taskAssignments || {};
+        const updates = {};
+        Object.entries(OLD_ROADMAP_STEP_TEXT).forEach(([key, old]) => {
+          const meta = taskAssignments[key];
+          if (!meta) return;
+          const [phaseId, idxStr] = key.split("__");
+          const stepDef = ROADMAP_CONTENT[phaseId]?.steps[Number(idxStr)];
+          if (!stepDef) return;
+          if (old.title && meta.title === old.title) updates[`taskAssignments.${key}.title`] = stepDef.title;
+          if (old.detail && meta.detail === old.detail) updates[`taskAssignments.${key}.detail`] = stepDef.detail;
+          if (old.outputs) {
+            Object.entries(old.outputs).forEach(([outIdx, oldLabel]) => {
+              if (meta.outputs?.[outIdx]?.label === oldLabel) {
+                updates[`taskAssignments.${key}.outputs.${outIdx}.label`] = stepDef.outputs[outIdx];
+              }
+            });
+          }
+        });
+        if (Object.keys(updates).length > 0) await updateDoc(ref, updates);
+      }
+    })();
+  }, [user, projects]);
+
   useEffect(() => {
     if (!user) return;
     const OLD_ARTICLE_TITLES = ["Gate review", "WBS del proyecto", "Scrum vs. Waterfall"];
@@ -716,6 +779,11 @@ export function useAppState() {
     setView("lecciones");
   }
 
+  function openStatusReport(projectId) {
+    setStatusSelectedProjectId(projectId);
+    setView("statusreport");
+  }
+
   function updateStatusReportField(field, value) {
     const updates = { [field]: value };
     if (!statusReportDoc?.createdAt) {
@@ -969,6 +1037,7 @@ export function useAppState() {
       setTab: setFichaTab,
       openRiesgos,
       openLecciones,
+      openStatusReport,
       roadmap: {
         phases: buildPhases(
           fichaRoadmapPhase || fichaCurrentPhase || "preproyecto",
